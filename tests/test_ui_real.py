@@ -1440,7 +1440,7 @@ def test_admin_links_to_project(ui_server, browser):
         "as => as.map(a => [a.href, a.target, a.rel, a.offsetWidth > 0])")
     hrefs = [l[0] for l in links]
     assert "https://rssgate.org/" in hrefs
-    assert "https://github.com/nkavassalis/RSSgate" in hrefs
+    assert "https://github.com/evulnet/RSSgate" in hrefs
     assert all(t == "_blank" and "noopener" in r and vis for _, t, r, vis in links)
     assert pg.errors == []
     pg.close()

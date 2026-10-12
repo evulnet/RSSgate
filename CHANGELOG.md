@@ -35,6 +35,14 @@ PATCH. When in doubt, cut the smaller number and fix forward.
 Release checklist: tests green (`python -m pytest`), `__version__` bumped,
 CHANGELOG entry added, `git tag -a vX.Y.Z`, `git push --follow-tags`.
 
+## [0.82.1] — 2026-10-09
+
+### Changed
+- Repository transferred to the **evulnet** GitHub organization; admin-page
+  footer links (source / changelog / issues) now point at
+  `github.com/evulnet/RSSgate` (the old URL 301-redirects, but canonical
+  beats redirect). Origin updated; the full tag history came across intact.
+
 ## [0.82.0] — 2026-10-09
 
 ### Added
