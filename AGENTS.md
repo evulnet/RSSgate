@@ -119,6 +119,12 @@ tests/              hermetic tests + test_ui_contract.py + test_ui_real.py
   `images_mode` filters at read time (no re-digest).
 - **Read state:** dwell engine marks the topmost >=55%-visible unread card
   after `ui.read_delay` s -> beacon -> per-feed cursors (+ global in New/all).
+  Focus-gated (v0.83.0): dwell accrues only while the page is visible AND the
+  window focused (`readerActive`, driven by blur/focus/visibilitychange); a
+  background or unfocused window cancels the countdown and the timer restarts
+  from zero on return - unfocused time is never reading credit. Do not gate
+  the CLICK-to-read path (a click implies attention; gating it would break
+  test_read_marking_is_honest).
   Unread-first (`prio=1`) applies to EVERY newest-first New view, INCLUDING a
   single feed (`store.feed`) and category filters - deliberately: a feed's pip
   links to that feed, and chronologically a late arrival (published 16:08,

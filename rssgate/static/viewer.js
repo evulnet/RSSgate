@@ -94,6 +94,21 @@
   let READ_DELAY_MS = 5000;                 // ui.read_delay via /api/resume
   const visCards = new Set();
   let curCard = null, curTimer = 0;
+  // Focus gating: dwell credit accrues ONLY while the page is what the
+  // reader is actually looking at - a visible tab AND a focused window.
+  // A finishing timer in a background tab (or while the reader is in
+  // another app) used to mark posts read that nobody read. Unfocused time
+  // earns nothing; when focus returns the countdown restarts from zero.
+  let readerActive = document.visibilityState !== 'hidden'
+                     && document.hasFocus();
+  function dwellArm() {                    // (re)start the countdown fresh
+    if (curTimer) { clearTimeout(curTimer); curTimer = 0; }
+    if (!curCard || !readerActive) return;
+    if (READ_DELAY_MS <= 0) { markSeen(curCard); armRead(); return; }
+    curTimer = setTimeout(() => {
+      curTimer = 0; markSeen(curCard); armRead();
+    }, READ_DELAY_MS);
+  }
   function armRead() {
     let best = null, bestTop = Infinity;
     for (const c of visCards) {
@@ -101,15 +116,29 @@
       const t = c.getBoundingClientRect().top;
       if (t < bestTop) { best = c; bestTop = t; }
     }
-    if (best === curCard) return;          // sticky: no timer churn
+    if (best === curCard) {                // sticky: no timer churn
+      // ...unless the timer is gone and the reader is (re)focused onto it:
+      // that is a pause ending, so count again from zero
+      if (!curTimer && curCard && readerActive
+          && curCard.classList.contains('unread')) dwellArm();
+      return;
+    }
     if (curTimer) { clearTimeout(curTimer); curTimer = 0; }
     curCard = best;
-    if (!curCard) return;
-    if (READ_DELAY_MS <= 0) { markSeen(curCard); armRead(); return; }
-    curTimer = setTimeout(() => {
-      curTimer = 0; markSeen(curCard); armRead();
-    }, READ_DELAY_MS);
+    if (curCard) dwellArm();
   }
+  function dwellFocus(active) {
+    if (active === readerActive) return;
+    readerActive = active;
+    if (!active) {
+      // away: drop the partial countdown, the clock restarts on return
+      if (curTimer) { clearTimeout(curTimer); curTimer = 0; }
+    } else armRead();
+  }
+  window.addEventListener('blur', () => dwellFocus(false));
+  window.addEventListener('focus', () => dwellFocus(true));
+  document.addEventListener('visibilitychange',
+    () => dwellFocus(document.visibilityState === 'visible'));
   // "being read" = most of the card is on screen, or (cards taller than
   // the screen) it fills most of the screen - a partly-entered card never is
   const dwellObs = new IntersectionObserver(entries => {

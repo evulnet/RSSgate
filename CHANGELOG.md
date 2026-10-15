@@ -35,6 +35,24 @@ PATCH. When in doubt, cut the smaller number and fix forward.
 Release checklist: tests green (`python -m pytest`), `__version__` bumped,
 CHANGELOG entry added, `git tag -a vX.Y.Z`, `git push --follow-tags`.
 
+## [0.83.0] — 2026-10-12
+
+### Changed
+- Mark-as-read dwell is now focus-gated: it accrues only while the reader
+  page is a visible tab AND a focused window. A timer finishing in a
+  background tab or while the reader is in another app used to mark posts
+  read that nobody read; away time now earns nothing and the countdown
+  restarts from zero when the reader looks back. No new setting - it is the
+  rule, matching how the pulse pill already stops when hidden. The admin
+  Display hint states it; the click-to-read path is deliberately ungated.
+
+### Tests
+- Browser: with `ui.read_delay` shrunk to 1s, a blurred window must keep the
+  visible unread card unread for 4x the dwell, then read it after a focus
+  event re-arms the timer (config restored in a finally - the tier shares
+  one file). The existing honest-read tests prove focused behaviour is
+  untouched.
+
 ## [0.82.1] — 2026-10-09
 
 ### Changed

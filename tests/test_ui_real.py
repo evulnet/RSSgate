@@ -1284,6 +1284,47 @@ def test_read_marking_is_honest(ui_server, browser):
     pg.close()
 
 
+def test_unfocused_window_does_not_read_posts_for_you(ui_server, browser):
+    """Focus gating: dwell credit accrues only while the reader is looking.
+    With the window blurred the mark-as-read timer must never finish (a
+    timer in an unfocused window used to read posts nobody read), and on
+    focus the countdown restarts from zero - time away earns nothing."""
+    fid, _ = _mkfeed("focusdwell", url=True)
+    _seed_article(fid, "d1", title="dwell focus probe",
+                  ts="2027-03-08T00:00:00Z")
+    pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    pg.goto(ui_server, wait_until="networkidle")
+    d0 = pg.evaluate("() => fetch('/api/resume').then(r => r.json())"
+                     ".then(s => s.read_delay)")
+    try:
+        pg.evaluate("""() => fetch('/api/config', {method: 'PUT',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify({ ui: { read_delay: 1 } })})""")
+        # blur lands at DOMContentLoaded - before the stream renders, so the
+        # dwell timer never starts focused (an init script re-runs per load)
+        pg.add_init_script(
+            "document.addEventListener('DOMContentLoaded', "
+            "() => window.dispatchEvent(new Event('blur')));")
+        pg.reload(wait_until="networkidle")
+        pg.click(f"#feed-filter li[data-feed='{fid}']")
+        card = pg.locator(".card", has_text="dwell focus probe")
+        assert "unread" in card.get_attribute("class")
+        pg.wait_for_timeout(4000)                    # 4x the dwell setting
+        assert "unread" in card.get_attribute("class"), \
+            "an unfocused window marked the post read anyway"
+        # back in focus: the countdown runs fresh and the card reads
+        pg.evaluate("window.dispatchEvent(new Event('focus'))")
+        pg.wait_for_function("""() => ![...document.querySelectorAll('.card')]
+            .some(c => c.textContent.includes('dwell focus probe') &&
+                       c.classList.contains('unread'))""", timeout=6000)
+        assert pg.errors == []
+    finally:
+        pg.evaluate("""(d) => fetch('/api/config', {method: 'PUT',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify({ ui: { read_delay: d } })})""", d0)
+    pg.close()
+
+
 def test_tall_and_wide_share_buttons(ui_server, browser):
     """Each card offers two formats: tall = banner at a fixed 640px card,
     wide = magazine layout at ui.snapshot_width. Verified on the PNG that
