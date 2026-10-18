@@ -969,6 +969,23 @@
     lb.id = 'lightbox';
     lb.innerHTML = `<img src="${esc(src)}" alt="${esc(alt || '')}">
       <span class="lb-hint">click anywhere or Esc to close</span>`;
+    // max-* only CAPS: a small photo in a big desktop window sat at natural
+    // size ("a tiny image in the center of my window"). Grow to fit when
+    // there is room, but at most 2x native - beyond that we are only
+    // inventing soft pixels.
+    const im = lb.querySelector('img');
+    const fit = () => {
+      const nw = im.naturalWidth, nh = im.naturalHeight;
+      if (!nw || !nh) return;
+      const sc = Math.min(window.innerWidth * 0.92 / nw,
+                          window.innerHeight * 0.88 / nh, 2);
+      if (sc > 1) {
+        im.style.width = Math.round(nw * sc) + 'px';
+        im.style.height = Math.round(nh * sc) + 'px';
+      }
+    };
+    im.addEventListener('load', fit);
+    if (im.complete) fit();
     lb.addEventListener('click', closeLb);
     document.body.appendChild(lb);
     document.addEventListener('keydown', lbKey);

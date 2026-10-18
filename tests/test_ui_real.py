@@ -1323,6 +1323,71 @@ def test_photo_post_chip_renders(ui_server, browser):
     pg.close()
 
 
+def _flat_png(w: int, h: int, name_seed: str) -> str:
+    """Solid-colour WxH png written into the UI image cache, hash-named as
+    imgstore would (the lightbox tests need KNOWN natural sizes)."""
+    import hashlib
+    from io import BytesIO
+    from PIL import Image
+    import rssgate.imgstore as ig
+    img = Image.new("RGB", (w, h), (10, 120, 200))
+    buf = BytesIO(); img.save(buf, "PNG")
+    ig.init(str(UI_IMG_DIR))
+    fname = hashlib.sha256(name_seed.encode()).hexdigest()[:24] + ".png"
+    UI_IMG_DIR.joinpath(fname).write_bytes(buf.getvalue())
+    return fname
+
+
+def test_lightbox_grows_small_photos_to_fill_the_window(ui_server, browser):
+    """A small photo in a big desktop window must not sit at NATURAL size
+    ('a tiny image in the center'): max-* only caps, so the lightbox scales
+    UP to fit too - capped at 2x native (beyond that is just soft pixels).
+    Images already bigger than the viewport still only shrink."""
+    fid = _mkfeed("lb")
+    small = _flat_png(300, 200, f"lb-small-{fid}")
+    big = _flat_png(2000, 120, f"lb-big-{fid}")
+    _seed_article(fid, "l1", title="lb small photo", image=small,
+                  ts="2027-03-10T00:00:00Z")
+    _seed_article(fid, "l2", title="lb big photo", image=big,
+                  ts="2027-03-10T00:00:01Z")
+    pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    pg.goto(ui_server, wait_until="networkidle")
+    for _ in range(3):                    # click until provably scoped
+        pg.click(f"#feed-filter li[data-feed='{fid}']")
+        try:
+            pg.wait_for_function(
+                "() => { const cs = document.querySelectorAll('#stream .card');"
+                " return cs.length && [...cs].every(c => c.dataset.feed ==="
+                f" '{fid}'); }}", timeout=4000)
+            break
+        except Exception:
+            pg.wait_for_timeout(400)
+
+    # small photo (300x200) -> upscaled to the 2x cap: 600x400 in 1280x900
+    pg.locator(".card", has_text="lb small photo").locator("img").first.click()
+    pg.wait_for_selector("#lightbox img")
+    pg.wait_for_function(
+        "() => { const i = document.querySelector('#lightbox img');"
+        " return i.getBoundingClientRect().width > 550; }", timeout=4000)
+    box = pg.evaluate("() => { const r = document.querySelector"
+                      "('#lightbox img').getBoundingClientRect();"
+                      " return [r.width, r.height]; }")
+    assert 580 <= box[0] <= 610 and 385 <= box[1] <= 405, box
+    pg.keyboard.press("Escape")
+    pg.wait_for_selector("#lightbox", state="detached")
+
+    # big photo (2000 wide) -> shrinks to the 92vw cap, never grows past
+    # natural: no inline size set, and width <= viewport bound
+    pg.locator(".card", has_text="lb big photo").locator("img").first.click()
+    pg.wait_for_selector("#lightbox img")
+    box2 = pg.evaluate("""() => { const i = document.querySelector('#lightbox img');
+        const r = i.getBoundingClientRect();
+        return [r.width, i.naturalWidth, i.style.width]; }""")
+    assert box2[1] == 2000 and box2[2] == "" and box2[0] <= 1280 * 0.92 + 2, box2
+    assert pg.errors == []
+    pg.close()
+
+
 def test_unfocused_window_does_not_read_posts_for_you(ui_server, browser):
     """Focus gating: dwell credit accrues only while the reader is looking.
     With the window blurred the mark-as-read timer must never finish (a

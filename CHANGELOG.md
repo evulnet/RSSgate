@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.84.2] — 2026-10-18 - the lightbox grows small photos
+
+The hero lightbox only ever SHRANK (`max-width:92vw; max-height:88vh`
+caps, no growth): a small photo in a big desktop window sat at natural
+size - "a tiny image in the center of my window" (reproduced: 706x1024
+inside 2560x1440, ~27% of the width). openLb now scales up to fit when
+there is room, capped at 2x native - past that it is only inventing soft
+pixels, and the reader already asked how low-res the source was. Images
+larger than the viewport are untouched (they still shrink to the caps).
+Browser test seeds known-size images into the UI cache and asserts both
+directions: 300x200 grows to the 2x cap, 2000-wide shrinks without an
+inline size.
+
 ## [0.84.1] — 2026-10-18 - post-mortem: the rabbit post
 
 Docs only. `docs/POSTMORTEM-v0.84.0.md` walks the full v0.84.0 bug hunt as
