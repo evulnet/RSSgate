@@ -121,6 +121,28 @@ def extract_article_text(html: str, max_chars: int = 24000) -> str:
             blocks.append(text)
         if sum(len(b) for b in blocks) > max_chars:
             break
+    if sum(len(b) for b in blocks) < 120:
+        # Sites that write post bodies as bare text + <br> inside plain divs
+        # (Ameba) have NO <p> for the collector above, so a real (if thin)
+        # post reads as just its title. Words are words: harvest the divs -
+        # leaf containers contribute their <br>-split lines, containers with
+        # children contribute only their DIRECT text runs (no double count).
+        # Only fires when the <p> pass came back nearly empty, so ordinary
+        # pages never take this path.
+        for d in root.find_all("div"):
+            if _is_junk(d):
+                continue
+            if d.find("div"):
+                segs = [str(s) for s in d.find_all(string=True, recursive=False)]
+            else:
+                segs = d.get_text("\n").split("\n")
+            for seg in segs:
+                seg = seg.strip()
+                if len(seg) >= 3 and seg not in seen:
+                    seen.add(seg)
+                    blocks.append(seg)
+            if sum(len(b) for b in blocks) > max_chars:
+                break
     return "\n\n".join(blocks).strip()[:max_chars]
 
 
@@ -154,7 +176,9 @@ def extract_candidate_links(html: str, base_url: str) -> list[dict]:
 
 
 AVATAR_RE = re.compile(
-    r"(avatar|gravatar|byline|author|profile|userpic|user[-_/]|member|crew|"
+    r"(avatar|gravatar|byline|author|profile|userpic|user[-_](?!images)|member|crew|"
+    # user_images: Ameba's CONTENT CDN (real photos) - the user_ avatar
+    # heuristic must not eat it; user_avatar/user-pic stay rejected
     r"mention|staff|comment(\b|er\b|s\b|[-_/])|respondent|persona|"
     r"emoji|emoticon|icon[s]?[-/]|sprite|logo|favicon|button|badge|"
     r"signature|reaction|face[-_/]|\?s=\d{1,3}\b|&s=\d{1,3}\b)", re.I)

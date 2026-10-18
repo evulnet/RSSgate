@@ -429,6 +429,28 @@ def backfill_images(conn, cfg, limit: int = 150, page_fetches: int = 40,
 
 EXCERPT_MIN = 80     # shorter feed text isn't worth a card on its own
 FULLTEXT_MIN = 600   # feed text at least this long is digested like a page
+IMAGE_LED_MIN = 24   # a photo post still needs a few words (any language)
+
+
+def _publish_image_led(conn, art, page_html: str, text: str) -> bool:
+    """Publish a legitimately thin post (the photo-blog genre) when the page
+    carries PHOTOS and a few words: zero tokens, the images are the card and
+    the longest available text (page vs feed) is the summary. The photo
+    requirement is also the junk guard - a cookie-banner stub has neither,
+    and keeps failing. digest_source='image' cards re-enter the page-upgrade
+    ladder: if the post ever grows words, a real digest replaces it in
+    place."""
+    ft = (art["feed_text"] if "feed_text" in art.keys() else "") or ""
+    best = text if len(text) >= len(ft) else ft
+    if len(best.strip()) < IMAGE_LED_MIN:
+        return False
+    if not _cache_image(conn, art, page_html):
+        return False                     # no photos: a stub, not a photo post
+    db.set_article(conn, art["id"], summary=best.strip(), status="ready",
+                   digest_source="image", summarized_at=db.now_iso(), llm_ms=0,
+                   body_hash=hashlib.sha256(best.strip().encode()).hexdigest())
+    db.schedule_upgrade(conn, art["id"], 0)   # the page may grow words later
+    return True
 
 
 def _use_excerpt(conn, art) -> bool:
@@ -627,9 +649,13 @@ def summarize_pending(conn, cfg, llm, limit: int = 5) -> int:
                              "site served a bot check instead of the article")
                     continue
                 if len(text) < 120:
-                    if src == "auto" and _use_excerpt(conn, art):
-                        done += 1                     # page empty, feed has text
-                        continue
+                    if src == "auto":
+                        if _use_excerpt(conn, art):
+                            done += 1                     # page empty, feed text
+                            continue
+                        if _publish_image_led(conn, art, resp.text, text):
+                            done += 1              # photo post: images ARE it
+                            continue
                     fail(conn, cfg, art["id"], f"extracted text too short ({len(text)} ch)")
                     continue
                 page_html = resp.text

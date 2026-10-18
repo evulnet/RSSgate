@@ -141,8 +141,19 @@ tests/              hermetic tests + test_ui_contract.py + test_ui_real.py
   chars (`_use_excerpt`, >= `EXCERPT_MIN`); `feed` = never fetch article
   pages (teaser shown as-is, >= `FULLTEXT_MIN` chars digested by the LLM);
   `page` = never fall back. `articles.digest_source` records the outcome
-  ('' page / 'excerpt' forced fallback / 'feed' chosen) and drives the card
-  chips and the admin "N from feed excerpt" badge.
+  ('' page / 'excerpt' forced fallback / 'feed' chosen / 'image' photo-led)
+  and drives the card chips and the admin "N from feed excerpt" badge.
+  **Photo posts are content:** when BOTH text paths are under the floors but
+  the page carries photos + >= `IMAGE_LED_MIN` chars, `refresh._publish_image_led`
+  publishes as-is (longest text = summary, images cached, zero tokens,
+  digest_source='image'); the photos are the junk guard - a stub has neither,
+  and keeps failing. Image-led posts join the upgrade ladder
+  (`db.due_upgrades` includes 'image') and are replaced in place if the page
+  ever grows words. The extractor under this has two Ameba-born rules: when
+  the <p> pass finds <120 chars, div text is harvested (leaf divs by <br>
+  lines, parents by direct strings - bare-text blogs extract); AVATAR_RE
+  carves out `user_images` (Ameba's content CDN) while user_avatar/user-pic
+  stay rejected.
 - **Auto adapts to bot checks.** Each detected check bumps
   `feeds.challenge_streak` (`db.feed_challenge`); at `STREAK_LIMIT` (3) Auto
   stops requesting article pages and uses the feed's text, allowing one page
@@ -404,6 +415,11 @@ perf, docs, tests, polish. When unsure, cut smaller.
     `&&`-guarded.** Three releases of edits here died mid-script (assert
     anchor) while the `sed`/`git commit` line after them still ran. Separate
     the invocations, or use the edit tool.
+16. **Importing a test module is not running the tests.** A release step
+    reported "release guard ok" from `python -c "import tests.test_release"`
+    while the CHANGELOG format it guards was broken; pytest was green only
+    BEFORE the changelog was written. After any release-hygiene write, run
+    the guard as a test (`pytest tests/test_release.py`), not an import.
 
 ## Known follow-ups (not started)
 - systemd user unit for the live server.

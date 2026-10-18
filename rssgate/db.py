@@ -134,7 +134,8 @@ def _migrate(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE articles ADD COLUMN read_at TEXT")
     if "feed_text" not in cols:          # the feed's own excerpt/content
         conn.execute("ALTER TABLE articles ADD COLUMN feed_text TEXT")
-    if "digest_source" not in cols:      # '' = page/LLM, 'excerpt' = feed text
+    if "digest_source" not in cols:      # '' = page/LLM, 'excerpt' = feed text,
+                                         # 'image' = photo-led thin post
         conn.execute("ALTER TABLE articles ADD COLUMN digest_source TEXT"
                      " NOT NULL DEFAULT ''")
     if "categories" not in cols:
@@ -740,12 +741,13 @@ def schedule_upgrade(conn, aid: int, tries: int) -> None:
 
 
 def due_upgrades(conn, limit: int = 1) -> list[sqlite3.Row]:
-    """Excerpt posts whose page retry is due, newest first, skipping feeds
-    that are paused or currently skipping pages (unless a probe is due)."""
+    """Excerpt- and image-led posts whose page retry is due, newest first,
+    skipping feeds that are paused or currently skipping pages (unless a
+    probe is due)."""
     now = now_iso()
     return list(conn.execute(
         "SELECT a.* FROM articles a JOIN feeds f ON f.id=a.feed_id"
-        " WHERE a.status='ready' AND a.digest_source='excerpt'"
+        " WHERE a.status='ready' AND a.digest_source IN ('excerpt','image')"
         "   AND a.upgrade_at IS NOT NULL AND a.upgrade_at <= ?"
         "   AND f.enabled=1 AND f.content_source='auto'"
         "   AND COALESCE(f.backoff_until, '') <= ?"

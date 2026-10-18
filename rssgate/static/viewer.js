@@ -59,6 +59,8 @@
       ? ' <span class="chip raw excerpt" title="the full article could not be fetched (the site blocks automated readers), so this is the excerpt the feed itself provides">\u26a0 feed excerpt</span>'
       : a.digest_source === 'feed'
         ? ' <span class="chip raw" title="this feed is set to use the text the feed provides, without fetching the article page">from feed</span>'
+      : a.digest_source === 'image'
+        ? ' <span class="chip raw" title="a photo post: too little text for a digest, so the words are shown as-is and the photos carry the story (no LLM used); it upgrades itself if the page ever grows text">\ud83d\udcf7 photo post</span>'
       : a.feed_summarize === false
         ? ' <span class="chip raw" title="shown as extracted, no LLM used">raw</span>' : '';
     const sub = a.feed_description && a.feed_description !== a.feed_title

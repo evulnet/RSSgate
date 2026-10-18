@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.84.0] — 2026-10-18 - photo posts are content too (and a stuck failed post)
+
+Diagnosing the one failed post (an Ameba photo blog: 16 words + 3 rabbit
+photos) turned up two real bugs behind it, and the class of bug is bigger
+than the post.
+
+- **The extractor only spoke `<p>`.** `extract_article_text` collects
+  p/li/blockquote/h*/pre/td blocks - sites that write post bodies as bare
+  text + `<br>` inside divs (Ameba, and plenty of old-school blogs) had
+  their words invisible: the post extracted as just its title. Now, when
+  the `<p>` pass comes back nearly empty (<120 chars), divs are harvested:
+  leaf containers contribute their `<br>`-split lines, containers with
+  children only their DIRECT text runs (no double counting). Ordinary
+  pages never take the path.
+- **`user_images` was eating real photos.** The avatar filter's `user[-_/]`
+  pattern rejected Ameba's CONTENT CDN (every real photo lives under
+  `/user_images/`); it is now `user[-_](?!images)` - user_avatar/user-pic
+  stay rejected.
+- **Image-led publishing.** A post can now be legitimately thin: when both
+  text paths fall under the digest floors but the page carries PHOTOS and a
+  few words, it is published as-is - longest available text (page vs feed)
+  as the summary, images cached, ZERO tokens, `digest_source='image'`. The
+  photo requirement is the junk guard: a cookie-banner stub has neither
+  photos nor words and keeps failing exactly as before. Image-led cards
+  join the page-upgrade ladder (excerpt's 6h/24h/72h): if the post ever
+  grows words, a real digest replaces it in place. The card carries a
+  camera chip explaining itself. (This is what v0.83.0's diagnosis called
+  "the wrong status": a photo post is not a failure.)
+- **Two browser-tier flakes put down for good.** The queue-panel test read
+  the live workqueue twice and raced the scheduler claiming a post between
+  reads (my LLM fix made the queue MOVE again, which is what exposed it) -
+  it now asserts against ONE frozen snapshot and accepts an in-flight
+  digest when the snapshot holds one. The photo-post chip test clicks the
+  sidebar until the stream is provably scoped to its own feed (a click on
+  a debounced sidebar re-render left it unscoped, and shared-tier cards sat
+  past page 1). Also `db.due_upgrades` includes image-led posts.
+
 All notable changes to RSSgate are documented here. Versions follow
 **semver-with-attitude** — the criteria below are the contract for humans and
 AI agents working on this repo.

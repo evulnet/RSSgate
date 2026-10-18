@@ -1284,6 +1284,45 @@ def test_read_marking_is_honest(ui_server, browser):
     pg.close()
 
 
+def test_photo_post_chip_renders(ui_server, browser):
+    """An image-led post (digest_source='image') tells the reader WHY it has
+    no digest: the card carries a 'photo post' chip (and it is not the
+    excerpt chip's warning copy)."""
+    from rssgate import db
+    fid = _mkfeed("photochip")
+    aid = _seed_article(fid, "ph1", title="photo post probe",
+                        ts="2027-03-09T00:00:00Z")
+    conn = db.connect(UI_DB)
+    db.set_article(conn, aid, digest_source="image")
+    conn.commit(); conn.close()
+    pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    pg.goto(ui_server, wait_until="networkidle")
+    # the sidebar re-renders on a debounce (scheduleFeedSync); a click that
+    # lands on a replaced li leaves the stream UNscoped, and in the shared
+    # tier the card can sit past page 1 of all-feeds. Click until the stream
+    # is provably scoped to this feed AND the card is on screen.
+    for _ in range(3):
+        pg.click(f"#feed-filter li[data-feed='{fid}']")
+        try:
+            pg.wait_for_function(
+                "() => { const cs = document.querySelectorAll('#stream .card');"
+                " return cs.length && [...cs].every(c => c.dataset.feed ==="
+                f" '{fid}') && [...cs].some(c =>"
+                " c.textContent.includes('photo post probe')); }",
+                timeout=4000)
+            break
+        except Exception:
+            pg.wait_for_timeout(400)          # sidebar was mid-resync
+    card = pg.locator(".card", has_text="photo post probe")
+    chip = card.locator(".chip", has_text="photo post")
+    assert chip.count() == 1, (
+        "chip missing; card html: " + card.inner_html()[:400])
+    assert "photos" in chip.get_attribute("title")
+    assert card.locator(".chip.excerpt").count() == 0
+    assert pg.errors == []
+    pg.close()
+
+
 def test_unfocused_window_does_not_read_posts_for_you(ui_server, browser):
     """Focus gating: dwell credit accrues only while the reader is looking.
     With the window blurred the mark-as-read timer must never finish (a
@@ -1606,20 +1645,33 @@ def test_queue_panel_explains_idle_and_paused(ui_server, browser):
     from rssgate import db
     _mkfeed("wqwords")                            # enabled, zero posts
     pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    # The panel must mirror the API - so hand it ONE frozen snapshot for the
+    # idle-phase asserts. Reading the live API twice raced the (live!) scheduler
+    # claiming a post between reads: the panel then said 'running just now'
+    # where the test expected the idle sentence (flaked once the LLM came back
+    # and the queue actually moved).
+    snap = pg.request.get(ui_server + "/api/workqueue").json()
+    pg.route("**/api/workqueue", lambda r: r.fulfill(json=snap))
     pg.goto(ui_server + "/admin#sec-queue", wait_until="networkidle")
     # `never_summarized` is a GLOBAL count and the tier shares one session DB,
-    # so assert the panel mirrors the API rather than a fixed number
-    want = pg.evaluate(
-        "() => fetch('/api/workqueue').then(r => r.json())"
-        ".then(d => d.never_summarized)")
+    # so assert the panel mirrors the snapshot rather than a fixed number
+    want = snap["never_summarized"]
     if want:
         pg.wait_for_function(
             "document.getElementById('wq-summary').textContent"
             ".includes('no digested posts yet')", timeout=8000)
         assert f"{want} enabled feed" in pg.locator("#wq-summary").inner_text()
-        assert "no digested posts" in pg.locator("#wq-current").inner_text()
+        # wq-current mirrors the SAME snapshot: a live scheduler may hold an
+        # in-flight digest at snapshot time - assert what the snapshot shows,
+        # not a guaranteed-idle queue (the queue is not ours to freeze)
+        cur = pg.locator("#wq-current").inner_text()
+        if snap["current"]:
+            assert "running just now" in cur, cur
+        else:
+            assert "no digested posts" in cur, cur
     else:
         assert "no digested posts" not in pg.locator("#wq-summary").inner_text()
+    pg.unroute("**/api/workqueue")               # paused phase reads the truth
 
     # now a feed whose posts a site paused -> the sentence must say so
     b = _mkfeed("wqpause")
