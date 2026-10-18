@@ -9503,3 +9503,30 @@ sqlite3.InterfaceError: bad parameter or other API misuse
 2026-10-18 09:54:42,571 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
 2026-10-18 09:55:13,521 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
 2026-10-18 09:55:44,967 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+RSSgate listening on http://0.0.0.0:8088
+ * Serving Flask app 'rssgate.web'
+ * Debug mode: off
+2026-10-18 10:01:18,427 werkzeug INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8088
+ * Running on http://10.1.13.45:8088
+2026-10-18 10:01:18,427 werkzeug INFO [33mPress CTRL+C to quit[0m
+2026-10-18 10:01:18,658 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-18 10:01:19,798 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 10:01:20,805 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 10:01:21,624 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 10:01:22,432 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 10:01:25,192 werkzeug INFO 127.0.0.1 - - [18/Oct/2026 10:01:25] "GET /api/status HTTP/1.1" 200 -
+2026-10-18 10:02:06,728 rssgate.refresh INFO image backfill: 2 enriched (10 pages fetched)
+2026-10-18 10:02:51,638 werkzeug INFO 127.0.0.1 - - [18/Oct/2026 10:02:51] "GET /image/fcf3c81bf272c8c6ecfa6743.jpg HTTP/1.1" 200 -
+2026-10-18 10:02:51,645 werkzeug INFO 127.0.0.1 - - [18/Oct/2026 10:02:51] "GET /static/viewer.js HTTP/1.1" 200 -
+2026-10-18 10:02:51,659 werkzeug INFO 127.0.0.1 - - [18/Oct/2026 10:02:51] "GET /api/articles?feed_id=12&limit=200 HTTP/1.1" 200 -
+2026-10-18 10:02:58,732 werkzeug INFO 127.0.0.1 - - [18/Oct/2026 10:02:58] "GET /api/articles?feed_id=16&limit=300 HTTP/1.1" 200 -
+2026-10-18 10:03:03,541 werkzeug INFO 127.0.0.1 - - [18/Oct/2026 10:03:03] "GET /api/articles?feed_id=16&limit=300 HTTP/1.1" 200 -
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:1136: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:3578: DecompressionBombWarning: Image size (141256752 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:3578: DecompressionBombWarning: Image size (110442584 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-10-18 10:03:39,461 rssgate.maint INFO maintenance: {'ts': '2026-10-18T10:03:18Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 1, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 539.25, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}

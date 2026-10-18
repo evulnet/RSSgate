@@ -2,7 +2,9 @@
 
 Read this before changing anything. It is the map, the rules, and the scars.
 Companion docs: `docs/TESTING.md` (test tiers and helpers), `docs/API.md`
-(HTTP contract), `CHANGELOG.md` (history; one entry per release).
+(HTTP contract), `docs/POSTMORTEM-v0.84.0.md` (worked bug hunt: stacked
+failures, fixture-first diagnosis, `error`-semantics), `CHANGELOG.md`
+(history; one entry per release).
 
 ## What it is
 A local-first RSS reader: Flask + SQLite (WAL), one YAML config, a background
@@ -420,6 +422,13 @@ perf, docs, tests, polish. When unsure, cut smaller.
     while the CHANGELOG format it guards was broken; pytest was green only
     BEFORE the changelog was written. After any release-hygiene write, run
     the guard as a test (`pytest tests/test_release.py`), not an import.
+17. **`error` must mean "retrying can help."** The v0.84.0 rabbit post
+    (photo blog: 16 words + 3 photos) sat `error` because it disagreed with
+    digest floors - a missing STATUS, not a missing check. When a fix
+    restores system behavior (the LLM came back), dormant races in tests
+    that read live global state fire; freeze the state (one snapshot +
+    route stub) instead of extending timeouts. Full story:
+    `docs/POSTMORTEM-v0.84.0.md`.
 
 ## Known follow-ups (not started)
 - systemd user unit for the live server.

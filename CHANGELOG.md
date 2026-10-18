@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.84.1] — 2026-10-18 - post-mortem: the rabbit post
+
+Docs only. `docs/POSTMORTEM-v0.84.0.md` walks the full v0.84.0 bug hunt as
+a worked example: the operational false start (two models on the backend),
+the fixture that stopped a wrong fix (the "prose" was the blog tagline),
+the stacked invisibility bugs (a `<p>`-only extractor + an avatar filter
+eating `/user_images/`), the `error`-semantics gap (a photo post is not a
+failure), the two test races the LLM fix woke up, and the self-inflicted
+greens (test-module import ≠ test run; `-q -q` swallowing the summary).
+AGENTS.md gains hard-won lesson #17 (`error` must mean retrying can help)
+and the companion-doc pointer.
+
 ## [0.84.0] — 2026-10-18 - photo posts are content too (and a stuck failed post)
 
 Diagnosing the one failed post (an Ameba photo blog: 16 words + 3 rabbit
