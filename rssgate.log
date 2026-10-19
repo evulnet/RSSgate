@@ -9700,3 +9700,1162 @@ sqlite3.OperationalError: not an error
 2026-10-18 11:05:51,647 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
 2026-10-18 11:06:00,715 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:06:00] "POST /api/position HTTP/1.1" 200 -
 2026-10-18 11:06:36,002 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+RSSgate listening on http://0.0.0.0:8088
+ * Serving Flask app 'rssgate.web'
+ * Debug mode: off
+2026-10-18 11:07:39,004 werkzeug INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8088
+ * Running on http://10.1.13.45:8088
+2026-10-18 11:07:39,004 werkzeug INFO [33mPress CTRL+C to quit[0m
+2026-10-18 11:07:39,985 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 11:07:40,750 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 11:07:41,422 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 11:07:41,743 werkzeug INFO 127.0.0.1 - - [18/Oct/2026 11:07:41] "GET /api/status HTTP/1.1" 200 -
+2026-10-18 11:07:41,756 werkzeug INFO 127.0.0.1 - - [18/Oct/2026 11:07:41] "GET /static/viewer.js HTTP/1.1" 200 -
+2026-10-18 11:07:42,178 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 11:07:54,269 rssgate.refresh INFO image backfill: 0 enriched (0 pages fetched)
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:1136: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:3578: DecompressionBombWarning: Image size (141256752 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:3578: DecompressionBombWarning: Image size (110442584 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-10-18 11:10:00,045 rssgate.maint INFO maintenance: {'ts': '2026-10-18T11:09:39Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 1, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 539.72, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-18 11:37:42,372 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 11:37:43,304 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 11:37:44,096 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 11:38:15,324 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 11:40:47,051 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET / HTTP/1.1" 200 -
+2026-10-18 11:40:47,135 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-18 11:40:47,137 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET /static/style.css?v=0.84.2 HTTP/1.1" 200 -
+2026-10-18 11:40:47,138 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET /static/viewer.js?v=0.84.2 HTTP/1.1" 200 -
+2026-10-18 11:40:47,242 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET /api/resume HTTP/1.1" 200 -
+2026-10-18 11:40:47,255 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 11:40:47,256 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-18 11:40:47,324 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET /image/14386cba52fce620e35394b1.jpg HTTP/1.1" 200 -
+2026-10-18 11:40:47,325 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET /image/31c68cd8d9306762bbc0a525.jpg HTTP/1.1" 200 -
+2026-10-18 11:40:47,326 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:47] "GET /image/ba9c70c8ef021b2af0cd48c0.jpg HTTP/1.1" 200 -
+2026-10-18 11:40:49,906 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:49] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 11:40:50,195 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:50] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-18 11:40:50,272 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:50] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-18 11:40:50,276 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:50] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-17T16:25:56Z&before_id=2658&before_u=0 HTTP/1.1" 200 -
+2026-10-18 11:40:50,286 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:50] "GET /api/status HTTP/1.1" 200 -
+2026-10-18 11:40:52,274 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:52] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 11:40:53,460 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:40:53] "GET /api/qr.png?u=https://www.timeextension.com/news/2026/10/the-kings-return-is-a-new-medieval-platformer-available-in-physical-form-for-game-boy-color HTTP/1.1" 200 -
+2026-10-18 11:41:36,745 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:41:36] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 11:42:05,712 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:42:05] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 11:43:05,731 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:43:05] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 11:44:05,761 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:44:05] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 11:44:28,588 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:44:28] "GET /api/pulse?hw=2677 HTTP/1.1" 200 -
+2026-10-18 11:44:33,573 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:44:33] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 11:44:36,083 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:44:36] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 11:44:40,070 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:44:40] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 11:44:40,071 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 11:44:40] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 12:07:48,549 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 12:07:48,973 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-18 12:07:49,584 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 12:07:50,392 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 12:08:13,474 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:08:13] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 12:08:22,091 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 12:08:39,566 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:08:39] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 12:08:40,864 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:08:40] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 12:08:48,275 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:08:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 12:09:28,231 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:28] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 12:09:39,278 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-18 12:09:39,283 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 12:09:39,305 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /image/31c68cd8d9306762bbc0a525.jpg HTTP/1.1" 200 -
+2026-10-18 12:09:39,307 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /image/ba9c70c8ef021b2af0cd48c0.jpg HTTP/1.1" 200 -
+2026-10-18 12:09:39,308 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /image/6a62e7592262a2b72ec65df1.jpg HTTP/1.1" 200 -
+2026-10-18 12:09:39,308 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /image/14386cba52fce620e35394b1.jpg HTTP/1.1" 200 -
+2026-10-18 12:09:39,311 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /image/77f8c2434ab44edebde23fd3.jpg HTTP/1.1" 200 -
+2026-10-18 12:09:39,312 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /image/cb6fc5c42a88985612be015f.jpg HTTP/1.1" 200 -
+2026-10-18 12:09:39,312 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /image/fcf3c81bf272c8c6ecfa6743.jpg HTTP/1.1" 200 -
+2026-10-18 12:09:39,315 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:39] "GET /image/5efc6ebf08d5955aa400a9d3.jpg HTTP/1.1" 200 -
+2026-10-18 12:09:53,240 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:53] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 12:09:58,157 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 12:09:58] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 12:37:55,685 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 12:37:56,633 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 12:37:57,634 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 12:38:28,332 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 12:52:29,891 rssgate.refresh WARNING LLM backend unavailable, holding the queue: LLMError: chat failed (401): {"error":"Unauthorized"}
+2026-10-18 13:08:03,133 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 1 new articles
+2026-10-18 13:08:04,017 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-18 13:08:04,896 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 13:08:35,578 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 13:35:02,056 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 13:35:02] "GET /api/resume HTTP/1.1" 200 -
+2026-10-18 13:35:02,171 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 13:35:02] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 13:35:05,139 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 13:35:05] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-18 13:35:05,345 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 13:35:05] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-18 13:35:05,402 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 13:35:05] "GET /api/status HTTP/1.1" 200 -
+2026-10-18 13:38:30,482 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 13:38:31,374 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 13:38:32,252 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 13:39:03,461 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 14:08:54,192 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-18 14:08:55,216 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 14:08:55,728 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-18 14:08:56,178 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 14:08:57,051 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 14:09:27,820 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 14:39:21,403 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-18 14:39:22,387 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 14:39:23,556 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 14:39:24,428 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 14:39:55,124 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 15:09:25,235 rssgate.refresh INFO feed https://du62m9e5v3var.cloudfront.net/feed.xml: 3 new articles
+2026-10-18 15:09:26,170 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 15:09:27,480 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-18 15:09:28,304 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 15:09:59,136 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 15:39:54,833 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 15:39:55,886 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 15:39:56,766 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 15:40:27,784 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 16:10:20,510 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 16:10:20,932 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-18 16:10:21,521 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 16:10:22,365 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 16:10:53,223 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 16:39:20,208 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 16:39:20] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 16:39:21,386 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 16:39:21] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 16:39:40,250 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 16:39:40] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 16:39:41,670 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 16:39:41] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 16:40:45,078 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-18 16:40:46,257 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 16:40:47,192 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 16:40:48,073 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 16:41:18,977 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 16:41:42,437 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 16:41:42] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-18 16:48:06,842 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 16:48:06] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 16:48:06,993 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 16:48:06] "GET /api/resume HTTP/1.1" 200 -
+2026-10-18 16:48:11,511 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 16:48:11] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-18 16:48:12,306 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 16:48:12] "GET /api/status HTTP/1.1" 200 -
+2026-10-18 16:48:12,723 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 16:48:12] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-18 17:10:20,594 rssgate.maint INFO maintenance: {'ts': '2026-10-18T17:10:00Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 0, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 541.16, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-18 17:11:10,823 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 17:11:11,840 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-18 17:11:12,701 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 17:11:43,597 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 17:24:58,982 rssgate.refresh WARNING LLM backend is back; resuming the queue
+2026-10-18 17:35:08,948 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 17:35:08] "GET /api/resume HTTP/1.1" 200 -
+2026-10-18 17:35:08,998 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 17:35:08] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 17:35:11,944 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 17:35:11] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-18 17:35:12,284 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 17:35:12] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-18 17:35:12,319 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 17:35:12] "GET /api/status HTTP/1.1" 200 -
+2026-10-18 17:41:23,552 rssgate.refresh INFO feed https://feeds.arstechnica.com/arstechnica/index: 1 new articles
+2026-10-18 17:41:24,271 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 17:41:24,640 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-18 17:41:25,219 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 17:41:26,055 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 17:42:04,245 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 18:11:36,330 rssgate.refresh INFO feed https://gizmodo.com/feed: 2 new articles
+2026-10-18 18:11:37,619 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 18:11:38,038 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-18 18:11:38,621 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 18:11:39,496 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-18 18:12:41,193 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 18:41:43,506 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-18 18:41:44,354 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 18:41:45,346 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 18:41:46,208 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-18 18:42:57,755 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 19:11:59,977 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-18 19:12:00,887 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 19:12:01,907 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 19:12:02,326 rssgate.refresh INFO feed https://www.techdirt.com/feed/: 1 new articles
+2026-10-18 19:12:02,865 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 19:13:16,892 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 19:42:20,260 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 19:42:21,227 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 19:42:22,001 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-18 19:43:31,653 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 20:12:35,072 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 20:12:35,519 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-18 20:12:36,166 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 20:12:37,079 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-18 20:13:47,668 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 20:42:49,107 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET / HTTP/1.1" 200 -
+2026-10-18 20:42:49,177 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-18 20:42:49,178 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "[36mGET /static/style.css?v=0.83.0 HTTP/1.1[0m" 304 -
+2026-10-18 20:42:49,182 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET /static/viewer.js?v=0.83.0 HTTP/1.1" 200 -
+2026-10-18 20:42:49,416 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET /static/viewer.js?v=0.84.2 HTTP/1.1" 200 -
+2026-10-18 20:42:49,417 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET /static/style.css?v=0.84.2 HTTP/1.1" 200 -
+2026-10-18 20:42:49,557 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET /api/resume HTTP/1.1" 200 -
+2026-10-18 20:42:49,566 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-18 20:42:49,572 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 20:42:49,653 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET /image/20e583ce92af9357dacc6ad5.jpg HTTP/1.1" 200 -
+2026-10-18 20:42:49,653 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:49] "GET /image/d2d07eaa9de08a261bb32698.jpg HTTP/1.1" 200 -
+2026-10-18 20:42:50,320 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:50] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 20:42:51,283 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 20:42:52,706 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-18 20:42:52,716 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:52] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-18 20:42:52,717 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 20:42:52,835 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:52] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 20:42:53,070 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:53] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-18T11:00:00Z&before_id=2676&before_u=0 HTTP/1.1" 200 -
+2026-10-18 20:42:53,079 werkzeug INFO 10.1.13.44 - - [18/Oct/2026 20:42:53] "GET /api/status HTTP/1.1" 200 -
+2026-10-18 20:42:53,567 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 20:44:06,596 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 21:13:09,600 rssgate.refresh INFO feed https://du62m9e5v3var.cloudfront.net/feed.xml: 2 new articles
+2026-10-18 21:13:10,222 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 21:13:11,235 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 21:13:12,159 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 21:14:20,721 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 21:43:24,314 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 21:43:25,278 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 21:43:28,507 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 21:44:29,373 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 21:48:13,932 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 21:48:13] "GET /api/resume HTTP/1.1" 200 -
+2026-10-18 21:48:13,980 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 21:48:13] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-18 21:48:16,930 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 21:48:16] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-18 21:48:17,184 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 21:48:17] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-18 21:48:17,199 werkzeug INFO 10.2.13.2 - - [18/Oct/2026 21:48:17] "GET /api/status HTTP/1.1" 200 -
+2026-10-18 22:13:32,406 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 22:13:32,843 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-18 22:13:33,426 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 22:13:34,309 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-18 22:14:46,575 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 22:43:49,905 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 22:43:50,896 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 22:43:51,830 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 22:44:53,352 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 23:10:41,537 rssgate.maint INFO maintenance: {'ts': '2026-10-18T23:10:20Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 0, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 543.85, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-18 23:13:55,587 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-18 23:13:56,790 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 23:13:57,268 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 1 new articles
+2026-10-18 23:13:57,919 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 23:13:58,720 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 23:15:18,478 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-18 23:44:21,685 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-18 23:44:22,292 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-18 23:44:22,872 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-18 23:44:23,744 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-18 23:45:25,348 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 00:14:27,321 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 00:14:28,264 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 00:14:28,728 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 00:14:29,236 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 00:14:30,163 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 00:15:41,079 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 00:44:44,385 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 00:44:44,797 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 00:44:45,390 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 00:44:46,340 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 00:45:56,256 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 1 new articles
+2026-10-19 01:14:46,142 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 01:14:47,028 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 01:14:48,005 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 01:15:18,955 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 01:16:19,752 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 01:44:52,057 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 01:44:53,151 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 01:44:54,091 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 01:45:25,084 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 01:46:25,869 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 1 new articles
+2026-10-19 01:49:02,262 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 01:49:02] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 01:49:02,271 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 01:49:02] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 01:49:05,292 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 01:49:05] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 01:49:05,390 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 01:49:05] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 01:49:05,400 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 01:49:05] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 02:15:14,981 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 02:15:16,006 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 02:15:46,880 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 02:16:48,291 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 02:45:21,525 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 02:45:22,458 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 02:45:53,449 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 02:46:54,473 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 03:15:27,089 rssgate.refresh INFO feed https://du62m9e5v3var.cloudfront.net/feed.xml: 2 new articles
+2026-10-19 03:15:27,598 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 03:15:27,993 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 03:15:28,581 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 03:16:07,394 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 03:17:08,253 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 03:45:41,514 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 03:45:42,462 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 03:46:13,517 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 03:47:14,149 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 1 new articles
+2026-10-19 04:16:04,135 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 04:16:04,601 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 04:16:05,127 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 04:16:36,108 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 04:17:36,879 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 04:46:09,357 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 04:46:10,250 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 04:46:41,187 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 04:47:42,578 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 05:11:01,999 rssgate.maint INFO maintenance: {'ts': '2026-10-19T05:10:41Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 0, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 545.66, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-19 05:16:15,916 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 05:16:16,358 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 05:16:16,946 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 05:16:47,844 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 05:17:49,125 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 05:46:22,388 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 05:46:23,363 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 05:46:54,173 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 05:47:55,747 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 06:16:28,195 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 06:16:29,451 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 06:16:29,884 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 06:16:30,406 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 06:17:01,377 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 06:18:08,823 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 06:46:40,935 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 06:46:42,079 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 06:46:43,053 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 06:47:13,902 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 06:48:14,747 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 1 new articles
+2026-10-19 07:17:03,073 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 07:17:03,919 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 07:17:04,340 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 07:17:04,902 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 07:17:05,101 rssgate.refresh INFO feed https://automaton-media.com/en/feed/: 1 new articles
+2026-10-19 07:17:57,029 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 07:18:27,836 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 07:47:31,073 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 07:47:31,990 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 07:48:02,814 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 07:48:34,008 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 08:17:37,299 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 08:17:37,701 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 08:17:38,019 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 08:18:08,955 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 08:18:50,152 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 08:47:53,293 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 08:47:54,322 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 08:48:25,285 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 08:48:56,128 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 09:17:58,395 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 09:17:59,109 rssgate.refresh INFO feed https://du62m9e5v3var.cloudfront.net/feed.xml: 1 new articles
+2026-10-19 09:17:59,849 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 09:18:00,333 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 09:18:00,857 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-19 09:18:53,254 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 09:19:23,910 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 09:48:26,850 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 09:48:27,824 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 09:48:58,728 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 09:49:29,647 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 1 new articles
+2026-10-19 09:59:23,442 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:23] "GET / HTTP/1.1" 200 -
+2026-10-19 09:59:23,454 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:23] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-19 09:59:23,486 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:23] "[36mGET /static/viewer.js?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 09:59:23,489 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:23] "[36mGET /static/style.css?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 09:59:23,528 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:23] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 09:59:23,551 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:23] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 09:59:26,553 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:26] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 09:59:26,634 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:26] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 09:59:26,649 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 09:59:26] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 10:18:48,838 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 10:18:49,605 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 10:18:50,082 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 10:18:50,670 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-19 10:19:38,209 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 10:19:38,888 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 10:20:48,550 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:20:48] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 10:20:48,567 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:20:48] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 10:21:48,579 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:21:48] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 10:21:48,597 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:21:48] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 10:22:48,611 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:22:48] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 10:22:48,626 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:22:48] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 10:23:09,922 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:23:09] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 10:26:14,782 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:26:14] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 10:26:14,798 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 10:26:14] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 10:49:11,156 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 10:49:11,989 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 10:49:12,382 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 10:49:12,896 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 10:49:43,789 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 10:49:44,619 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 11:11:22,629 rssgate.maint INFO maintenance: {'ts': '2026-10-19T11:11:02Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 0, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 547.98, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-19 11:19:16,964 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 11:19:17,801 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 1 new articles
+2026-10-19 11:19:18,780 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-19 11:19:21,835 rssgate.refresh WARNING LLM backend unavailable, holding the queue: LLMError: chat failed (401): {"error":"Unauthorized"}
+2026-10-19 11:19:57,160 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 11:19:57,880 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 11:30:26,927 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:26] "GET / HTTP/1.1" 200 -
+2026-10-19 11:30:27,010 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /static/style.css?v=0.84.2 HTTP/1.1" 200 -
+2026-10-19 11:30:27,011 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-19 11:30:27,012 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /static/viewer.js?v=0.84.2 HTTP/1.1" 200 -
+2026-10-19 11:30:27,058 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 11:30:27,078 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:30:27,079 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 11:30:27,141 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /image/b51e725d3f7396cb52e543e5.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:27,142 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /image/42e2d79cbeab15dd72f068a3.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:27,143 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /image/7b19ebcc6f28372f9aca8fb3.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:27,143 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /image/f925e52cf05d2acaae917708.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:27,146 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:27] "GET /image/c32adfa6a3415fd7a35d7cfa.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:30,095 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:30] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 11:30:30,206 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:30] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-19 11:30:30,207 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:30] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-18T21:00:02Z&before_id=2699&before_u=1 HTTP/1.1" 200 -
+2026-10-19 11:30:30,217 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:30] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 11:30:30,956 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:30] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:31,454 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:31] "GET /image/9f42769216361e51b913b37f.png HTTP/1.1" 200 -
+2026-10-19 11:30:31,516 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:31] "GET /image/648943fc16a59931ab73185b.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:33,485 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:33] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:30:33,658 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:33] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:36,462 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:36] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:38,989 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:38] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:30:47,890 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:47] "GET /image/04f2ab8ef4b8cf5be146d5f9.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:48,876 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:49,324 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:49] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:50,188 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:50] "GET /image/a771aee3c98a53ee48cbf822.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:51,403 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:51] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:30:51,457 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:51] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:52,237 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:53,421 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:53] "GET /image/8dd48d6051dc66495a8db7a6.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:53,424 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:53] "GET /image/83937b971cc2f20e54fe7a1c.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:54,629 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:54,767 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:54] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:30:58,008 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:58] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:58,486 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:58] "GET /image/8743fb3ad8bb5e4640cf962b.jpg HTTP/1.1" 200 -
+2026-10-19 11:30:59,136 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:59] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:30:59,650 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:30:59] "GET /image/f2f24a13f7b2a2ef45e9d0e6.jpg HTTP/1.1" 200 -
+2026-10-19 11:31:01,125 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:01] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:01,652 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:01] "GET /image/0952a4ca9e6be7c65d83f1ff.jpg HTTP/1.1" 200 -
+2026-10-19 11:31:02,695 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:02] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:03,037 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:03] "GET /image/7853ba5a77b07f9d77faf330.jpg HTTP/1.1" 200 -
+2026-10-19 11:31:04,346 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:04] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:05,198 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:05] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:31:05,804 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:05] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:06,025 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:06] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:06,539 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:06] "GET /image/10daf139c6f96220f9abb308.jpg HTTP/1.1" 200 -
+2026-10-19 11:31:06,600 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:06] "GET /image/5a2f4640e1832180e8d3cdac.png HTTP/1.1" 200 -
+2026-10-19 11:31:08,533 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:08] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:31:09,738 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:09] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:11,578 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:11] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:14,078 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:14] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:31:23,435 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:23] "GET /image/999f7f8e2e93ca570c40eb4b.png HTTP/1.1" 200 -
+2026-10-19 11:31:25,020 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:25] "GET /image/8548d096d51891c78726b6f2.png HTTP/1.1" 200 -
+2026-10-19 11:31:25,149 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:25] "GET /image/9af092ba699808f8702174b6.jpg HTTP/1.1" 200 -
+2026-10-19 11:31:26,262 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:26] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:26,990 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:26] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:28,787 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:28] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:31:30,293 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:30] "GET /api/pulse?hw=2718 HTTP/1.1" 200 -
+2026-10-19 11:31:30,656 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:30] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:34,688 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:34] "GET /image/e5f21e9e7de3a8a04ff9bcca.jpg HTTP/1.1" 200 -
+2026-10-19 11:31:35,869 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:35] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:36,328 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:36] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:38,382 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:38] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:31:44,593 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:44] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:47,104 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:47] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:31:55,068 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:55] "GET /image/44c5138a13dfa074dfb770d6.jpg HTTP/1.1" 200 -
+2026-10-19 11:31:56,374 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:56] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:57,869 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:57] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:31:58,739 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:31:58] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:00,381 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:00] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:32:01,156 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:01] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:05,070 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:05] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:07,136 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:07] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:07,702 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:07] "GET /image/7763b8327db2dc151d837e7a.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:08,839 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:08] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:08,973 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:08] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:10,368 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:10] "GET /image/1816d10f10f6641697532181.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:11,021 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:11] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:11,437 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:11] "GET /image/fd497cb56bd82c528e1a5ee1.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:12,671 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:12] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:12,739 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:12] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:15,179 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:15] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:32:16,353 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:16] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:26,454 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:26] "GET /image/4966a8e9820596d9cf2284d0.png HTTP/1.1" 200 -
+2026-10-19 11:32:27,128 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:27] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:27,588 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:27] "GET /image/66499bf90374ce114b5519cf.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:28,457 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:28] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:28,927 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:28] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:29,149 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:29] "GET /image/d2d07eaa9de08a261bb32698.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:30,343 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:30] "GET /api/pulse?hw=2718 HTTP/1.1" 200 -
+2026-10-19 11:32:30,961 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:30] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:32:33,823 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:33] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:36,089 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:36] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:37,193 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:37] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:37,992 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:37] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:38,553 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:38] "GET /image/01da108e630c3bb5da3a1c98.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:39,136 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:39] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:39,794 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:39] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:41,671 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:41] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:32:43,218 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:43] "GET /image/5295f07d1ae2f197894dd73e.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:43,686 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:43] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:44,152 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:44] "GET /image/bd5fcf8d504684beec599fd5.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:45,376 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:45] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:45,419 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:45] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:47,550 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:47] "GET /image/449483be200d3056eb0fd84e.jpg HTTP/1.1" 200 -
+2026-10-19 11:32:47,907 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:47] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:32:48,733 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:50,458 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:50] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:51,261 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:51] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:32:54,523 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:32:59,124 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:32:59] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:01,268 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:01] "GET /image/c2b4f6c4041f2e6c6e706e05.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:02,557 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:02] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:03,068 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:03] "GET /image/185f5b21c4e7a514c8940158.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:03,684 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:03] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:06,212 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:06] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:33:06,240 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:06] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:10,224 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:10] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:14,354 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:14] "GET /image/9b30a314113376b4d45926aa.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:17,188 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:17] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:26,198 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:26] "GET /image/19a6fd24e60d75c229f2ffed.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:26,827 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:26] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:27,369 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:27] "GET /image/0f7c8bff774c52da08d9319a.png HTTP/1.1" 200 -
+2026-10-19 11:33:27,741 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:27] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:28,653 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:28] "GET /image/aaaaa44a9d5465b75e448b57.png HTTP/1.1" 200 -
+2026-10-19 11:33:28,749 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:28] "GET /image/421dea3315682fc13fee606b.png HTTP/1.1" 200 -
+2026-10-19 11:33:29,551 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:29] "GET /image/1f4373d3cd73bd10b3f111cc.png HTTP/1.1" 200 -
+2026-10-19 11:33:30,247 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:30] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:33:30,390 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:30] "GET /api/pulse?hw=2718 HTTP/1.1" 200 -
+2026-10-19 11:33:30,891 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:30] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:32,460 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:32] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:34,085 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:34] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:34,965 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:34] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:33:37,385 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:37] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:38,819 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:38] "GET /image/85ca4a7c8ab70cf98558fb6a.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:39,394 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:39] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:40,419 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:40] "GET /image/28e0e509c6f807aacbac919b.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:40,805 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:40] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:43,126 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:43] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:43,658 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:43] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:45,630 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:45] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:33:48,365 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:48] "GET /image/b675dcda1ac9ad51e9a0c5be.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:48,974 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:49,535 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:49] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:49,675 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:49] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:49,934 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:49] "GET /image/475f37222b595d10cb8b71c6.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:50,582 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:50] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:51,211 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:51] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:52,302 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:52] "GET /image/1e58ffe253aea11ce3ddf53c.jpg HTTP/1.1" 200 -
+2026-10-19 11:33:52,439 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:52] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-18T13:00:00Z&before_id=2679&before_u=1 HTTP/1.1" 200 -
+2026-10-19 11:33:53,094 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:53] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:33:53,117 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:53] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:53,610 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:53] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:55,649 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:55] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:33:55,867 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:55] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:57,303 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:57] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:33:58,769 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:58] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:33:58,769 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:58] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 11:33:59,830 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:59] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:33:59,931 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:33:59] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:34:02,352 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:34:02] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:34:02,353 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:34:02] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:34:52,558 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:34:52] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 11:35:52,614 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:35:52] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 11:36:47,565 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:36:47] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:39:17,190 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:17] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 11:39:20,478 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 11:39:20,483 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:39:20,513 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /image/f925e52cf05d2acaae917708.jpg HTTP/1.1" 200 -
+2026-10-19 11:39:20,516 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /image/b51e725d3f7396cb52e543e5.jpg HTTP/1.1" 200 -
+2026-10-19 11:39:20,519 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /image/42e2d79cbeab15dd72f068a3.jpg HTTP/1.1" 200 -
+2026-10-19 11:39:20,525 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /image/648943fc16a59931ab73185b.jpg HTTP/1.1" 200 -
+2026-10-19 11:39:20,526 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /image/7b19ebcc6f28372f9aca8fb3.jpg HTTP/1.1" 200 -
+2026-10-19 11:39:20,528 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /image/c32adfa6a3415fd7a35d7cfa.jpg HTTP/1.1" 200 -
+2026-10-19 11:39:20,536 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /image/9f42769216361e51b913b37f.png HTTP/1.1" 200 -
+2026-10-19 11:39:20,542 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:39:20] "GET /image/04f2ab8ef4b8cf5be146d5f9.jpg HTTP/1.1" 200 -
+2026-10-19 11:40:06,795 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:40:06] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:49:21,627 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 11:49:22,377 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 11:49:23,268 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 11:50:24,166 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 11:50:24,864 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 11:57:00,258 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:00] "GET / HTTP/1.1" 200 -
+2026-10-19 11:57:00,355 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:00] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-19 11:57:00,360 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:00] "[36mGET /static/viewer.js?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 11:57:00,362 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:00] "[36mGET /static/style.css?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 11:57:00,440 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:00] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 11:57:00,451 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:00] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 11:57:00,452 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:00] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 11:57:03,449 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:03] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 11:57:03,498 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:03] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-19 11:57:03,500 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:03] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-18T21:00:02Z&before_id=2699&before_u=0 HTTP/1.1" 200 -
+2026-10-19 11:57:03,510 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:03] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 11:57:03,648 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:03] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 11:57:03,648 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 11:57:03] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 12:13:50,787 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 12:13:50] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 12:14:02,676 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 12:14:02] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 12:19:48,939 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 12:19:49,264 rssgate.refresh INFO feed https://feeds.arstechnica.com/arstechnica/index: 1 new articles
+2026-10-19 12:19:49,955 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 12:19:50,945 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-19 12:20:51,954 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 12:20:53,044 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 12:33:26,097 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 12:33:26] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 12:34:26,116 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 12:34:26] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 12:34:46,981 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 12:34:46] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 12:50:17,093 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 12:50:17,985 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 12:50:18,456 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 1 new articles
+2026-10-19 12:50:18,927 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 12:50:19,312 rssgate.refresh INFO feed https://www.techdirt.com/feed/: 1 new articles
+2026-10-19 12:51:19,902 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 12:51:20,918 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 13:20:36,525 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 13:20:37,753 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 1 new articles
+2026-10-19 13:20:38,184 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 3 new articles
+2026-10-19 13:20:38,761 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-19 13:21:39,612 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 13:21:40,365 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 13:50:52,498 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 13:50:53,898 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 1 new articles
+2026-10-19 13:50:54,436 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 13:51:55,378 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 2 new articles
+2026-10-19 13:51:56,033 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 13:57:34,028 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:57:34] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 13:57:34,045 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:57:34] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 13:58:00,469 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:00] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 13:58:27,657 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:27] "GET /api/pulse?hw=2619 HTTP/1.1" 200 -
+2026-10-19 13:58:27,684 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:27] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 13:58:29,665 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:29] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 13:58:29,668 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:29] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 13:58:29,677 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:29] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 13:58:29,685 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:29] "GET /image/8841f3117b8f01da6b410b81.jpg HTTP/1.1" 200 -
+2026-10-19 13:58:31,433 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:31] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 13:58:33,941 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:33] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 13:58:33,950 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:33] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 13:58:36,481 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:36] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 13:58:54,121 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:58:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 13:59:44,802 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:59:44] "GET /api/pulse?hw=2735 HTTP/1.1" 200 -
+2026-10-19 13:59:49,360 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 13:59:49] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:12:32,089 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:12:32] "GET /api/pulse?hw=2735 HTTP/1.1" 200 -
+2026-10-19 14:13:31,945 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:13:31] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:15:04,950 rssgate.refresh WARNING LLM backend is back; resuming the queue
+2026-10-19 14:17:38,194 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:17:38] "GET /api/pulse?hw=2735 HTTP/1.1" 200 -
+2026-10-19 14:17:38,210 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:17:38] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 14:18:06,045 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 14:18:06,047 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 14:18:06,055 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 14:18:06,069 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /image/5f3ec955f85328cb62855233.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:06,069 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /image/af208d412e466c28dc178f20.png HTTP/1.1" 200 -
+2026-10-19 14:18:06,071 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /image/f75f1980302db62310c9f82d.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:06,072 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /image/eeaa3e768698d1316fc9b28d.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:06,073 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /image/e53dbad7ed4072624af60f8c.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:06,073 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:06] "GET /image/a8f09bf8d795e854e2f21d12.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:08,278 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:08] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:08,731 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:08] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:09,855 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:09] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:10,107 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:10] "GET /image/090d9e64ea93e06ee40021e7.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:11,011 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:11] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:11,251 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:11] "GET /image/f89b2003b6c973aef0438928.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:12,047 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:12] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:12,309 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:12] "GET /image/7893ca3ba881c1a2e1d448e9.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:12,417 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:12] "GET /image/d135950d612a2e4daa5c2c5d.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:13,048 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:13] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:13,585 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:13] "GET /image/a70b9783dd0baff3dc96459a.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:14,199 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:14] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:14,399 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:14] "GET /image/a9bba1af62d2c9cc1df1a7dc.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:14,525 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:14] "GET /image/b1ae29a5b38bb81a66a8f00f.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:15,007 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:15] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:15,850 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:15] "GET /image/b996c6adb4df0254909c5f24.jpg HTTP/1.1" 200 -
+2026-10-19 14:18:16,412 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:16] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:17,365 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:17] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:18,006 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:18] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:19,161 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:19] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:20,071 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:20] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:22,598 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:22] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 14:18:23,075 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:23] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:18:38,237 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:18:38] "GET /api/pulse?hw=2738 HTTP/1.1" 200 -
+2026-10-19 14:19:38,281 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:19:38] "GET /api/pulse?hw=2738 HTTP/1.1" 200 -
+2026-10-19 14:20:38,301 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:20:38] "GET /api/pulse?hw=2738 HTTP/1.1" 200 -
+2026-10-19 14:21:15,397 rssgate.refresh INFO feed https://gizmodo.com/feed: 2 new articles
+2026-10-19 14:21:15,689 rssgate.refresh INFO feed https://feeds.arstechnica.com/arstechnica/index: 2 new articles
+2026-10-19 14:21:16,378 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 14:21:17,205 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-19 14:21:38,344 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:38] "GET /api/pulse?hw=2738 HTTP/1.1" 200 -
+2026-10-19 14:21:38,366 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:38] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 14:21:53,083 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 14:21:53,094 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 14:21:53,102 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /image/adda8dc16482f2d2d0c6619c.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:53,102 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /image/f35f56f02b5304131e2b4480.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:53,103 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /image/8b31d1d0862b472c2cbf1ebd.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:53,104 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /image/c0d1fb5f4e1cabc7ff227a55.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:53,105 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /image/8572c3e3eef142914187085d.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:53,107 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /image/59a3f19566e9346cd804cb44.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:53,109 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /image/affa8283f624ca8ebb809ea5.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:53,114 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:53] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 14:21:54,130 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:21:54,824 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:21:55,178 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:55] "GET /image/9d64cc73f12499a4455888c7.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:55,178 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:55] "GET /image/79a48f9d9a6dde49f90f31a4.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:55,183 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:55] "GET /image/2edfbb1a23fb3537142a6292.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:56,106 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:56] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:21:56,273 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:56] "GET /image/1a73d6c9ba69622d5c23b63d.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:57,177 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:57] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:21:57,341 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:57] "GET /image/8c7c2598a6b0b27c6cbf9a68.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:57,891 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:57] "GET /image/9becebc58ec973993b994464.jpg HTTP/1.1" 200 -
+2026-10-19 14:21:58,272 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:21:58] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:22:00,005 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:00] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:22:00,560 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:00] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:22:02,515 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:02] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 14:22:05,459 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:05] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:22:07,361 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:07] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:22:07,726 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:07] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:22:09,624 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:09] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:22:09,866 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:09] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 14:22:15,962 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 14:22:16,714 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 14:22:38,387 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:38] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:22:48,235 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:22:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:23:38,433 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:23:38] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:24:38,478 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:24:38] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:25:15,887 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:25:15] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:28:29,920 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:28:29] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:29:29,962 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:29:29] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:30:29,984 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:30:29] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:31:30,002 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:31:30] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:31:52,991 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:31:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:33:35,932 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:33:35] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:33:42,721 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:33:42] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 14:48:20,761 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:48:20] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:49:20,784 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 14:49:20] "GET /api/pulse?hw=2739 HTTP/1.1" 200 -
+2026-10-19 14:51:27,157 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 14:51:28,233 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 14:51:28,674 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 14:51:29,290 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 14:52:30,359 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 14:52:31,205 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 14:58:05,963 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 14:58:05] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 14:58:06,039 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 14:58:06] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 14:58:09,225 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 14:58:09] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 14:58:12,300 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 14:58:12] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 14:58:12,379 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 14:58:12] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 15:21:38,986 rssgate.refresh INFO feed https://gizmodo.com/feed: 2 new articles
+2026-10-19 15:21:39,284 rssgate.refresh INFO feed https://feeds.arstechnica.com/arstechnica/index: 2 new articles
+2026-10-19 15:21:39,726 rssgate.refresh INFO feed https://du62m9e5v3var.cloudfront.net/feed.xml: 2 new articles
+2026-10-19 15:21:41,584 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 15:21:42,036 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 2 new articles
+2026-10-19 15:21:42,558 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-19 15:22:43,595 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 15:22:44,842 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 15:51:57,930 rssgate.refresh INFO feed https://gizmodo.com/feed: 3 new articles
+2026-10-19 15:52:00,218 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 15:53:02,249 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 2 new articles
+2026-10-19 15:53:03,311 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 16:21:58,685 rssgate.refresh INFO feed https://gizmodo.com/feed: 2 new articles
+2026-10-19 16:22:54,629 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 16:22:55,390 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 1 new articles
+2026-10-19 16:23:38,107 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 16:23:39,242 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 16:52:11,536 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 16:52:11,849 rssgate.refresh INFO feed https://feeds.arstechnica.com/arstechnica/index: 1 new articles
+2026-10-19 16:52:56,618 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 16:52:57,079 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 16:52:57,573 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 16:52:58,349 rssgate.refresh INFO feed https://www.techdirt.com/feed/: 1 new articles
+2026-10-19 16:53:58,953 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 16:53:59,885 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 17:11:43,744 rssgate.maint INFO maintenance: {'ts': '2026-10-19T17:11:22Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 0, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 560.4, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-19 17:22:40,071 rssgate.refresh INFO feed https://gizmodo.com/feed: 3 new articles
+2026-10-19 17:23:37,846 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 17:23:38,294 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 2 new articles
+2026-10-19 17:23:38,725 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 17:24:41,437 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 17:24:42,256 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 17:52:59,124 rssgate.refresh INFO feed https://gizmodo.com/feed: 0 new articles
+2026-10-19 17:54:00,270 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 17:54:00,791 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 17:54:01,199 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 17:55:02,064 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 2 new articles
+2026-10-19 17:55:03,192 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 18:10:08,389 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 18:10:08] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 18:10:08,447 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 18:10:08] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 18:10:11,709 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 18:10:11] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 18:10:11,932 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 18:10:11] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 18:10:11,967 werkzeug INFO 10.2.13.2 - - [19/Oct/2026 18:10:11] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 18:23:16,674 rssgate.refresh INFO feed https://gizmodo.com/feed: 2 new articles
+2026-10-19 18:24:13,286 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 18:24:13,735 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 18:24:14,137 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 18:24:14,591 rssgate.refresh INFO feed https://www.techdirt.com/feed/: 2 new articles
+2026-10-19 18:25:15,201 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 18:25:16,335 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 18:53:24,761 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 18:54:42,409 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 18:54:42,864 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 18:54:43,367 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 18:55:44,240 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 18:55:45,449 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 19:23:47,592 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 19:25:05,446 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 19:25:05,908 rssgate.refresh INFO feed https://www.gematsu.com/rss/: 0 new articles
+2026-10-19 19:25:06,298 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 19:25:06,599 rssgate.refresh INFO feed https://automaton-media.com/en/feed/: 4 new articles
+2026-10-19 19:26:12,929 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 19:26:14,065 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 19:48:38,151 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "GET / HTTP/1.1" 200 -
+2026-10-19 19:48:38,476 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "[36mGET /static/viewer.js?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 19:48:38,478 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "[36mGET /static/style.css?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 19:48:38,481 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-19 19:48:38,530 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 19:48:38,585 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 19:48:38,586 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:48:38,650 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "GET /image/dfcffa5e80322528b5bffd73.jpg HTTP/1.1" 200 -
+2026-10-19 19:48:38,652 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "GET /image/2b8284a1043778ab5766c7da.jpg HTTP/1.1" 200 -
+2026-10-19 19:48:38,653 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:38] "GET /image/1f841090bd4f3afb1caf7b65.jpg HTTP/1.1" 200 -
+2026-10-19 19:48:40,906 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:40] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:41,861 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:41] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:41,865 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:41] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 19:48:41,911 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:41] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-19 19:48:41,912 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:41] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-19T16:00:48Z&before_id=2760&before_u=1 HTTP/1.1" 200 -
+2026-10-19 19:48:41,922 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:41] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 19:48:42,925 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:42] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:45,432 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:45] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:48:45,738 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:45] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:46,242 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:46] "GET /image/58cccdb47d407d794f38bed4.jpg HTTP/1.1" 200 -
+2026-10-19 19:48:46,808 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:46] "GET /image/b964aed3d534fae9d8ca8458.jpg HTTP/1.1" 200 -
+2026-10-19 19:48:46,908 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:46] "GET /image/9f1658b889a1e480ef63ba0e.jpg HTTP/1.1" 200 -
+2026-10-19 19:48:48,264 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:48,287 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:48] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:48:49,057 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:49] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:49,423 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:49] "GET /image/528fef08a402d83bde1cc145.jpg HTTP/1.1" 200 -
+2026-10-19 19:48:49,524 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:49] "GET /image/0692330e8344960db60eef96.jpg HTTP/1.1" 200 -
+2026-10-19 19:48:50,769 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:50] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:51,569 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:51] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:48:54,435 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:56,941 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:56] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:48:57,179 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:57] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:59,453 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:59] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:48:59,943 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:48:59] "GET /api/qr.png?u=https://www.techpowerup.com/353885/xodus-nexus-launcher-brings-xbox-game-pass-to-steamos-and-linux-with-easy-management-and-installs HTTP/1.1" 200 -
+2026-10-19 19:49:01,975 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:01] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:09,705 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:09] "GET /image/0279c7cd1b9fd30d5cf6c1a5.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:11,034 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:11] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:14,734 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:14] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:17,220 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:17] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:17,357 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:17] "GET /image/fb5b4e7a3520c4843f783743.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:18,669 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:18] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:18,709 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:18] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:19,021 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:19] "GET /image/486a76b1006528e75d247589.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:19,157 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:19] "GET /image/ffacb144babd1f24e8de3524.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:19,870 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:19] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:20,380 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:20] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:22,371 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:22] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:23,406 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:23] "GET /api/qr.png?u=https://www.techpowerup.com/353883/galax-prepares-geforce-rtx-5090-hof-with-swarovski-crystals HTTP/1.1" 200 -
+2026-10-19 19:49:32,286 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:32] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:32,623 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:32] "GET /image/b28ce0d9778cd912ad236789.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:33,150 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:33] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:33,525 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:33] "GET /image/418548d939737f9c70314086.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:33,556 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:33] "GET /image/749143cbc3c4c1c3ac4d6538.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:34,884 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:34] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:35,650 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:35] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:38,538 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:38] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:41,040 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:41] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:41,959 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:41] "GET /api/pulse?hw=2778 HTTP/1.1" 200 -
+2026-10-19 19:49:43,840 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:43] "GET /image/87aef0ca492a70106f84507d.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:44,320 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:44] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:45,127 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:45] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:46,476 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:46] "GET /image/ae65c76d6cb1da117fea513a.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:46,823 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:46] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:47,936 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:47] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:48,300 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:49,944 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:49] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:50,438 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:50] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:50,732 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:50] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:52,021 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:52,652 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:53,111 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:53] "GET /image/b9a72df77a33b6203f260770.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:54,399 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:54,522 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:54] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:56,011 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:56] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:56,712 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:56] "GET /image/edd721c6a4fb5ee2e91c1e26.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:56,940 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:56] "GET /image/7cacaeb4a6a92a1c4103f3a8.png HTTP/1.1" 200 -
+2026-10-19 19:49:57,275 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:57] "GET /image/c151520a8e7f1adeb6ca3e49.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:58,501 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:58] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:49:58,547 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:58] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:58,588 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:58] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:49:58,940 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:58] "GET /image/392599c0ddd82b57bdc2c910.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:59,035 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:59] "GET /image/dc5b7ce1c691519162621dfd.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:59,037 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:59] "GET /image/8065583004080f032bb0e166.jpg HTTP/1.1" 200 -
+2026-10-19 19:49:59,684 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:49:59] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:00,268 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:00] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:02,209 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:02] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:50:06,394 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:06] "GET /image/6a57c88f1841d3988f5205d5.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:06,992 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:06] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:07,593 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:07] "GET /image/441cf012829338de77e850a8.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:08,163 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:08] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:08,869 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:08] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:09,694 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:09] "GET /image/692890ece522c7f6de87338b.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:10,344 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:10] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:11,032 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:11] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:12,851 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:12] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:50:39,406 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:39] "GET /image/7cc1afd88ceaccbb3b1fafa9.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:40,242 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:40] "GET /image/d77d81c89e6b0776a695b10f.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:41,147 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:41] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:41,607 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:41] "GET /image/3e01c37900342dad480f4872.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:42,009 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:42] "GET /api/pulse?hw=2778 HTTP/1.1" 200 -
+2026-10-19 19:50:42,227 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:42] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:42,884 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:42] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:44,733 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:44] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:50:45,008 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:45] "GET /image/14b85725dacb6644391d9dbd.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:45,611 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:45] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:46,707 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:46] "GET /image/c5e527dc1c7553206595bf0a.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:46,807 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:46] "GET /image/6634c0e4271b0bfa1ab32cea.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:47,364 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:47] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:48,110 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:48] "GET /image/885615d60e7392d9efee5ff9.png HTTP/1.1" 200 -
+2026-10-19 19:50:48,171 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:48] "GET /image/7125532f7006f2bb9cdec1a3.png HTTP/1.1" 200 -
+2026-10-19 19:50:48,992 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:49,474 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:49] "GET /image/af312593268f799741cd7d50.webp HTTP/1.1" 200 -
+2026-10-19 19:50:49,477 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:49] "GET /image/05d13b4e7fec96c53852ce18.webp HTTP/1.1" 200 -
+2026-10-19 19:50:49,603 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:49] "GET /image/4eb2622ca3f4a4d40f9f00e7.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:51,504 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:51] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:50:52,051 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:52,391 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:52,840 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:52] "GET /image/de1971a92d3405cde9d1a46f.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:52,972 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:52] "GET /image/76b979b054ec21e9ead3483c.jpg HTTP/1.1" 200 -
+2026-10-19 19:50:54,181 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:54,902 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:54] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:50:56,011 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:56] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:57,141 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:57] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:50:59,651 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:50:59] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:51:04,191 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:04] "GET /image/88d9cb10f9563033e60ec976.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:05,273 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:05] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:05,531 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:05] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:07,788 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:07] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:51:07,993 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:07] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:16,475 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:16] "GET /image/8b28483a69f1f146ec2b29b2.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:17,157 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:17] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:17,506 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:17] "GET /image/faa8e4ea513bc437fa54fd0a.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:17,548 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:17] "GET /image/98e0330d854fdff6ac158324.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:18,157 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:18] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:18,817 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:18] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:19,109 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:19] "GET /image/863f0f72976550f7eb8fa672.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:19,808 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:19] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:20,375 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:20] "GET /image/83083784c85cf23b2562117d.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:20,508 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:20] "GET /image/0c54bf95156e0cc0cbd4c148.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:21,098 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:21] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:21,908 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:21] "GET /image/3cba9048cc49c98d8682d416.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:21,910 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:21] "GET /image/54da57d26e0385bfc54b5fce.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:21,913 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:21] "GET /image/857b1d44cd9637b58c0ffc1f.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:21,938 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:21] "GET /image/e41e0d76cba9eccda11bb888.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:22,380 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:22] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:24,888 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:24] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:51:26,592 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:26] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:27,147 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:27] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:27,315 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:27] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-19T13:00:00Z&before_id=2782&before_u=1 HTTP/1.1" 200 -
+2026-10-19 19:51:27,351 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:27] "GET /image/c55e37a989fc0b61e48d2b9d.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:28,034 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:28] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:28,628 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:28] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:29,441 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:29] "GET /image/bd46169daa3a79607755afff.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:29,444 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:29] "GET /image/8faef63ae553aacb403befcd.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:29,446 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:29] "GET /image/521de06446fd7d26b7ef7741.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:29,512 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:29] "GET /image/28855ba2594c09debdc3b6f9.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:30,559 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:30] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:51:30,746 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:30] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:32,976 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:32] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:33,392 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:33] "GET /image/7eae77a5ad97371180b66085.jpg HTTP/1.1" 200 -
+2026-10-19 19:51:33,975 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:33] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:34,508 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:34] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-19T07:26:28Z&before_id=2784&before_u=1 HTTP/1.1" 200 -
+2026-10-19 19:51:35,504 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:35] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:35,828 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:35] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:38,039 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:38] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:51:39,593 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:39] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:40,481 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:40] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:41,432 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:41] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 19:51:41,435 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:41] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:51:42,059 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:42] "GET /api/pulse?hw=2778 HTTP/1.1" 200 -
+2026-10-19 19:51:42,102 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:42] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 19:51:42,628 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:42] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:51:51,707 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:51:51] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:53:15,719 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:53:15] "GET /api/pulse?hw=2778 HTTP/1.1" 200 -
+2026-10-19 19:53:17,431 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:53:17] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:53:18,770 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:53:18] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:53:51,957 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:53:51] "GET /api/pulse?hw=2778 HTTP/1.1" 200 -
+2026-10-19 19:53:52,851 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:53:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:54:06,044 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:54:06] "GET /api/pulse?hw=2778 HTTP/1.1" 200 -
+2026-10-19 19:54:06,905 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:54:06] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:54:06,906 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 19:54:06] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 19:54:16,612 rssgate.refresh INFO feed https://feeds.arstechnica.com/arstechnica/index: 3 new articles
+2026-10-19 19:55:08,919 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 19:55:09,801 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 19:56:40,890 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 19:56:41,681 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 20:24:43,926 rssgate.refresh INFO feed https://gizmodo.com/feed: 2 new articles
+2026-10-19 20:25:44,777 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 20:25:45,625 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 20:25:46,079 rssgate.refresh INFO feed https://www.techdirt.com/feed/: 1 new articles
+2026-10-19 20:26:46,636 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 20:26:47,404 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 20:54:49,819 rssgate.refresh INFO feed https://gizmodo.com/feed: 2 new articles
+2026-10-19 20:55:49,392 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 20:56:50,350 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 20:56:50,894 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 21:25:01,351 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-19 21:25:01,590 rssgate.refresh INFO feed https://feeds.arstechnica.com/arstechnica/index: 4 new articles
+2026-10-19 21:25:02,095 rssgate.refresh INFO feed https://du62m9e5v3var.cloudfront.net/feed.xml: 0 new articles
+2026-10-19 21:26:01,804 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 21:26:02,673 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 21:27:10,815 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 2 new articles
+2026-10-19 21:27:11,410 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 21:27:33,733 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "GET / HTTP/1.1" 200 -
+2026-10-19 21:27:33,758 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-19 21:27:33,804 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "[36mGET /static/style.css?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 21:27:33,806 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "[36mGET /static/viewer.js?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 21:27:33,856 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 21:27:33,907 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 21:27:33,910 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:27:33,939 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "GET /image/0d9f9d8726ce1d0ad5413f04.jpg HTTP/1.1" 200 -
+2026-10-19 21:27:33,940 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:33] "GET /image/929829efba2058db578ba709.jpg HTTP/1.1" 200 -
+2026-10-19 21:27:36,854 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:36] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:27:37,238 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:37] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 21:27:37,331 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:37] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-19 21:27:37,333 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:37] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-19T18:09:43Z&before_id=2776&before_u=0 HTTP/1.1" 200 -
+2026-10-19 21:27:37,343 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:37] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 21:27:38,071 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:38] "GET /image/4295742a7b3e9222e0eb75f3.jpg HTTP/1.1" 200 -
+2026-10-19 21:27:39,127 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:39] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:27:40,631 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:40] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:27:42,324 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:42] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:27:43,468 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:43] "GET /image/0fde9d24403588bdd7b0b131.jpg HTTP/1.1" 200 -
+2026-10-19 21:27:44,830 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:44] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:27:46,707 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:46] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:27:48,399 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:27:50,294 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:50] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:27:52,799 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:27:52] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:28:06,725 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:06] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:11,948 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:11] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:14,234 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:14] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:22,396 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:22] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:24,090 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:24] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:24,407 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:24] "GET /image/5e86127d1256fbffd21660c3.jpg HTTP/1.1" 200 -
+2026-10-19 21:28:24,815 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:24] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:25,730 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:25] "GET /image/d5a95e6e1708b928c798883f.jpg HTTP/1.1" 200 -
+2026-10-19 21:28:26,569 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:26] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:26,960 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:26] "GET /image/a371f3ef2b89a0502490ca85.jpg HTTP/1.1" 200 -
+2026-10-19 21:28:28,668 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:28] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:29,060 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:29] "GET /image/30a050097ebe1f8c18e22b00.jpg HTTP/1.1" 200 -
+2026-10-19 21:28:30,539 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:30] "GET /image/cb9a512090326e39811ab094.jpg HTTP/1.1" 200 -
+2026-10-19 21:28:31,175 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:31] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:28:31,607 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:31] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:31,968 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:31] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:34,125 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:34] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:28:37,366 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:37] "GET /api/pulse?hw=2800 HTTP/1.1" 200 -
+2026-10-19 21:28:38,057 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:38] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:41,213 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:41] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:41,495 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:41] "GET /image/6bcd87390950afa1f0bd74ed.jpg HTTP/1.1" 200 -
+2026-10-19 21:28:42,854 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:42] "GET /image/b861c51fd10263a6ddebe876.jpg HTTP/1.1" 200 -
+2026-10-19 21:28:43,728 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:43] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:28:44,341 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:44] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:45,936 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:45] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:47,497 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:47] "GET /image/7e40aa72268b793359b3c9a7.jpg HTTP/1.1" 200 -
+2026-10-19 21:28:48,467 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:48] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:28:49,438 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:49] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:28:53,392 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:28:53] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:01,300 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:01] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:04,533 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:04] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:06,120 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:06] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:09,414 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:09] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:09,469 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:09] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:11,985 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:11] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:29:12,582 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:12] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:13,233 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:13] "GET /image/13e9c41f5491cd052cea953e.jpg HTTP/1.1" 200 -
+2026-10-19 21:29:14,158 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:14] "GET /image/27fdbc6aaf09fdf144dd9c39.jpg HTTP/1.1" 200 -
+2026-10-19 21:29:15,116 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:15] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:29:15,591 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:15] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:15,730 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:15] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:16,298 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:16] "GET /image/55054185e2cc7733114eaf8b.webp HTTP/1.1" 200 -
+2026-10-19 21:29:17,771 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:17] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:18,136 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:18] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:18,324 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:18] "GET /image/de50162f53561b069bac5dd2.jpg HTTP/1.1" 200 -
+2026-10-19 21:29:19,628 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:19] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:20,296 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:20] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:29:24,669 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:24] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:26,087 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:26] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:26,690 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:26] "GET /image/9764f82754afc014edfe4098.jpg HTTP/1.1" 200 -
+2026-10-19 21:29:27,408 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:27] "GET /image/eebf2d4780b2d85b391967a1.jpg HTTP/1.1" 200 -
+2026-10-19 21:29:27,517 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:27] "GET /image/10a212ce1a0994be2f44be76.jpg HTTP/1.1" 200 -
+2026-10-19 21:29:28,608 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:28] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:29:28,741 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:28] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:31,935 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:31] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:34,462 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:34] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:29:37,399 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:37] "GET /api/pulse?hw=2800 HTTP/1.1" 200 -
+2026-10-19 21:29:39,351 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:39] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:39,647 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:39] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:41,981 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:41] "GET /image/dfcffa5e80322528b5bffd73.jpg HTTP/1.1" 200 -
+2026-10-19 21:29:42,152 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:42] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 21:29:43,415 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:43] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:45,382 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:45] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:52,582 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:29:54,787 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 21:29:54] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 21:55:25,809 rssgate.refresh INFO feed https://gizmodo.com/feed: 3 new articles
+2026-10-19 21:56:23,525 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 21:56:24,444 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 21:57:36,704 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 2 new articles
+2026-10-19 21:57:37,532 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 22:26:54,154 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 22:26:54,674 rssgate.refresh INFO feed https://www.techdirt.com/feed/: 1 new articles
+2026-10-19 22:27:55,329 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 22:27:56,395 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 22:41:47,225 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:47] "GET / HTTP/1.1" 200 -
+2026-10-19 22:41:47,408 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:47] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-19 22:41:47,410 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:47] "[36mGET /static/style.css?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 22:41:47,413 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:47] "[36mGET /static/viewer.js?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 22:41:47,504 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:47] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 22:41:47,516 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:47] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:41:47,518 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:47] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 22:41:47,584 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:47] "GET /image/357cfea037e244137ac03ce1.jpg HTTP/1.1" 200 -
+2026-10-19 22:41:50,907 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:50] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 22:41:50,951 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:50] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-19 22:41:50,952 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:50] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-19T19:39:19Z&before_id=2798&before_u=0 HTTP/1.1" 200 -
+2026-10-19 22:41:50,963 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:50] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 22:41:52,599 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:41:54,929 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:54] "GET /api/qr.png?u=https://www.techpowerup.com/353897/xbox-strategy-manager-says-studios-avoiding-ai-are-planning-for-a-fake-future HTTP/1.1" 200 -
+2026-10-19 22:41:55,101 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:41:55] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:42:33,780 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:33] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:34,406 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:34] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:34,765 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:34] "GET /image/4d4a0ff05f9b64970830ed62.jpg HTTP/1.1" 200 -
+2026-10-19 22:42:34,829 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:34] "GET /image/f2e716b216725adc0e8d1742.jpg HTTP/1.1" 200 -
+2026-10-19 22:42:35,527 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:35] "GET /image/201e0fc8a378cd812a2866ab.jpg HTTP/1.1" 200 -
+2026-10-19 22:42:36,295 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:36] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:42:36,552 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:36] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:36,871 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:36] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:37,114 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:37] "GET /image/9b44cd5b8856e1b497f0f784.jpg HTTP/1.1" 200 -
+2026-10-19 22:42:38,456 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:38] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:39,085 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:39] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:42:42,121 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:42] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:44,652 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:44] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:42:45,998 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:45] "GET /image/d0e0167f4d049e14c98160b8.jpg HTTP/1.1" 200 -
+2026-10-19 22:42:47,518 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:47] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:47,929 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:47] "GET /image/0d9f9d8726ce1d0ad5413f04.jpg HTTP/1.1" 200 -
+2026-10-19 22:42:48,716 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:48] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:49,264 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:49] "GET /image/929829efba2058db578ba709.jpg HTTP/1.1" 200 -
+2026-10-19 22:42:50,997 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:50] "GET /api/pulse?hw=2807 HTTP/1.1" 200 -
+2026-10-19 22:42:51,246 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:51] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:42:52,874 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:52] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:55,003 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:55] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:55,646 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:55] "GET /image/4295742a7b3e9222e0eb75f3.jpg HTTP/1.1" 200 -
+2026-10-19 22:42:56,923 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:56] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:42:57,512 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:42:57] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:56:21,377 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:21] "GET / HTTP/1.1" 200 -
+2026-10-19 22:56:21,543 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:21] "[36mGET /static/style.css?v=0.84.2 HTTP/1.1[0m" 304 -
+2026-10-19 22:56:21,545 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:21] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-19 22:56:21,547 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:21] "GET /static/viewer.js?v=0.84.2 HTTP/1.1" 200 -
+2026-10-19 22:56:21,608 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:21] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 22:56:21,647 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:21] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:56:21,649 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:21] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 22:56:22,958 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:22] "POST /api/position HTTP/1.1" 200 -
+2026-10-19 22:56:22,958 rssgate.web ERROR unhandled error on /api/position
+Traceback (most recent call last):
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/web.py", line 204, in api_position
+    if db.article_exists(conn, aid):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/db.py", line 1133, in article_exists
+    return conn.execute("SELECT 1 FROM articles WHERE id=?", (aid,)).fetchone() is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.InterfaceError: bad parameter or other API misuse
+2026-10-19 22:56:22,960 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:22] "[35m[1mPOST /api/position HTTP/1.1[0m" 500 -
+2026-10-19 22:56:25,319 werkzeug INFO 10.1.13.44 - - [19/Oct/2026 22:56:25] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 22:57:07,646 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 22:57:08,500 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 22:58:09,567 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 22:58:10,389 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 22:58:43,335 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 22:58:43] "GET /api/resume HTTP/1.1" 200 -
+2026-10-19 22:58:43,363 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 22:58:43] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-19 22:58:47,160 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 22:58:47] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-19 22:58:47,311 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 22:58:47] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-19 22:58:47,322 werkzeug INFO 10.1.13.109 - - [19/Oct/2026 22:58:47] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 23:12:07,641 rssgate.maint INFO maintenance: {'ts': '2026-10-19T23:11:43Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 1, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 566.65, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-19 23:27:13,971 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 23:27:14,738 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 23:28:15,576 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-19 23:28:16,239 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles

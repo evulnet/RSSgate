@@ -775,6 +775,7 @@
   // IDENTITY watermark (see pulseTick): ids only grow, so unlike the count
   // it cannot cancel out or ratchet when the reader consumes posts.
   let pulseSeenHw = 0, pulseShownHw = 0;
+  let pulsePipSig = null;            // last per-feed unread vector the pips showed
   // see pulseTick for what these mean
   // The pill node lives INSIDE #stream (a flex sibling of the stream steals
   // column width), and restart() does stream.innerHTML='' - which detaches
@@ -852,7 +853,22 @@
       pulseAcked = Math.max(pulseAcked, n);
       pulseSeenHw = p.high_water_id || 0;
       box.hidden = true;
+      // The boot render already showed the truth a moment ago; do NOT also
+      // rebuild the sidebar on the baseline tick (a load-time rebuild raced
+      // a sidebar click once in the tier). The pip check starts with tick 2.
+      pulsePipSig = (p.feeds || []).map(f => f.feed_id + ":" + f.unread).join(",");
       return;
+    }
+    // The sidebar pips are a snapshot of the DB taken at the last render.
+    // A read on ANOTHER DEVICE lives only in the shared DB, and a DROP in
+    // unread is "nothing new" for the pill - so only the heartbeat can heal
+    // them. The tick already carries the per-feed truth (parity-enforced
+    // with feed_unread), so follow it whenever the vector moved; the sig
+    // keeps idle minutes from rebuilding the sidebar.
+    const pipSig = (p.feeds || []).map(f => f.feed_id + ":" + f.unread).join(",");
+    if (pipSig !== pulsePipSig) {
+      pulsePipSig = pipSig;
+      renderFeedFilter().catch(() => {});
     }
     if ((p.new_since_id || 0) > 0 || n > pulseAcked) {
       pulseShown = n;
@@ -1133,7 +1149,18 @@
   }
 
   async function renderFeedFilter() {
-    const feeds = await fetch('/api/feeds').then(r => r.json());
+    // The heartbeat heals pips through this render, so a hiccupy /api/feeds
+    // (a lock behind a scheduler digest, a 500 page) must not leave the
+    // sidebar stale until the next reload: retry once after a beat. A
+    // non-OK response counts as a hiccup (an error page is not JSON).
+    let feeds;
+    try {
+      feeds = await fetch('/api/feeds').then(r => {
+        if (!r.ok) throw new Error('feeds ' + r.status); return r.json(); });
+    } catch (e) {
+      await new Promise(res => setTimeout(res, 1200));
+      feeds = await fetch('/api/feeds').then(r => r.json());
+    }
     const ul = $('feed-filter');
     ul.innerHTML = '<li data-feed="" class="' + (store.feed ? '' : 'active') + '">All feeds' + '</li>'
       + feeds.map(f => `<li data-feed="${f.id}" class="${store.feed == f.id ? 'active' : ''}"

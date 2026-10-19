@@ -163,6 +163,27 @@ def _mkfeed(prefix: str = "t", url: bool = False):
     return (fid, link) if url else fid
 
 
+def _scope(pg, fid, text=None):
+    """Click the feed's sidebar li until the stream is PROVABLY scoped to it
+    (every card belongs to the feed, and the probe text is on screen). A
+    single click can land on a li that the debounced feed-sync re-render
+    just replaced, leaving the stream unscoped and the probe card past
+    page 1 of the shared tier (this exact shape flaked three times)."""
+    probe = (f" && [...cs].some(c => c.textContent.includes('{text}'))"
+             if text else "")
+    for _ in range(3):
+        pg.click(f"#feed-filter li[data-feed='{fid}']")
+        try:
+            pg.wait_for_function(
+                "() => { const cs = document.querySelectorAll('#stream .card');"
+                f" return cs.length && [...cs].every(c => c.dataset.feed ==="
+                f" '{fid}'){probe}; }}", timeout=4000)
+            return
+        except Exception:
+            pg.wait_for_timeout(400)
+    raise AssertionError(f"stream never scoped to feed {fid} (text={text!r})")
+
+
 def _seed_article(fid: int, guid: str, title: str = "probe",
                   ts: str = "2027-01-01T00:00:00Z", status: str = "ready",
                   summary: str = "probe digest", image: str | None = None,
@@ -1388,6 +1409,58 @@ def test_lightbox_grows_small_photos_to_fill_the_window(ui_server, browser):
     pg.close()
 
 
+def test_pulse_heartbeat_refreshes_pips_after_a_read_elsewhere(ui_server, browser):
+    """Reads on another device land in the shared DB, but an open tab's
+    sidebar pips are a snapshot: a DROP in unread is 'nothing new' for the
+    pill, so only the heartbeat can heal them. The tick already carries the
+    per-feed unread truth - the pips must follow it with no reload, and an
+    UNCHANGED vector must not re-render the sidebar (lesson 14: assert the
+    request rate, not just the effect)."""
+    from rssgate import db
+    fid = _mkfeed("pipsync")
+    _seed_article(fid, "p1", title="pip sync one", ts="2027-04-01T00:00:00Z")
+    _seed_article(fid, "p2", title="pip sync two", ts="2027-04-01T00:00:01Z")
+    stub = {"newest_ts": "2027-04-01T00:00:01Z", "ready_total": 2,
+            "unread_total": 2, "unread_since_total": 0,
+            "since_ts": "2027-03-31T00:00:00Z", "every_minutes": 1,
+            "feeds": [{"feed_id": fid, "title": "pipsync", "unread": 2,
+                       "unread_since": 0, "ts": "2027-04-01T00:00:01Z"}]}
+    pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    pg.route("**/api/pulse**", lambda r: r.fulfill(json=stub))
+    pg.goto(ui_server, wait_until="networkidle")
+    pg.wait_for_selector(".card")
+    pill = pg.locator(f"#feed-filter li[data-feed='{fid}'] .unread-pill")
+    pill.wait_for()
+    assert pill.inner_text() == "2"
+
+    # the other device read one post: this is exactly the write its dwell
+    # beacon performs server-side
+    conn = db.connect(UI_DB)
+    conn.execute("UPDATE articles SET read_at=? WHERE guid='p1'",
+                 (db.now_iso(),))
+    conn.commit(); conn.close()
+    stub["unread_total"] = stub["feeds"][0]["unread"] = 1
+    pg.evaluate("window.__pulseTick()")
+    pg.wait_for_function(
+        "() => { const b = document.querySelector"
+        f"(\"#feed-filter li[data-feed='{fid}'] .unread-pill\");"
+        " return b && b.textContent === '1'; }", timeout=4000)
+    assert pg.is_hidden("#pulse"), "a DROP in unread is not an announcement"
+
+    # rate: unchanged vectors must not re-render the sidebar at all
+    def feeds_calls():
+        return pg.evaluate(
+            "performance.getEntriesByType('resource')"
+            ".filter(e => e.name.includes('/api/feeds')).length")
+    before = feeds_calls()
+    pg.evaluate("window.__pulseTick(); window.__pulseTick();"
+                "window.__pulseTick()")
+    pg.wait_for_timeout(400)
+    assert feeds_calls() == before, "idle heartbeats are drumming the sidebar"
+    assert pg.errors == []
+    pg.close()
+
+
 def test_unfocused_window_does_not_read_posts_for_you(ui_server, browser):
     """Focus gating: dwell credit accrues only while the reader is looking.
     With the window blurred the mark-as-read timer must never finish (a
@@ -2167,7 +2240,7 @@ def test_copy_link_button_copies_and_sits_left_of_the_link(ui_server, browser):
     pg = _new_page(browser, viewport={"width": 1280, "height": 900},
                    permissions=["clipboard-read", "clipboard-write"])
     pg.goto(ui_server, wait_until="networkidle")
-    pg.click(f"#feed-filter li[data-feed='{fid}']")
+    _scope(pg, fid, "copy probe")
     card = pg.locator(".card", has_text="copy probe")
     btn = card.locator(".copy-btn")
     assert btn.count() == 1
@@ -2216,7 +2289,7 @@ def test_copy_link_opens_the_share_sheet_from_the_home_screen(ui_server, browser
         Object.assign(new Error('cancel'), {name: 'AbortError'}));
     """)
     pg.reload(wait_until="networkidle")
-    pg.click(f"#feed-filter li[data-feed='{fid2}']")
+    _scope(pg, fid2, "abort probe")
     card2 = pg.locator(".card", has_text="abort probe")
     card2.locator(".copy-btn").click()
     pg.wait_for_timeout(300)
@@ -2537,6 +2610,9 @@ def test_pill_and_sidebar_pips_agree_when_it_speaks(ui_server, browser):
             "since_ts": "2027-04-01T00:00:00Z", "every_minutes": 1, "feeds": []}
     pg = _new_page(browser, viewport={"width": 1280, "height": 900})
     pg.route("**/api/pulse**", lambda r: r.fulfill(json=stub))
+    feeds_seen = []
+    pg.on("response", lambda r: feeds_seen.append(
+        (r.status, r.url)) if "/api/feeds" in r.url else None)
     pg.goto(ui_server, wait_until="domcontentloaded")
     pg.wait_for_selector(".card")
     pg.wait_for_function("window.__pulseState().booted === true", timeout=5000)
@@ -2550,9 +2626,24 @@ def test_pill_and_sidebar_pips_agree_when_it_speaks(ui_server, browser):
                         "unread_since": 2, "ts": "2027-05-03T00:00:00Z"}])
     pg.evaluate("window.__pulseTick()")
     pg.wait_for_selector("#pulse:not([hidden])", timeout=4000)
-    pg.wait_for_function(
-        f"""() => {{
-          const li = document.querySelector("#feed-filter li[data-feed='{fid}'] .unread-pill");
-          return li && li.textContent.trim() === '2'; }}""", timeout=5000)
+    try:
+        pg.wait_for_function(
+            f"""() => {{
+              const li = document.querySelector("#feed-filter li[data-feed='{fid}'] .unread-pill");
+              return li && li.textContent.trim() === '2'; }}""", timeout=5000)
+    except Exception:
+        conn = db.connect(UI_DB)
+        rows = conn.execute(
+            "SELECT guid, status, read_at, published FROM articles"
+            " WHERE feed_id=?", (fid,)).fetchall()
+        cur = conn.execute("SELECT last_read_ts FROM feeds WHERE id=?",
+                           (fid,)).fetchone()["last_read_ts"]
+        conn.close()
+        body = pg.request.get(ui_server + "/api/feeds").json()
+        mine = [x for x in body if x["id"] == fid]
+        raise AssertionError(
+            "pip stale. db rows=" + repr([tuple(r) for r in rows])
+            + f" cursor={cur!r} api={mine!r}"
+            + " feeds_responses=" + repr(feeds_seen)) from None
     assert pg.errors == []
     pg.close()

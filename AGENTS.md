@@ -323,10 +323,32 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
   answer proves the pips are stale, and arrivals used to leave the pill at 45
   with every pip empty until a feed switch
   (`test_pill_and_sidebar_pips_agree_when_it_speaks`).
+  Cross-device reads heal the same way in reverse: `read_at`/cursors live in
+  the shared DB, so a phone's read is already truth - but an open desktop
+  tab's pips are a render-time snapshot, and a DROP in unread is "nothing
+  new" for the pill. `pulseTick` therefore compares the tick's per-feed
+  unread vector (`p.feeds` `feed_id:unread`, already parity-enforced) to
+  `pulsePipSig` and re-renders the sidebar only when it moved (the sig keeps
+  idle minutes from rebuilding it). The browser test asserts BOTH the heal
+  and the rate (idle ticks must not request `/api/feeds`). Limitation: with
+  `ui.pulse_minutes=0` there is no heartbeat, so pips stay stale until a
+  reload or feed switch; and a post read OUTSIDE RSSgate (the source site
+  itself) has no signal - nothing here can know about it.
   Browser tests that assert the pill's visibility must stub `/api/pulse` (the
   tier shares one DB, so the real number is other tests' unread posts) and use
   `wait_for_function` for the hidden state - `wait_for_selector("[hidden]")`
   waits for *visible* and can never resolve.
+  **Sidebar scoping is a helper, not a click:** `pg.click(li)` can land on a
+  node the debounced feed-sync just replaced, leaving the stream UNscoped and
+  the probe card past page 1 of the shared tier (bit the chip, both copy-link
+  and the pillagree tests; each passed in isolation, which proves nothing).
+  Use `_scope(pg, fid, text)` - click until every visible card is yours and
+  the text is on screen. The remaining bare `li` clicks in older tests are
+  latent flakes; convert them when you touch those tests.
+  `renderFeedFilter` retries `/api/feeds` ONCE (non-OK counts) because the
+  heartbeat heals pips through it, and a swallowed hiccup used to leave the
+  pillagree pip stale for the rest of the page's life (the tier's scheduler
+  digests for real, so brief DB pressure is normal).
 - Theme: `ui.theme` (auto|light|dark) is admin-editable (`cfg-theme`) and
   server-rendered into `data-theme`. Anything that differs by theme MUST be a
   CSS variable (the `--ok/--warn/--danger/--accent/--link` set) - a

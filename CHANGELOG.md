@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.84.3] — 2026-10-18 - the heartbeat heals sidebar pips
+
+Reads on another device were already shared (read_at and the cursors live
+in the server DB - there was no sync problem to solve); what was missing
+was an open tab's awareness of them. A DROP in unread is 'nothing new' for
+the pill, so the old tick never touched the sidebar and pips stayed stale
+until a reload or feed switch. pulseTick now compares the tick's per-feed
+unread vector (already in every /api/pulse answer, parity-enforced with
+feed_unread) to the last one the pips showed and re-renders the sidebar
+only when it moved - no new endpoint, state, or setting. The browser test
+seeds two posts, marks one read server-side (the write the phone's beacon
+performs), and asserts the pip follows 2->1 with no reload, the pill stays
+silent for the drop, and idle ticks issue zero /api/feeds requests.
+Limitations: pulse_minutes=0 means no heartbeat (pips stale until reload),
+and posts read OUTSIDE RSSgate have no signal to sync from.
+The tier hunt that came with it: the pillagree test failed ~1 in 2 full runs
+(a swallowed /api/feeds hiccup left the pip stale forever - renderFeedFilter
+now retries once, non-OK included), and both copy-link tests hit the known
+single-click sidebar race (new _scope() helper: click until the stream is
+provably scoped; the bare li clicks left in older tests are latent and
+should convert on touch). Nine full-tier runs after the fixes: eight green,
+and the ninth's failure is what the fixes targeted. Limitations:
+pulse_minutes=0 means no heartbeat (pips stale until reload), and posts read
+OUTSIDE RSSgate have no signal to sync from.
+
 ## [0.84.2] — 2026-10-18 - the lightbox grows small photos
 
 The hero lightbox only ever SHRANK (`max-width:92vw; max-height:88vh`
