@@ -1502,6 +1502,57 @@ def test_unfocused_window_does_not_read_posts_for_you(ui_server, browser):
     pg.close()
 
 
+def test_dwell_marks_one_card_per_scroll(ui_server, browser):
+    """One stillness = one read mark. After the dwell engine reads the card
+    you are looking at, the next 55%-visible card must wait for the reader
+    to MOVE: a still page used to mark its whole visible stack read, one
+    card per delay, while only the top card was ever looked at."""
+    from rssgate import db
+    fid = _mkfeed("cascade")
+    short = "A short digest that keeps the card small enough to stack."
+    ids = [_seed_article(fid, f"c{i}", title=f"cascade probe {i}",
+                         ts=f"2027-07-0{3 - i}T00:00:00Z", summary=short)
+           for i in range(3)]        # c0 newest = top of the stream
+    pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    pg.goto(ui_server, wait_until="networkidle")
+    d0 = pg.evaluate("() => fetch('/api/resume').then(r => r.json())"
+                     ".then(s => s.read_delay)")
+    try:
+        pg.evaluate("""() => fetch('/api/config', {method: 'PUT',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify({ ui: { read_delay: 1 } })})""")
+        pg.reload(wait_until="networkidle")
+        _scope(pg, fid, "cascade probe 0")
+        card = lambda i: pg.locator(f".card[data-id='{ids[i]}']")
+        # all three short cards sit on screen; stillness reads exactly ONE
+        pg.wait_for_function(
+            f"""() => !document.querySelector('.card[data-id="{ids[0]}"]')
+                .classList.contains('unread')""", timeout=5000)
+        pg.wait_for_timeout(4000)                 # 4x the delay, no scroll
+        assert "unread" in card(1).get_attribute("class"), \
+            "the cascade marked the next card without a scroll"
+        assert "unread" in card(2).get_attribute("class")
+        # the reader moves: the next topmost visible card may now earn it
+        pg.evaluate("scrollBy(0, 60)")
+        pg.wait_for_function(
+            f"""() => !document.querySelector('.card[data-id="{ids[1]}"]')
+                .classList.contains('unread')""", timeout=5000)
+        pg.wait_for_timeout(3000)                 # and again: one per move
+        assert "unread" in card(2).get_attribute("class")
+        conn = db.connect(UI_DB)
+        got = dict(conn.execute(
+            "SELECT id, read_at IS NOT NULL FROM articles WHERE feed_id=?",
+            (fid,)).fetchall())
+        conn.close()
+        assert got[ids[0]] == 1 and got[ids[1]] == 1 and got[ids[2]] == 0
+        assert pg.errors == []
+    finally:
+        pg.evaluate("""(d) => fetch('/api/config', {method: 'PUT',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify({ ui: { read_delay: d } })})""", d0)
+    pg.close()
+
+
 def test_tall_and_wide_share_buttons(ui_server, browser):
     """Each card offers two formats: tall = banner at a fixed 640px card,
     wide = magazine layout at ui.snapshot_width. Verified on the PNG that

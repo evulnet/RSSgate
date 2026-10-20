@@ -103,12 +103,27 @@
   // earns nothing; when focus returns the countdown restarts from zero.
   let readerActive = document.visibilityState !== 'hidden'
                      && document.hasFocus();
+  // ONE mark per scroll: after a dwell mark, the next card waits for the
+  // reader to MOVE. The engine used to re-arm itself after every mark, so
+  // a still page read its whole visible stack - one card per delay - while
+  // only the top card was ever looked at. A scroll (or a focus return, or
+  // a fresh stream) re-earns the credit; the click-to-read path never
+  // needed it and never will (a click IS attention).
+  let dwellCredit = true;
   function dwellArm() {                    // (re)start the countdown fresh
-    if (curTimer) { clearTimeout(curTimer); curTimer = 0; }
+    // CLEAR FIRST, unconditionally: an early return (inactive reader) used
+    // to happen AFTER clearTimeout but BEFORE curTimer=0, so curTimer kept a
+    // dead handle; every later dwellArm then "cleared" a stale id and armed
+    // a SECOND live timer - two timers, two marks, one credit. Invariant:
+    // curTimer is 0 iff a timer is pending.
+    if (curTimer) { clearTimeout(curTimer); }
+    curTimer = 0;
     if (!curCard || !readerActive) return;
-    if (READ_DELAY_MS <= 0) { markSeen(curCard); armRead(); return; }
+    if (READ_DELAY_MS <= 0) {
+      markSeen(curCard); dwellCredit = false; armRead(); return;
+    }
     curTimer = setTimeout(() => {
-      curTimer = 0; markSeen(curCard); armRead();
+      curTimer = 0; markSeen(curCard); dwellCredit = false; armRead();
     }, READ_DELAY_MS);
   }
   function armRead() {
@@ -121,13 +136,13 @@
     if (best === curCard) {                // sticky: no timer churn
       // ...unless the timer is gone and the reader is (re)focused onto it:
       // that is a pause ending, so count again from zero
-      if (!curTimer && curCard && readerActive
+      if (!curTimer && curCard && readerActive && dwellCredit
           && curCard.classList.contains('unread')) dwellArm();
       return;
     }
     if (curTimer) { clearTimeout(curTimer); curTimer = 0; }
     curCard = best;
-    if (curCard) dwellArm();
+    if (curCard && dwellCredit) dwellArm();
   }
   function dwellFocus(active) {
     if (active === readerActive) return;
@@ -135,10 +150,16 @@
     if (!active) {
       // away: drop the partial countdown, the clock restarts on return
       if (curTimer) { clearTimeout(curTimer); curTimer = 0; }
-    } else armRead();
+    } else { dwellCredit = true; armRead(); }   // returning IS a fresh look
   }
   window.addEventListener('blur', () => dwellFocus(false));
   window.addEventListener('focus', () => dwellFocus(true));
+  // moving the page re-earns the dwell credit (see dwellCredit above);
+  // only pay when it was actually spent - an idle scroll listener must
+  // not churn the timer
+  window.addEventListener('scroll', () => {
+    if (!dwellCredit) { dwellCredit = true; armRead(); }
+  }, { passive: true });
   document.addEventListener('visibilitychange',
     () => dwellFocus(document.visibilityState === 'visible'));
   // "being read" = most of the card is on screen, or (cards taller than
@@ -312,6 +333,10 @@
     stream.innerHTML = ''; cursor = null; exhausted = false;
     seenIds.clear();
     started = false; endBanner.hidden = true;
+    dwellCredit = true;              // a fresh stream: the first card may
+    if (curTimer) { clearTimeout(curTimer); }   // earn a mark without a
+    curCard = null; curTimer = 0;               // scroll (and never leak
+                                               // the pending timer!)
     if (!keepDrawer) {
       $('sidebar').classList.remove('open'); $('sidebar-veil').classList.remove('show');
     }
@@ -932,6 +957,9 @@
     renderFeedFilter().catch(() => {});   // sidebar pips must match what loaded
   });
   window.__pulseTick = pulseTick;      // test seam: run one check now
+  window.__dwellState = () => ({cur: curCard ? curCard.dataset.id : null,
+                                credit: dwellCredit, timer: !!curTimer,
+                                active: readerActive, delay: READ_DELAY_MS});
   window.__pulseClear = pulseClear;    // test seam: re-baseline (as a click)
   window.__pulseState = () => ({acked: pulseAcked, shown: pulseShown,
                                 booted: pulseBooted, seenHw: pulseSeenHw,

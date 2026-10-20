@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.85.0] — 2026-10-20 - one read mark per scroll
+
+The dwell engine re-armed itself after every mark, so a still page read
+its whole visible stack - one card per ui.read_delay while the reader
+looked only at the top card ("marking articles as read when they're only
+partially on screen"). Now a dwell mark spends a `dwellCredit`; the next
+card waits until the reader MOVES (a scroll, a focus return, or a fresh
+stream re-earn it). The click-to-read path is untouched - a click IS
+attention - and the pass path (cards scrolled ENTIRELY past) still marks
+on scroll as always.
+
+The hunt found two timer-handle bugs underneath, both violating the same
+invariant (`curTimer` is 0 iff a timer is PENDING): dwellArm's early
+return for an inactive reader cleared the timer without zeroing the
+variable, and restart() zeroed it without clearing - each left a live
+timer whose later fire marked the NEXT card, silently defeating the
+credit. Both fixed by clearing unconditionally before any return. Debug
+seam `window.__dwellState()` joins the other test seams. New browser
+test seeds three short cards and asserts: stillness reads exactly one,
+a scroll reads the next, stillness again reads none.
+
 ## [0.84.4] — 2026-10-20 - code review of the v0.84.x run finds three
 
 A fresh-eyes review of the last four releases caught what their own tests

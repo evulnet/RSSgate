@@ -121,12 +121,24 @@ tests/              hermetic tests + test_ui_contract.py + test_ui_real.py
   `images_mode` filters at read time (no re-digest).
 - **Read state:** dwell engine marks the topmost >=55%-visible unread card
   after `ui.read_delay` s -> beacon -> per-feed cursors (+ global in New/all).
-  Focus-gated (v0.83.0): dwell accrues only while the page is visible AND the
-  window focused (`readerActive`, driven by blur/focus/visibilitychange); a
-  background or unfocused window cancels the countdown and the timer restarts
-  from zero on return - unfocused time is never reading credit. Do not gate
-  the CLICK-to-read path (a click implies attention; gating it would break
-  test_read_marking_is_honest).
+  **One mark per scroll (v0.85.0):** after a dwell mark the engine stops
+  until the reader MOVES - `dwellCredit` gates every `dwellArm` and is
+  re-earned by a scroll, a focus return, or `restart()` (a fresh stream).
+  Focus-gated (v0.83.0, never remove): dwell accrues only while the page is
+  visible AND the window focused (`readerActive`, driven by blur/focus/
+  visibilitychange); a background or unfocused window cancels the countdown
+  and the timer restarts from zero on return - unfocused time is never
+  reading credit.
+  The old engine re-armed after every mark, so a still page read its whole
+  visible stack one card per delay while only the top card was looked at
+  (`test_dwell_marks_one_card_per_scroll`). Timer discipline: `curTimer` is
+  0 iff a timer is PENDING - clear unconditionally at the top of `dwellArm`
+  and in `restart` before dropping the handle (two bugs lived here: an
+  early-return that cleared without zeroing, and a restart that zeroed
+  without clearing; each leaked a live timer whose later fire marked the
+  NEXT card, defeating the credit). Never gate the CLICK-to-read path (a
+  click implies attention; gating it would break
+  test_read_marking_is_honest). Seam: `window.__dwellState()`.
   Unread-first (`prio=1`) applies to EVERY newest-first New view, INCLUDING a
   single feed (`store.feed`) and category filters - deliberately: a feed's pip
   links to that feed, and chronologically a late arrival (published 16:08,
