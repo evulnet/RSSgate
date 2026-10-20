@@ -103,6 +103,10 @@ def test_thin_photo_page_publishes_image_led_with_zero_tokens(
                        " FROM articles WHERE id=?", (aid,)).fetchone()
     assert art["status"] == "ready" and art["digest_source"] == "image"
     assert "\u3046\u305f\u5cf6" in art["summary"]          # longest text won
+    assert "##" not in art["summary"], art["summary"]   # no markdown markers
+    # the card shows this text verbatim - the extractor's heading markers
+    # ("## title") are an LLM cue, not something to print at the reader
+    assert art["summary"].lstrip().startswith("\u3046\u305f\u5cf6")
     assert art["image"] and (tmp_path / "images" / art["image"]).read_bytes() \
         .startswith(b"\xff\xd8")
     assert llm.calls == 0                          # zero tokens spent
@@ -110,6 +114,17 @@ def test_thin_photo_page_publishes_image_led_with_zero_tokens(
     # queued for a real digest in case the page grows words later
     assert conn.execute("SELECT upgrade_at FROM articles WHERE id=?",
                         (aid,)).fetchone()["upgrade_at"]
+
+
+def test_avatar_filter_keeps_user_slash_and_carves_user_images():
+    """The v0.84.0 user_images carve-out must not widen the avatar hole:
+    user/avatar.png (a classic avatar path) stays rejected, Ameba's content
+    CDN user_images/ stays accepted. The carve-out replaced [-_/] with [-_]
+    once and silently let user/ avatars through - this test is the scar."""
+    from rssgate.extract import AVATAR_RE
+    assert AVATAR_RE.search("https://x.com/user/photo123.jpg")
+    assert AVATAR_RE.search("profile/user-2/icon.jpg")
+    assert not AVATAR_RE.search("https://stat.ameba.jp/user_images/cat.jpg")
 
 
 def test_thin_stub_without_images_still_fails(conn, cfg, tmp_path, monkeypatch):

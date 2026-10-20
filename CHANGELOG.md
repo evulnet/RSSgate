@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.84.4] — 2026-10-20 - code review of the v0.84.x run finds three
+
+A fresh-eyes review of the last four releases caught what their own tests
+could not:
+
+- **`user/` avatars walked free** (v0.84.0 regression): the user_images
+  carve-out replaced `user[-_/]` with `user[-_]`, silently dropping the
+  slash branch - images under `user/photo.jpg` paths stopped being rejected
+  as avatars. Restored to `user[-_/](?!images)`; a new test pins BOTH
+  directions (user/ rejected, user_images/ accepted) and is deliberately
+  written so the word "avatar" cannot carry it.
+- **Markdown leaked to the reader**: `_publish_image_led` published the
+  extractor's text verbatim, `## ` heading markers and all - every photo
+  post's card opened with "## title" (the live rabbit post did). The
+  markers are an LLM cue; they now come off before the summary is stored
+  (and before it is hashed). Test asserts no `##` in a card summary.
+- **The pillagree diagnostic could not diagnose**: its except path used an
+  un-imported `db` and a non-existent `published` column - a forced-failure
+  canary caught the NameError first, then the column fix was canaried too.
+  A diagnostic is code: run it red on purpose before trusting it.
+
 ## [0.84.3] — 2026-10-18 - the heartbeat heals sidebar pips
 
 Reads on another device were already shared (read_at and the cursors live

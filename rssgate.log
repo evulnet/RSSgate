@@ -10859,3 +10859,31 @@ sqlite3.InterfaceError: bad parameter or other API misuse
 2026-10-19 23:27:14,738 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
 2026-10-19 23:28:15,576 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
 2026-10-19 23:28:16,239 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+RSSgate listening on http://0.0.0.0:8088
+ * Serving Flask app 'rssgate.web'
+ * Debug mode: off
+2026-10-19 23:46:45,327 werkzeug INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8088
+ * Running on http://10.1.13.45:8088
+2026-10-19 23:46:45,327 werkzeug INFO [33mPress CTRL+C to quit[0m
+2026-10-19 23:46:45,794 rssgate.refresh INFO feed https://feeds.arstechnica.com/arstechnica/index: 1 new articles
+2026-10-19 23:46:46,486 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-19 23:46:47,432 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-19 23:46:48,249 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-19 23:46:48,252 werkzeug INFO 127.0.0.1 - - [19/Oct/2026 23:46:48] "GET /api/status HTTP/1.1" 200 -
+2026-10-19 23:46:48,266 werkzeug INFO 127.0.0.1 - - [19/Oct/2026 23:46:48] "GET /static/viewer.js HTTP/1.1" 200 -
+2026-10-19 23:46:48,772 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-19 23:47:09,994 rssgate.refresh INFO image backfill: 2 enriched (5 pages fetched)
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:1136: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:3578: DecompressionBombWarning: Image size (141256752 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:3578: DecompressionBombWarning: Image size (110442584 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-10-19 23:49:06,749 rssgate.maint INFO maintenance: {'ts': '2026-10-19T23:48:45Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 1, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 566.9, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-20 00:16:56,874 rssgate.refresh INFO feed https://gizmodo.com/feed: 1 new articles
+2026-10-20 00:16:57,764 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-20 00:16:58,668 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-20 00:16:59,505 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 1 new articles
+2026-10-20 00:17:00,274 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles

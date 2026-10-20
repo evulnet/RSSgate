@@ -442,13 +442,21 @@ def _publish_image_led(conn, art, page_html: str, text: str) -> bool:
     place."""
     ft = (art["feed_text"] if "feed_text" in art.keys() else "") or ""
     best = text if len(text) >= len(ft) else ft
-    if len(best.strip()) < IMAGE_LED_MIN:
+    best = best.strip()
+    if len(best) < IMAGE_LED_MIN:
+        return False
+    # The extractor marks headings with "## " for the LLM; this text goes to
+    # the READER verbatim, so the markdown cue must come off (it once shipped
+    # every photo post's card as "## title").
+    summary = "\n".join(ln[3:].strip() if ln.startswith("## ") else ln
+                        for ln in best.split("\n")).strip()
+    if len(summary) < IMAGE_LED_MIN:
         return False
     if not _cache_image(conn, art, page_html):
         return False                     # no photos: a stub, not a photo post
-    db.set_article(conn, art["id"], summary=best.strip(), status="ready",
+    db.set_article(conn, art["id"], summary=summary, status="ready",
                    digest_source="image", summarized_at=db.now_iso(), llm_ms=0,
-                   body_hash=hashlib.sha256(best.strip().encode()).hexdigest())
+                   body_hash=hashlib.sha256(summary.encode()).hexdigest())
     db.schedule_upgrade(conn, art["id"], 0)   # the page may grow words later
     return True
 

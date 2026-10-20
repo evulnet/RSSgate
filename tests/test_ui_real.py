@@ -2632,9 +2632,10 @@ def test_pill_and_sidebar_pips_agree_when_it_speaks(ui_server, browser):
               const li = document.querySelector("#feed-filter li[data-feed='{fid}'] .unread-pill");
               return li && li.textContent.trim() === '2'; }}""", timeout=5000)
     except Exception:
+        from rssgate import db
         conn = db.connect(UI_DB)
         rows = conn.execute(
-            "SELECT guid, status, read_at, published FROM articles"
+            "SELECT guid, status, read_at, published_at FROM articles"
             " WHERE feed_id=?", (fid,)).fetchall()
         cur = conn.execute("SELECT last_read_ts FROM feeds WHERE id=?",
                            (fid,)).fetchone()["last_read_ts"]

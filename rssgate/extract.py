@@ -176,7 +176,7 @@ def extract_candidate_links(html: str, base_url: str) -> list[dict]:
 
 
 AVATAR_RE = re.compile(
-    r"(avatar|gravatar|byline|author|profile|userpic|user[-_](?!images)|member|crew|"
+    r"(avatar|gravatar|byline|author|profile|userpic|user[-_/](?!images)|member|crew|"
     # user_images: Ameba's CONTENT CDN (real photos) - the user_ avatar
     # heuristic must not eat it; user_avatar/user-pic stay rejected
     r"mention|staff|comment(\b|er\b|s\b|[-_/])|respondent|persona|"
