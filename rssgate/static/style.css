@@ -118,6 +118,15 @@ body { margin:0; background:var(--bg); color:var(--text);
 .boot-error[hidden] { display:none !important; }
 .boot-error h2 { color:var(--text); margin:0 0 .5rem; }
 .boot-error p { margin:0 0 .9rem; }
+
+/* back to top: pure navigation, mid-page only (refresh stays the sticky
+   top-bar button's job). fixed + theme variables; under the lightbox (100) */
+#to-top { position:fixed; right:16px; bottom:16px; z-index:30;
+  width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+  background:var(--bg); color:var(--text); font-size:1.25rem; line-height:1;
+  cursor:pointer; box-shadow:var(--shadow); display:flex;
+  align-items:center; justify-content:center; }
+#to-top:hover { border-color:var(--accent); color:var(--accent); }
 .new-above { text-align:center; margin:10px auto 0; max-width:520px; }
 .new-above[hidden] { display:none; }
 .new-above .btn { width:100%; }

@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.86.0] — 2026-10-20 - back to top, one tap from anywhere
+
+Mid-way down a long session the only way home was the sticky top-bar
+refresh (which also polls and rebuilds the stream) or an honest scroll.
+Now a floating round button appears past ~1.5 screens, bottom-right of
+the stream, and ONE tap lands at the top - pure navigation: it never
+touches /api/poll (the browser test counts the requests to prove it),
+and at the top it hides (PTR and the sticky refresh own the top).
+Smooth scroll for short hops, instant for long ones, instant under
+prefers-reduced-motion. The brand link gains its classic idiom: mid-page
+it jumps home instead of reloading. position:FIXED outside #stream -
+restart() empties that node (the pill's detach scar) and a sibling would
+squeeze the flex column. The jump fires a scroll event, so it re-earns
+the dwell credit: returning to the top is a fresh reading session, and
+unread-first has already parked the unread queue up there.
+
 ## [0.85.0] — 2026-10-20 - one read mark per scroll
 
 The dwell engine re-armed itself after every mark, so a still page read

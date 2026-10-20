@@ -1135,6 +1135,30 @@
     setBusy(false);
   });
 
+  // ---- back to top: pure navigation (refresh stays the sticky ⟳'s job).
+  // Appears past ~1.5 screens; one tap lands at the top, where unread-first
+  // has already parked the unread queue. The jump fires a scroll event, so
+  // it re-earns the dwell credit - returning IS a fresh reading session.
+  const toTopBtn = $('to-top');
+  let toTopShown = false;
+  function toTopSync() {
+    const want = window.scrollY > window.innerHeight * 1.5;
+    if (want !== toTopShown) { toTopShown = want; toTopBtn.hidden = !want; }
+  }
+  window.addEventListener('scroll', toTopSync, { passive: true });
+  function jumpTop() {
+    // smooth only for short hops - easing down a 300-card session is a
+    // slideshow; reduced-motion readers get instant, always
+    const smooth = window.scrollY < window.innerHeight * 3
+      && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+  }
+  toTopBtn.addEventListener('click', jumpTop);
+  // the classic site idiom: mid-page, the brand is a jump, not a reload
+  document.querySelector('.brand').addEventListener('click', e => {
+    if (window.scrollY > 4) { e.preventDefault(); jumpTop(); }
+  });
+
   function setFeedFilter(id) {
     store.feed = id;
     document.querySelectorAll('#feed-filter li').forEach(li =>

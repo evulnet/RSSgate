@@ -72,6 +72,11 @@ RSSgate</title>
     wait a few seconds and try again &mdash; your place in the reading is kept.</p>
     <p><button id="boot-retry" class="btn" type="button">Try again</button></p>
   </div>
+  <!-- position:FIXED outside #stream: restart() empties #stream (a child
+       would be detached for the session - the pill's scar), and a sibling
+       of #stream would be a flex ITEM of .layout and squeeze the column. -->
+  <button id="to-top" type="button" hidden
+          aria-label="Back to top" title="Back to top">&#8593;</button>
 </div>
 
 <div id="new-above" class="new-above" hidden>

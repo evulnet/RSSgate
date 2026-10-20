@@ -198,6 +198,11 @@ tests/              hermetic tests + test_ui_contract.py + test_ui_real.py
 - **Refresh:** button and pull-to-refresh share `doRefreshWork()`: POST
   /api/poll -> settle wait unless throttled -> restart stream -> refresh
   pips. The top rail (`#stream-progress`, min 400 ms) is the one busy signal.
+  **Back to top (v0.86.0):** `#to-top` (fixed, outside #stream - restart()
+  empties that node) appears past 1.5 screens; one tap jumps home and
+  NEVER polls (nav only - refresh stays the sticky button's job). The
+  `.brand` link mid-page is a jump, not a reload. The jump re-earns the
+  dwell credit via its scroll event.
 
 ## Share card (viewer.js) - read before touching
 ```

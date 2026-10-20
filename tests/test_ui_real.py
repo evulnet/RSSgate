@@ -1461,6 +1461,48 @@ def test_pulse_heartbeat_refreshes_pips_after_a_read_elsewhere(ui_server, browse
     pg.close()
 
 
+def test_back_to_top_button_appears_and_jumps(ui_server, browser):
+    """Mid-way down a long session, a floating button appears (past ~1.5
+    screens) and ONE tap returns to the top - pure navigation: it must not
+    poll feeds (refresh stays the sticky top-bar button's job). At the top
+    it hides. The brand link keeps its classic idiom: mid-page it jumps
+    home instead of reloading."""
+    fid = _mkfeed("totop")
+    long = " ".join(f"Sentence {i} of a digest body that makes cards tall."
+                   for i in range(40))
+    for i in range(12):
+        _seed_article(fid, f"t{i}", title=f"top probe {i}",
+                      ts=f"2027-08-{20 - i:02d}T00:00:00Z", summary=long)
+    pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    pg.goto(ui_server, wait_until="networkidle")
+    _scope(pg, fid)
+    assert pg.is_hidden("#to-top"), "the button looms at the top of the page"
+
+    pg.evaluate("scrollTo(0, document.body.scrollHeight)")
+    pg.wait_for_selector("#to-top:not([hidden])", timeout=4000)
+
+    def polls():
+        return pg.evaluate(
+            "performance.getEntriesByType('resource')"
+            ".filter(e => e.name.includes('/api/poll')).length")
+    before = polls()
+    pg.click("#to-top")
+    pg.wait_for_function("() => window.scrollY < 50", timeout=5000)
+    assert polls() == before, "back-to-top asked the server to fetch feeds"
+    # the hide rides the LAST scroll event (Chrome coalesces them); wait for
+    # it rather than racing the tail of a smooth scroll
+    pg.wait_for_selector("#to-top", state="hidden", timeout=4000)
+
+    # the brand idiom: mid-page it is a jump, not a reload
+    pg.evaluate("scrollTo(0, 2000)")
+    pg.wait_for_selector("#to-top:not([hidden])", timeout=4000)
+    pg.click(".brand")
+    pg.wait_for_function("() => window.scrollY < 50", timeout=5000)
+    assert "/" in pg.url
+    assert pg.errors == []
+    pg.close()
+
+
 def test_unfocused_window_does_not_read_posts_for_you(ui_server, browser):
     """Focus gating: dwell credit accrues only while the reader is looking.
     With the window blurred the mark-as-read timer must never finish (a
