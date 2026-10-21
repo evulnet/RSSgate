@@ -194,6 +194,18 @@ tests/              hermetic tests + test_ui_contract.py + test_ui_real.py
   first 300 chars - real digests can end with caveats). Refusals are never
   published and never served from the hash cache; maintenance
   `requeue_refusals` repairs old ones.
+  `is_boilerplate` (v0.87.3) is the PRE-call gate for pages that extract
+  long but say nothing: strips label lines (ending in ':'), markdown
+  headings and `ARCHIVE_NOTICE_RE` lines ("This is a Techmeme archive
+  page" - every Techmeme item link is a snapshot whose ~250-char notice
+  cleared the 120 floor and shipped a refusal twice); if the rest is
+  <120 chars the LLM is never asked: auto falls back to the feed excerpt
+  (never image-led - nav text is not a summary and aggregator pages are
+  full of thumbnails), page-mode fails with "page is navigation". The
+  upgrade ladder treats boilerplate as still-not-ready (reschedules, zero
+  tokens). Widened REFUSAL_RE covers "cannot produce a faithful digest",
+  "no summary can be produced", "contains no article content", "consists
+  entirely of" - the exact shipped phrasings.
 - **Digest queue:** `claim_pending` takes the NEWEST pending post first
   (across feeds, skipping paused feeds), so a new feed's latest posts
   digest first and its backlog drips in at the paced rate.

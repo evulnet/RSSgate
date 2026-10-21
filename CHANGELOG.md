@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.87.3] — 2026-10-21 - don't ask the LLM about a page with no article
+
+A Techmeme item shipped with the model's refusal as its digest ("I
+cannot produce a faithful digest..."). The user's rule, implemented:
+if the page has no article, do not spend the call. `is_boilerplate`
+now runs BEFORE the LLM: strip "Reporter / Source :" label lines,
+markdown headings and archive notices (every Techmeme item link is a
+snapshot page whose own ~250-char "This is a Techmeme archive page"
+notice was enough to clear the 120-char floor); if what remains cannot
+fill a paragraph, auto falls back to the feed's own text (zero tokens,
+"feed excerpt" chip, upgrade ladder) and page-mode fails as
+"navigation, not an article" - never image-led, since aggregator
+thumbnails would make nav a photo post. The upgrade ladder reschedules
+instead of digesting a wall. The refusal net widened to the exact
+phrasings that slipped through ("cannot produce a faithful digest",
+"contains no article content", "consists entirely of") - the live post
+refused twice in two wordings before the pre-call gate caught it. The
+affected post now carries the real FT teaser from the feed, llm_ms=0.
+
 ## [0.87.2] — 2026-10-21 - the pixel floor: icons are chrome, not gallery
 
 Techmeme's galleries were three 32x32 share icons appended to every

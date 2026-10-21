@@ -307,11 +307,22 @@ REFUSAL_RE = re.compile(
     r"(does not contain (a |an |any )?(news |actual |substantive )?"
     r"(article|news|information)|cannot be summari[sz]ed|no (factual )?digest "
     r"(can|could) be (generated|produced)|(bot|security) (check|verification)"
-    r" (notice|page|message|prompt)|was not successfully retrieved)", re.I)
+    r" (notice|page|message|prompt)|was not successfully retrieved"
+    r"|cannot (produce|write|generate|offer|provide) (a |an |the )?"
+    r"(faithful |accurate |useful |meaningful |reliable )?(digest|summary)"
+    r"|no (summary|digest) can be (produced|generated|written)"
+    r"|contains no (article|news|actual|real|substantive|usable) content"
+    r"|consists entirely of)", re.I)
 
 
 def looks_like_botcheck(text: str) -> bool:
     return len(text) < 2000 and bool(BOTCHECK_RE.search(text))
+
+
+ARCHIVE_NOTICE_RE = re.compile(
+    r"(this is a .*archive page|how the site appeared|snapshot date"
+    r"|most current version .*available|to view an earlier snapshot"
+    r"|archive (page|notice|snapshot))", re.I)
 
 
 def is_refusal(digest: str) -> bool:
@@ -319,6 +330,22 @@ def is_refusal(digest: str) -> bool:
     "...therefore cannot be summarized" and must not be thrown away."""
     d = digest or ""
     return len(d) < 1500 and bool(REFUSAL_RE.search(d[:300]))
+
+
+def is_boilerplate(text: str) -> bool:
+    """A page that extracts long but says nothing: Techmeme item pages are
+    walls of "Reporter / Source :" label lines plus nav, and every item
+    link is an ARCHIVE snapshot whose own ~250-char notice was enough to
+    clear the 120-char floor and reach the LLM (which correctly refused -
+    twice, in two phrasings, once shipping). Strip label lines (anything
+    ending in ':'), markdown headings and archive/snapshot notices; if what
+    remains cannot fill a paragraph, there is no article here and the LLM
+    must not be asked (zero tokens)."""
+    body = [ln for ln in (text or "").splitlines()
+            if len(ln.strip()) > 2 and not ln.strip().endswith(":")
+            and not ln.strip().startswith("#")
+            and not ARCHIVE_NOTICE_RE.search(ln)]
+    return sum(len(ln) for ln in body) < 120
 
 
 def system_prompt(cfg, feed=None) -> str:
@@ -514,7 +541,9 @@ def upgrade_excerpts(conn, cfg, llm, limit: int = 1) -> int:
             db.feed_challenge(conn, feed["id"])
             db.schedule_upgrade(conn, art["id"], tries)
             continue
-        if len(text) < 120:
+        if len(text) < 120 or is_boilerplate(text):
+            # still no article (or only a label wall): stay an excerpt and
+            # ride the ladder - never spend tokens on navigation
             db.schedule_upgrade(conn, art["id"], tries)
             continue
         db.feed_pages_ok(conn, feed["id"])          # the site lets us in again
@@ -656,15 +685,21 @@ def summarize_pending(conn, cfg, llm, limit: int = 5) -> int:
                         fail(conn, cfg, art["id"],
                              "site served a bot check instead of the article")
                     continue
-                if len(text) < 120:
+                if len(text) < 120 or is_boilerplate(text):
+                    # boilerplate (label walls) joins the too-short path BUT
+                    # never image-led: its "summary" would be nav text and
+                    # aggregator pages are full of thumbnail photos
+                    boiler = len(text) >= 120
                     if src == "auto":
                         if _use_excerpt(conn, art):
                             done += 1                     # page empty, feed text
                             continue
-                        if _publish_image_led(conn, art, resp.text, text):
+                        if not boiler and _publish_image_led(conn, art, resp.text, text):
                             done += 1              # photo post: images ARE it
                             continue
-                    fail(conn, cfg, art["id"], f"extracted text too short ({len(text)} ch)")
+                    fail(conn, cfg, art["id"],
+                         "page is navigation, not an article" if boiler
+                         else f"extracted text too short ({len(text)} ch)")
                     continue
                 page_html = resp.text
                 if feed and feed["challenge_streak"]:

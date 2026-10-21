@@ -166,3 +166,111 @@ def test_image_led_post_upgrades_in_place(conn, cfg, tmp_path, monkeypatch):
                        " WHERE id=?", (aid,)).fetchone()
     assert art["digest_source"] == ""
     assert art["summary"] == "A real digest of the full article."
+
+
+# ------------------------------------------------- boilerplate walls (v0.88.0)
+# Techmeme item pages extract to a wall of "Reporter Name / Source :" label
+# lines + nav: >120 chars, so the short-text floor let it reach the LLM,
+# which correctly refused - and the refusal SHIPPED (REFUSAL_RE missed this
+# phrasing). Two fixes: measure label-only lines before the call, and widen
+# the refusal net for what slips through.
+TECHMEME_WALL = """October 21, 2026, 7:35 AM Enter Techmeme snapshot date and time:
+
+## Top News
+
+Lawrence Abrams / BleepingComputer :
+
+Dan Goodin / Ars Technica :
+
+Anissa Gardizy / Wall Street Journal :
+
+David Morris / Bloomberg :
+
+Andrew J. Hawkins / The Verge :
+
+Lora Kolodny / CNBC :
+
+Financial Times :
+
+## Quick Links
+
+Podcasts : The Vergecast :
+
+Archive : Sunday : Saturday : Friday :"""
+
+REAL_PROSE = ("SpaceX and Tesla are moving toward a merger that would create "
+              "a $3.6 trillion company, according to people familiar with the "
+              "matter. The combined entity would pool Starlink's satellite "
+              "revenue with Tesla's manufacturing base, but the deal faces "
+              "shareholder votes on both sides and at least two regulatory "
+              "probes that could stretch into next year.")
+
+
+TECHMEME_ARCHIVE = """This is a Techmeme archive page.
+
+It shows how the site appeared at 7:35 AM ET, October 21, 2026.
+
+The most current version of the site as always is available at our home page.
+
+To view an earlier snapshot click here and then modify the date indicated.
+
+Lawrence Abrams / BleepingComputer :
+
+Financial Times :"""
+
+
+def test_is_boilerplate_flags_label_walls_and_archive_notices():
+    from rssgate.refresh import is_boilerplate
+    assert is_boilerplate(TECHMEME_WALL), "a wall of source labels is not an article"
+    # the REAL 2026-10-21 case: every techmeme item link is an archive
+    # snapshot; the page's own ~250-char notice was enough to clear the
+    # 120-char line floor and reach the LLM
+    assert is_boilerplate(TECHMEME_ARCHIVE), "an archive notice is not an article"
+    assert not is_boilerplate(REAL_PROSE)
+    # a real article with a few attribution lines stays real
+    assert not is_boilerplate("Reuters :\n\n" + REAL_PROSE + "\n\nAP :")
+
+
+def test_boilerplate_page_falls_back_to_feed_excerpt_zero_tokens(
+        conn, cfg, tmp_path, monkeypatch):
+    """The user's rule: if the page has no article, do not ask the LLM.
+    Feed text carries the real teaser, so the post publishes as an excerpt
+    (upgrade ladder included) and the call counter stays at zero."""
+    html = ("<html><head><title>SpaceX-Tesla merger</title></head><body>"
+            "<div>" + "</div><div>".join(
+                (TECHMEME_WALL + "\n" + TECHMEME_ARCHIVE).split("\n"))
+            + "</div></body></html>")
+    hits = _serve(monkeypatch, tmp_path, html)
+    llm = LLM()
+    fid = db.add_feed(conn, "https://memewall.test/feed", type_="feed")["id"]
+    teaser = ("Financial Times: A look at Elon Musk's planned SpaceX-Tesla "
+              "merger, which would create a $3.6T company but faces serious "
+              "hurdles like shareholder votes and regulatory probes.")
+    aid = db.upsert_article(conn, fid, "g1", "https://memewall.test/p16",
+                            "SpaceX-Tesla merger", "2026-10-21T07:35:00Z",
+                            feed_text=teaser)
+    n = refresh.summarize_pending(conn, load_config(cfg), llm, limit=1)
+    assert n == 1
+    art = conn.execute("SELECT status, digest_source, summary, llm_ms"
+                       " FROM articles WHERE id=?", (aid,)).fetchone()
+    assert art["status"] == "ready" and art["digest_source"] == "excerpt"
+    assert "SpaceX-Tesla" in art["summary"]
+    assert art["llm_ms"] == 0 and llm.calls == 0, "boilerplate must cost zero"
+    assert any(u.endswith("/p16") for u in hits)     # the page WAS tried
+    assert conn.execute("SELECT upgrade_at FROM articles WHERE id=?",
+                        (aid,)).fetchone()["upgrade_at"]
+
+
+def test_refusal_net_catches_the_shipped_phrasing():
+    """The digest that shipped verbatim on 2026-10-21: REFUSAL_RE must
+    catch 'contains no article content' / 'cannot produce a faithful
+    digest' / 'consists entirely of' - while a real digest that merely
+    ENDS in a caveat stays publishable (the 300-char lead window)."""
+    from rssgate.refresh import is_refusal
+    shipped = ("I cannot produce a faithful digest of this article because "
+               "the provided text contains no article content. The input "
+               "consists entirely of Techmeme page boilerplate.")
+    assert is_refusal(shipped)
+    assert is_refusal("No summary can be produced from the supplied text.")
+    assert not is_refusal(REAL_PROSE + " The outcome cannot be summarized "
+                          "with certainty, analysts warned.")
