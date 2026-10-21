@@ -12785,3 +12785,183 @@ sqlite3.InterfaceError: bad parameter or other API misuse
 2026-10-21 09:39:03,439 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:39:03] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-21T04:31:29Z&before_id=2978&before_u=0 HTTP/1.1" 200 -
 2026-10-21 09:39:03,449 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:39:03] "GET /api/status HTTP/1.1" 200 -
 2026-10-21 09:39:53,321 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:39:53] "POST /api/position HTTP/1.1" 200 -
+RSSgate listening on http://0.0.0.0:8088
+ * Serving Flask app 'rssgate.web'
+ * Debug mode: off
+2026-10-21 09:45:30,843 werkzeug INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8088
+ * Running on http://10.1.13.45:8088
+2026-10-21 09:45:30,843 werkzeug INFO [33mPress CTRL+C to quit[0m
+2026-10-21 09:45:32,132 rssgate.refresh INFO feed https://spectrum.ieee.org/customfeeds/feed/all-topics/rss: 0 new articles
+2026-10-21 09:45:32,876 rssgate.refresh INFO feed https://www.techpowerup.com/rss/news: 0 new articles
+2026-10-21 09:45:33,431 rssgate.refresh INFO feed https://www.techmeme.com/feed.xml: 1 new articles
+2026-10-21 09:45:33,553 werkzeug INFO 127.0.0.1 - - [21/Oct/2026 09:45:33] "GET /api/status HTTP/1.1" 200 -
+2026-10-21 09:45:33,567 werkzeug INFO 127.0.0.1 - - [21/Oct/2026 09:45:33] "GET /static/admin.js HTTP/1.1" 200 -
+2026-10-21 09:45:33,951 rssgate.refresh INFO feed https://www.timeextension.com/feeds/latest: 0 new articles
+2026-10-21 09:45:35,805 rssgate.refresh INFO feed http://rssblog.ameba.jp/maron0/rss20.xml: 0 new articles
+2026-10-21 09:45:45,849 rssgate.refresh INFO image backfill: 0 enriched (0 pages fetched)
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:1136: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:3578: DecompressionBombWarning: Image size (141256752 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+/home/nick/rssgate/.venv/lib/python3.12/site-packages/PIL/Image.py:3578: DecompressionBombWarning: Image size (110442584 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+2026-10-21 09:47:54,374 rssgate.maint INFO maintenance: {'ts': '2026-10-21T09:47:30Z', 'deleted_articles': 0, 'articles_freed_images': 0, 'orphans_removed': 1, 'orphans_freed_mb': 0.0, 'cache_trimmed': 0, 'cache_trimmed_mb': 0.0, 'cache_mb': 623.32, 'galleries_deduped': 0, 'refusals_requeued': 0, 'ok': True}
+2026-10-21 09:52:18,067 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:18] "GET /api/usage HTTP/1.1" 200 -
+2026-10-21 09:52:18,068 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:18] "GET /api/llm/stats HTTP/1.1" 200 -
+2026-10-21 09:52:18,082 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:18] "GET /api/status HTTP/1.1" 200 -
+2026-10-21 09:52:18,086 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:18] "GET /api/workqueue HTTP/1.1" 200 -
+2026-10-21 09:52:19,808 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:19] "GET / HTTP/1.1" 200 -
+2026-10-21 09:52:19,910 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:19] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-21 09:52:19,913 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:19] "GET /static/style.css?v=0.87.1 HTTP/1.1" 200 -
+2026-10-21 09:52:19,915 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:19] "GET /static/viewer.js?v=0.87.1 HTTP/1.1" 200 -
+2026-10-21 09:52:20,018 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:20] "GET /api/resume HTTP/1.1" 200 -
+2026-10-21 09:52:20,022 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:20] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-21 09:52:20,031 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:20] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 09:52:20,101 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:20] "GET /image/52710fe42de3bc54223cb828.png HTTP/1.1" 200 -
+2026-10-21 09:52:20,103 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:20] "GET /image/545b7db5c60599044d4df80d.jpg HTTP/1.1" 200 -
+2026-10-21 09:52:20,104 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:20] "GET /image/986a76aadba86fcb0552fafb.png HTTP/1.1" 200 -
+2026-10-21 09:52:20,105 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:20] "GET /image/b426025ec40a62714d5e94ea.png HTTP/1.1" 200 -
+2026-10-21 09:52:21,998 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:21] "GET /admin HTTP/1.1" 200 -
+2026-10-21 09:52:22,078 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "[36mGET /static/style.css?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 09:52:22,089 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-21 09:52:22,090 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "POST /api/position HTTP/1.1" 200 -
+2026-10-21 09:52:22,091 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /static/admin.js?v=0.87.1 HTTP/1.1" 200 -
+2026-10-21 09:52:22,113 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "POST /api/position HTTP/1.1" 200 -
+2026-10-21 09:52:22,117 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/config HTTP/1.1" 200 -
+2026-10-21 09:52:22,151 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/categories HTTP/1.1" 200 -
+2026-10-21 09:52:22,167 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/maintenance HTTP/1.1" 200 -
+2026-10-21 09:52:22,174 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/llm/stats HTTP/1.1" 200 -
+2026-10-21 09:52:22,175 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/feed-errors?limit=30 HTTP/1.1" 200 -
+2026-10-21 09:52:22,180 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/usage HTTP/1.1" 200 -
+2026-10-21 09:52:22,187 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/models HTTP/1.1" 200 -
+2026-10-21 09:52:22,233 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/workqueue HTTP/1.1" 200 -
+2026-10-21 09:52:22,744 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/status HTTP/1.1" 200 -
+2026-10-21 09:52:22,852 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 09:52:22,872 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:22] "GET /api/categories HTTP/1.1" 200 -
+2026-10-21 09:52:24,162 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:24] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-21 09:52:24,162 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:24] "GET /api/status HTTP/1.1" 200 -
+2026-10-21 09:52:25,295 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:25] "GET / HTTP/1.1" 200 -
+2026-10-21 09:52:25,367 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:25] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-21 09:52:25,370 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:25] "[36mGET /static/viewer.js?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 09:52:25,372 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:25] "[36mGET /static/style.css?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 09:52:25,452 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:25] "GET /api/resume HTTP/1.1" 200 -
+2026-10-21 09:52:25,464 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:25] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-21 09:52:25,466 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:25] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 09:52:27,221 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:27] "GET /api/articles?limit=20&order=newest&prio=1&feed_id=17 HTTP/1.1" 200 -
+2026-10-21 09:52:27,326 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:27] "GET /image/11841a696b06b3c29129aa18.jpg HTTP/1.1" 200 -
+2026-10-21 09:52:27,329 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:27] "GET /image/39060c244397e565fcde9881.jpg HTTP/1.1" 200 -
+2026-10-21 09:52:27,633 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:27] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 09:52:29,490 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:29] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-21 09:52:29,527 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:29] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-21 09:52:29,541 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:29] "GET /api/status HTTP/1.1" 200 -
+2026-10-21 09:52:32,346 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:32] "POST /api/position HTTP/1.1" 200 -
+2026-10-21 09:52:32,869 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:32] "GET /api/articles?limit=20&order=newest&prio=1&feed_id=17 HTTP/1.1" 200 -
+2026-10-21 09:52:32,887 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:32] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 09:52:34,201 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:34] "GET /image/dfae56ecf51b5dcf9504843a.jpg HTTP/1.1" 200 -
+2026-10-21 09:52:34,857 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:34] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 09:52:35,363 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:35] "GET /image/2eac398715a8db95ab82fe25.jpg HTTP/1.1" 200 -
+2026-10-21 09:52:40,754 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:40] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 09:52:40,755 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:40] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-21 09:52:42,715 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 09:52:42] "POST /api/position HTTP/1.1" 200 -
+2026-10-21 10:02:18,608 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:18] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-21 10:02:18,635 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:18] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 10:02:19,374 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "GET / HTTP/1.1" 200 -
+2026-10-21 10:02:19,439 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "POST /api/position HTTP/1.1" 200 -
+2026-10-21 10:02:19,440 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "POST /api/position HTTP/1.1" 200 -
+2026-10-21 10:02:19,515 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "[36mGET /static/manifest.webmanifest HTTP/1.1[0m" 304 -
+2026-10-21 10:02:19,519 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "[36mGET /static/style.css?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 10:02:19,522 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "[36mGET /static/viewer.js?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 10:02:19,560 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "GET /api/resume HTTP/1.1" 200 -
+2026-10-21 10:02:19,603 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-21 10:02:19,605 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:19] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 10:02:20,219 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET / HTTP/1.1" 200 -
+2026-10-21 10:02:20,286 rssgate.web ERROR unhandled error on /api/position
+Traceback (most recent call last):
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/web.py", line 204, in api_position
+    if db.article_exists(conn, aid):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/db.py", line 1153, in article_exists
+    return conn.execute("SELECT 1 FROM articles WHERE id=?", (aid,)).fetchone() is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.InterfaceError: bad parameter or other API misuse
+2026-10-21 10:02:20,288 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "[36mGET /static/style.css?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 10:02:20,291 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "[36mGET /static/viewer.js?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 10:02:20,296 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "[35m[1mPOST /api/position HTTP/1.1[0m" 500 -
+2026-10-21 10:02:20,302 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "POST /api/position HTTP/1.1" 200 -
+2026-10-21 10:02:20,302 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET /static/manifest.webmanifest HTTP/1.1" 200 -
+2026-10-21 10:02:20,325 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET /api/resume HTTP/1.1" 200 -
+2026-10-21 10:02:20,417 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-21 10:02:20,464 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 10:02:20,661 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET / HTTP/1.1" 200 -
+2026-10-21 10:02:20,714 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "[36mGET /static/style.css?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 10:02:20,723 rssgate.web ERROR unhandled error on /api/position
+Traceback (most recent call last):
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/web.py", line 205, in api_position
+    db.set_state(conn, "resume_ts", ts)
+  File "/home/nick/rssgate/rssgate/db.py", line 1116, in set_state
+    conn.execute("INSERT INTO state(key,value) VALUES(?,?)"
+sqlite3.InterfaceError: bad parameter or other API misuse
+2026-10-21 10:02:20,723 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "POST /api/position HTTP/1.1" 200 -
+2026-10-21 10:02:20,724 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "[36mGET /static/viewer.js?v=0.87.1 HTTP/1.1[0m" 304 -
+2026-10-21 10:02:20,724 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "[35m[1mPOST /api/position HTTP/1.1[0m" 500 -
+2026-10-21 10:02:20,731 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET /static/manifest.webmanifest HTTP/1.1" 200 -
+2026-10-21 10:02:20,773 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET /api/resume HTTP/1.1" 200 -
+2026-10-21 10:02:20,833 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:20] "GET /api/articles?limit=20&order=newest&prio=1&fresh=1 HTTP/1.1" 200 -
+2026-10-21 10:02:21,087 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:21] "GET /api/feeds HTTP/1.1" 200 -
+2026-10-21 10:02:23,734 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:23] "GET /api/categories?viewer=1 HTTP/1.1" 200 -
+2026-10-21 10:02:25,361 rssgate.web ERROR unhandled error on /api/categories
+Traceback (most recent call last):
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/web.py", line 390, in api_categories
+    return jsonify(db.category_list(conn))
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/db.py", line 500, in category_list
+    "post": grouped("SELECT categories c FROM articles"
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/db.py", line 490, in grouped
+    cnt = conn.execute(
+          ^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+2026-10-21 10:02:25,361 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:25] "[35m[1mGET /api/categories?viewer=1 HTTP/1.1[0m" 500 -
+2026-10-21 10:02:25,362 rssgate.web ERROR unhandled error on /api/categories
+Traceback (most recent call last):
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/.venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/web.py", line 390, in api_categories
+    return jsonify(db.category_list(conn))
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/db.py", line 500, in category_list
+    "post": grouped("SELECT categories c FROM articles"
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nick/rssgate/rssgate/db.py", line 490, in grouped
+    cnt = conn.execute(
+          ^^^^^^^^^^^^^
+sqlite3.InterfaceError: bad parameter or other API misuse
+2026-10-21 10:02:25,362 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:25] "[35m[1mGET /api/categories?viewer=1 HTTP/1.1[0m" 500 -
+2026-10-21 10:02:25,405 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:25] "GET /api/pulse?hw=0 HTTP/1.1" 200 -
+2026-10-21 10:02:25,407 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:25] "GET /api/articles?limit=20&order=newest&prio=1&before_ts=2026-10-21T04:40:01Z&before_id=2997&before_u=0 HTTP/1.1" 200 -
+2026-10-21 10:02:25,418 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:02:25] "GET /api/status HTTP/1.1" 200 -
+2026-10-21 10:03:11,128 werkzeug INFO 10.1.13.44 - - [21/Oct/2026 10:03:11] "POST /api/position HTTP/1.1" 200 -

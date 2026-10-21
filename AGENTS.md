@@ -43,7 +43,9 @@ rssgate/
                     (config_path), so admin edits apply without a restart.
   maint.py          run_all every 6h + at boot: retention, orphan prune,
                     dedupe_galleries (idempotent repair), cache cap.
-  imgstore.py       cache dir, store(url) (magic-byte sniff, sha256 name),
+  imgstore.py       cache dir, store(url) (magic-byte sniff, sha256 name,
+                    PIXEL FLOOR: both sides <100px = icon = refuse; only
+                    when PIL can measure - unmeasurable bytes still store),
                     safe_path, ahash (8x8 centre-crop average hash),
                     dedupe(names) = THE hero/gallery duplicate rule.
   extract.py        article text + image candidates (og first, article-root

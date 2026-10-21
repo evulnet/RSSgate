@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.87.2] — 2026-10-21 - the pixel floor: icons are chrome, not gallery
+
+Techmeme's galleries were three 32x32 share icons appended to every
+post. The extractor's size floor reads markup width/height ATTRIBUTES -
+Techmeme sets none, so nothing rejected them. store() now measures the
+BYTES it already holds: an image whose sides are BOTH under 100px is an
+icon and never enters the cache. The gate is lenient on purpose -
+whatever PIL cannot open (odd sniffable formats, truncated streams,
+test fixtures' magic-byte stand-ins) still stores; we never reject what
+we cannot measure. A one-time repair pass measured every referenced
+file across the library: 42 articles lost their icon entries (several
+feeds had the same problem), 4 shared icon files released via
+release_files, and a second run is a no-op. The '-' single-image
+sentinel rows are untouched by design.
+
 ## [0.87.1] — 2026-10-21 - drag the grip, not the arrows
 
 Feed ordering (v0.87.0) now works like it looks: each row carries a

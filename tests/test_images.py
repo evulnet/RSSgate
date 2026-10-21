@@ -332,3 +332,41 @@ def test_feed_delete_releases_images(client, tmp_path, monkeypatch):
     db.set_article(client.conn, aid, image=name, images=name, status="ready")
     client.delete(f"/api/feeds/{fid}")
     assert not (img / name).exists()
+
+
+def _real_png(w, h):
+    import io
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGB", (w, h), (200, 30, 30)).save(buf, "PNG")
+    return buf.getvalue()
+
+
+def test_store_rejects_icon_sized_images(tmp_path, monkeypatch):
+    """Techmeme's gallery was three 32x32 share icons: the page set no
+    width/height ATTRIBUTES, so the extractor's attribute floor never saw
+    them coming. The pixel truth is measured after download - an image
+    whose sides are BOTH under 100px is chrome, not content."""
+    monkeypatch.setattr(imgstore, "_dir", tmp_path / "images")
+    (tmp_path / "images").mkdir(exist_ok=True)
+
+    def fake_get(url, **kw):
+        return FakeResp(_real_png(32, 32) if "icon" in url
+                        else _real_png(300, 200), ctype="image/png")
+    monkeypatch.setattr("rssgate.net.get", fake_get)
+    assert imgstore.store("https://x/icon.png") is None, \
+        "a 32x32 icon must never enter the cache"
+    big = imgstore.store("https://x/content.png")
+    assert big, "a real content image must still store"
+    assert (tmp_path / "images" / big).exists()
+
+
+def test_store_keeps_images_pil_cannot_measure(tmp_path, monkeypatch):
+    """The pixel floor is a lenient gate: bytes PIL cannot open (odd but
+    sniffable formats, truncated streams, the test fixtures' magic-byte
+    stand-ins) must still store - never reject what we cannot measure."""
+    monkeypatch.setattr(imgstore, "_dir", tmp_path / "images")
+    (tmp_path / "images").mkdir(exist_ok=True)
+    monkeypatch.setattr("rssgate.net.get",
+                        lambda url, **kw: FakeResp(PNG, ctype="image/png"))
+    assert imgstore.store("https://x/unmeasurable.png")

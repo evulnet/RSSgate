@@ -97,6 +97,20 @@ def store(url: str, timeout=20) -> str | None:
         ext = _sniff(data)
         if not ext:
             return None
+        # Pixel floor: icons and share buttons are chrome. The extractor
+        # only sees markup width/height ATTRIBUTES - Techmeme sets none and
+        # shipped a gallery of 32x32 share icons. Here we hold the bytes.
+        # LENIENT by design: reject only what PIL can actually measure and
+        # both sides are tiny; unmeasurable bytes still store.
+        try:
+            import io
+            from PIL import Image
+            with Image.open(io.BytesIO(data)) as im:
+                w, h = im.size
+            if w < 100 and h < 100:
+                return None
+        except Exception:  # noqa: BLE001  # unmeasurable != junk
+            pass
         fname = hashlib.sha256(url.encode()).hexdigest()[:24] + "." + ext
         tmp = _dir / (fname + ".part")
         with _lock:
