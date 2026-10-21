@@ -1461,6 +1461,54 @@ def test_pulse_heartbeat_refreshes_pips_after_a_read_elsewhere(ui_server, browse
     pg.close()
 
 
+def test_admin_can_reorder_feeds_and_the_reader_sees_it(ui_server, browser):
+    """The ▲/▼ buttons are the reader's pen: the admin table order is the
+    sidebar order (both follow db.list_feeds). Asserted on the FULL row
+    list - the tier shares one DB, so other tests' feeds sit between ours
+    and a swap is with the DOM neighbour, whatever it is."""
+    a, b, c = _mkfeed("orda"), _mkfeed("ordb"), _mkfeed("ordc")
+    pg = _new_page(browser)
+    pg.goto(ui_server + "/admin", wait_until="networkidle")
+    pg.wait_for_selector("#feed-table tbody tr[data-id]")
+
+    def rows():
+        return pg.eval_on_selector_all(
+            "#feed-table tbody tr[data-id]",
+            "els => els.map(e => +e.dataset.id)")
+
+    before = rows()
+    assert before == [a, b, c] or before[:0] == []  # ours last, freshly added
+    assert before[-3:] == [a, b, c], f"new feeds must append: {before}"
+
+    # the edges are honest: first cannot go up, last cannot go down
+    assert pg.get_attribute(f"tr[data-id='{before[0]}'] [data-act='up']",
+                            "disabled") is not None
+    assert pg.get_attribute(f"tr[data-id='{c}'] [data-act='down']",
+                            "disabled") is not None
+
+    pg.click(f"tr[data-id='{c}'] [data-act='up']")
+    want = list(before)
+    i = want.index(c)
+    want[i], want[i - 1] = want[i - 1], want[i]
+    pg.wait_for_function(
+        "([want]) => JSON.stringify([...document.querySelectorAll("
+        "'#feed-table tbody tr[data-id]')].map(e => +e.dataset.id))"
+        " === JSON.stringify(want)", arg=[want], timeout=5000)
+
+    # the reader's sidebar follows the same server order (relative to ours)
+    vp = _new_page(browser)
+    vp.goto(ui_server, wait_until="networkidle")
+    vp.wait_for_selector("#feed-filter li[data-feed]")
+    side = vp.eval_on_selector_all(
+        "#feed-filter li[data-feed]",
+        "els => els.map(e => +e.dataset.feed)")
+    mine = {a, b, c}
+    assert [x for x in side if x in mine] == [x for x in want if x in mine]
+    assert vp.errors == []
+    vp.close()
+    pg.close()
+
+
 def test_back_to_top_button_appears_and_jumps(ui_server, browser):
     """Mid-way down a long session, a floating button appears (past ~1.5
     screens) and ONE tap returns to the top - pure navigation: it must not

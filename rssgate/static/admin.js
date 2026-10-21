@@ -51,11 +51,17 @@ async function renderFeeds() {
   ALLFEEDS = feeds;
   $('all-cats').innerHTML = ALLCATS.map(c => `<option>${esc(c)}</option>`).join('');
   const tbody = $('feed-table').querySelector('tbody');
-  tbody.innerHTML = feeds.map(f => `
+  tbody.innerHTML = feeds.map((f, idx) => `
     <tr data-id="${f.id}" data-was-llm="${f.summarize === 0 ? 0 : 1}"
         data-search="${esc([f.custom_title, f.title, f.url, f.categories]
                             .filter(Boolean).join(' ').toLowerCase())}"
         class="${f.enabled ? '' : 'off'}">
+      <td class="hint" style="white-space:nowrap">
+        <button class="btn ghost sm" data-act="up" title="move up (reader sees this order)"
+          ${idx === 0 ? 'disabled' : ''}>&#9650;</button>
+        <button class="btn ghost sm" data-act="down" title="move down"
+          ${idx === feeds.length - 1 ? 'disabled' : ''}>&#9660;</button>
+      </td>
       <td><span class="fname-cell" data-role="fname">
           <a href="${esc(f.url)}" target="_blank">${esc(f.custom_title || f.title || f.url)}</a>
           ${f.custom_title ? ' <b class="hint" title="renamed">(you)</b>' : ''}
@@ -156,6 +162,23 @@ async function renderFeeds() {
     tr.querySelectorAll('button').forEach(btn => btn.addEventListener('click', async () => {
       if (btn.dataset.act === 'cfg') { openFeedCfg(id); return; }
       if (btn.dataset.act === 'rename') { startFeedRename(tr, id); return; }
+      if (btn.dataset.act === 'up' || btn.dataset.act === 'down') {
+        // swap with the DOM neighbour (DOM order == server order, hidden
+        // filtered rows included, so a search never reorders wrongly)
+        const ids = [...tbody.querySelectorAll('tr[data-id]')]
+          .map(r => +r.dataset.id);
+        const i = ids.indexOf(+id);
+        const j = btn.dataset.act === 'up' ? i - 1 : i + 1;
+        if (i < 0 || j < 0 || j >= ids.length) return;
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+        btn.textContent = '\u2026';
+        try {
+          await api('/api/feeds/reorder', { method: 'POST',
+            body: JSON.stringify({ ids }) });
+        } catch (e) { alert('Reorder failed: ' + e.message); }
+        renderFeeds();
+        return;
+      }
       if (btn.dataset.act === 'del' && confirm('Delete this feed and its articles?'))
         await api(`/api/feeds/${id}`, { method: 'DELETE' });
       if (btn.dataset.act === 'refresh') {

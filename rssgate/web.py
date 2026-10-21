@@ -278,6 +278,23 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
             threading.Thread(target=_bg, daemon=True).start()
         return jsonify(_feed_dict(feed_row)), 201
 
+    @app.route("/api/feeds/reorder", methods=["POST"])
+    def api_reorder_feeds():
+        # full-list semantics: body {ids: [...]} must contain every feed id
+        # exactly once (the admin page sends its full order). db validates
+        # the set; anything else is a 400, never a partial apply.
+        data = _body()
+        ids = data.get("ids")
+        if not isinstance(ids, list) or not ids:
+            return jsonify({"error": "ids must be a non-empty list"}), 400
+        if not all(isinstance(i, int) and not isinstance(i, bool) for i in ids):
+            return jsonify({"error": "ids must all be integers"}), 400
+        try:
+            db.reorder_feeds(conn, ids)
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        return jsonify({"ok": True})
+
     @app.route("/api/feeds/probe", methods=["POST"])
     def api_probe_feed():
         from .fetcher import find_feeds

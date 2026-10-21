@@ -108,6 +108,11 @@ def _migrate(conn: sqlite3.Connection) -> None:
     if "custom_title" not in cols:
         conn.execute("ALTER TABLE feeds ADD COLUMN custom_title TEXT NOT NULL"
                      " DEFAULT ''")
+    if "sort_order" not in cols:          # reader-chosen order (admin ▲▼);
+        conn.execute("ALTER TABLE feeds ADD COLUMN sort_order INTEGER NOT NULL"
+                     " DEFAULT 0")         # tiebreak by id keeps a never-
+        conn.execute("UPDATE feeds SET sort_order = id")   # reordered library
+        # stable at exactly the insertion order it already had
     if "attempts" not in [r["name"] for r in conn.execute(
             "PRAGMA table_info(articles)")]:
         conn.execute("ALTER TABLE articles ADD COLUMN attempts INTEGER"
@@ -230,7 +235,8 @@ def add_feed(conn, url: str, type_: str = "auto", title: str = "",
              categories: list[str] | None = None) -> sqlite3.Row:
     """Insert and return the new feed row."""
     cur = conn.execute(
-        "INSERT INTO feeds(url, type, title, categories, added_at) VALUES(?,?,?,?,?)",
+        "INSERT INTO feeds(url, type, title, categories, added_at, sort_order)"
+        " VALUES(?,?,?,?,?,(SELECT COALESCE(MAX(sort_order), -1) + 1 FROM feeds))",
         (url, type_, title, ",".join(categories or []), now_iso()))
     conn.commit()
     row = conn.execute("SELECT * FROM feeds WHERE id=?", (cur.lastrowid,)).fetchone()
@@ -242,7 +248,21 @@ def add_feed(conn, url: str, type_: str = "auto", title: str = "",
 
 
 def list_feeds(conn) -> list[sqlite3.Row]:
-    return list(conn.execute("SELECT * FROM feeds ORDER BY id"))
+    # sort_order is reader-chosen (admin ▲▼ -> /api/feeds/reorder); the id
+    # tiebreak means never-reordered feeds keep their insertion order
+    return list(conn.execute("SELECT * FROM feeds ORDER BY sort_order, id"))
+
+
+def reorder_feeds(conn, ids: list[int]) -> None:
+    """Assign sort_order = position. ids must be EXACTLY the set of existing
+    feed ids (the admin page always sends the full visible order): a partial
+    list would merge two orderings with undefined results."""
+    have = {r["id"] for r in conn.execute("SELECT id FROM feeds")}
+    if len(ids) != len(set(ids)) or set(ids) != have:
+        raise ValueError("reorder must list every feed id exactly once")
+    for pos, fid in enumerate(ids):
+        conn.execute("UPDATE feeds SET sort_order=? WHERE id=?", (pos, fid))
+    conn.commit()
 
 
 def get_feed(conn, feed_id: int) -> sqlite3.Row | None:

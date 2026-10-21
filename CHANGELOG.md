@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.87.0] — 2026-10-20 - drag-free feed ordering
+
+The reader can now choose the order feeds appear in. The admin feed
+table grew a pair of small triangle buttons per row; ▲▼ swap a feed
+with its neighbour, and the SAME order shows in the reader's sidebar -
+both views follow db.list_feeds, which now orders by a new
+feeds.sort_order column (additive, backfilled from id, id tiebreak, so
+an un-reordered library is byte-for-byte the order it always had). New
+feeds append to the end. POST /api/feeds/reorder takes the FULL id list
+and assigns positions - partial lists are a 400, never a merge, so two
+tabs can't interleave half-orders. Buttons over drag-and-drop on
+purpose: keyboard-accessible, touch-friendly, and Playwright can click
+them (the browser test asserts table order, edge-disabled buttons, and
+sidebar parity on the full row list, since the tier shares one DB).
+
 ## [0.86.0] — 2026-10-20 - back to top, one tap from anywhere
 
 Mid-way down a long session the only way home was the sticky top-bar
