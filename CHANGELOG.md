@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.87.1] — 2026-10-21 - drag the grip, not the arrows
+
+Feed ordering (v0.87.0) now works like it looks: each row carries a
+\u2630 grip and you drag it to a new place - rows re-order live under the
+pointer, and the full order saves on release. Pointer events, not HTML5
+draggable: mouse and touch share one code path, and Playwright can drive
+it step by step (the browser test grabs the real grip, drags past the
+neighbour's midline, and proves a <5px grip CLICK posts nothing - the
+threshold that keeps row buttons clickable and clicks inert). Same
+full-list /api/feeds/reorder endpoint underneath, so the ▲▼ buttons it
+replaced and the sidebar order are unaffected. The grip selector uses
+the contract test's unquoted [data-act=grip] wiring form.
+
 ## [0.87.0] — 2026-10-20 - drag-free feed ordering
 
 The reader can now choose the order feeds appear in. The admin feed

@@ -378,14 +378,18 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
   a confirm().
 - Feed rows are slim; per-feed settings live in the cog modal (`#cfg-modal`),
   autosaving per field. The feed filter appears past 8 feeds.
-- Feed ORDER is reader-chosen (v0.87.0): `feeds.sort_order` (additive column,
-  backfilled from id, tiebreak `sort_order, id` in `db.list_feeds`) is the
-  ONE order - admin table and viewer sidebar both follow `/api/feeds`.
-  ▲▼ buttons swap with the DOM neighbour (DOM order == server order even
-  while the search filter hides rows) and POST the FULL id list to
-  `/api/feeds/reorder` (full-list semantics: partial lists are 400, never
-  merged). New feeds append (`MAX+1`). Drag-and-drop was deliberately not
-  built: buttons are keyboard-accessible and Playwright-testable.
+- Feed ORDER is reader-chosen (v0.87.0, drag UI v0.87.1): `feeds.sort_order`
+  (additive column, backfilled from id, tiebreak `sort_order, id` in
+  `db.list_feeds`) is the ONE order - admin table and viewer sidebar both
+  follow `/api/feeds`. Rows carry a `\u2630` grip (`[data-act=grip]`, the
+  contract test's unquoted selector form matters); POINTER events (not
+  HTML5 draggable - mouse-only, untestable per-step) reorder rows live,
+  and the FULL id list posts once on drop to `/api/feeds/reorder`
+  (full-list semantics: partial lists are 400, never merged). A <5px
+  pointer move is a click, not a drag: nothing posts. New feeds append
+  (`MAX+1`). Browser test drags with a real mouse (scroll rows into view
+  first - viewport coords!) and asserts click-does-nothing + reload
+  persistence.
 
 ## Workflow and release checklist
 1. Make the change. For patch scripts: assert every anchor exists

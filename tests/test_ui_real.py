@@ -1462,10 +1462,11 @@ def test_pulse_heartbeat_refreshes_pips_after_a_read_elsewhere(ui_server, browse
 
 
 def test_admin_can_reorder_feeds_and_the_reader_sees_it(ui_server, browser):
-    """The ▲/▼ buttons are the reader's pen: the admin table order is the
-    sidebar order (both follow db.list_feeds). Asserted on the FULL row
-    list - the tier shares one DB, so other tests' feeds sit between ours
-    and a swap is with the DOM neighbour, whatever it is."""
+    """Grip-drag is the reader's pen: the admin table order is the sidebar
+    order (both follow db.list_feeds). Driven with a REAL mouse: down on
+    the grip, move past the neighbour's midline, up. Asserted on the FULL
+    row list - the tier shares one DB, so other tests' feeds sit between
+    ours."""
     a, b, c = _mkfeed("orda"), _mkfeed("ordb"), _mkfeed("ordc")
     pg = _new_page(browser)
     pg.goto(ui_server + "/admin", wait_until="networkidle")
@@ -1477,16 +1478,22 @@ def test_admin_can_reorder_feeds_and_the_reader_sees_it(ui_server, browser):
             "els => els.map(e => +e.dataset.id)")
 
     before = rows()
-    assert before == [a, b, c] or before[:0] == []  # ours last, freshly added
     assert before[-3:] == [a, b, c], f"new feeds must append: {before}"
 
-    # the edges are honest: first cannot go up, last cannot go down
-    assert pg.get_attribute(f"tr[data-id='{before[0]}'] [data-act='up']",
-                            "disabled") is not None
-    assert pg.get_attribute(f"tr[data-id='{c}'] [data-act='down']",
-                            "disabled") is not None
-
-    pg.click(f"tr[data-id='{c}'] [data-act='up']")
+    # drag c (last) up above b: start on c's grip, drop past b's midline
+    # (scroll both into view first - the shared tier DB makes the table
+    # taller than the viewport and mouse coords are viewport-relative)
+    gc = pg.locator(f"tr[data-id='{c}'] [data-act='grip']")
+    gb = pg.locator(f"tr[data-id='{b}']")
+    gc.scroll_into_view_if_needed()
+    gb.scroll_into_view_if_needed()
+    src = gc.bounding_box()
+    tgt = gb.bounding_box()
+    pg.mouse.move(src["x"] + src["width"] / 2, src["y"] + src["height"] / 2)
+    pg.mouse.down()
+    pg.mouse.move(src["x"] + src["width"] / 2, tgt["y"] + tgt["height"] * 0.25,
+                  steps=10)
+    pg.mouse.up()
     want = list(before)
     i = want.index(c)
     want[i], want[i - 1] = want[i - 1], want[i]
@@ -1494,6 +1501,27 @@ def test_admin_can_reorder_feeds_and_the_reader_sees_it(ui_server, browser):
         "([want]) => JSON.stringify([...document.querySelectorAll("
         "'#feed-table tbody tr[data-id]')].map(e => +e.dataset.id))"
         " === JSON.stringify(want)", arg=[want], timeout=5000)
+
+    # a plain grip CLICK (no movement) must not churn the server - but the
+    # drag's own POST may still be in flight (performance entries appear on
+    # COMPLETION), so baseline only after it lands
+    pg.wait_for_function(
+        "() => performance.getEntriesByType('resource')"
+        ".filter(e => e.name.includes('/api/feeds/reorder')).length >= 1",
+        timeout=5000)
+    before_n = pg.evaluate(
+        "performance.getEntriesByType('resource')"
+        ".filter(e => e.name.includes('/api/feeds/reorder')).length")
+    pg.click(f"tr[data-id='{want[0]}'] [data-act='grip']")
+    pg.wait_for_timeout(300)
+    assert pg.evaluate(
+        "performance.getEntriesByType('resource')"
+        ".filter(e => e.name.includes('/api/feeds/reorder')).length") == before_n
+
+    # the order is server state: a fresh admin load keeps it
+    pg.reload(wait_until="networkidle")
+    pg.wait_for_selector("#feed-table tbody tr[data-id]")
+    assert rows() == want
 
     # the reader's sidebar follows the same server order (relative to ours)
     vp = _new_page(browser)

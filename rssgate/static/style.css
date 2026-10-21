@@ -159,6 +159,13 @@ label input,label select,label textarea { margin-top:4px; }
 .row input { flex:1; min-width:140px; }
 textarea { resize:vertical; }
 .feed-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+/* drag grip: touch-action:none so a pointer drag beats the page scroll */
+.feed-table td.grip { cursor:grab; color:var(--muted); width:26px;
+  text-align:center; user-select:none; -webkit-user-select:none;
+  touch-action:none; padding:8px 2px; }
+.feed-table tr.drag-src { opacity:.45; }
+.feed-table tr.drag-src td { border-top:1px dashed var(--accent);
+  border-bottom:1px dashed var(--accent); }
 .feed-table th,.feed-table td { text-align:left; padding:8px 6px;
   border-bottom:1px solid var(--line); vertical-align:top; }
 .feed-table td.cats input { width:100%; font-size:.85rem; }

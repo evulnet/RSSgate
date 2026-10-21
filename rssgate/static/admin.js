@@ -51,17 +51,12 @@ async function renderFeeds() {
   ALLFEEDS = feeds;
   $('all-cats').innerHTML = ALLCATS.map(c => `<option>${esc(c)}</option>`).join('');
   const tbody = $('feed-table').querySelector('tbody');
-  tbody.innerHTML = feeds.map((f, idx) => `
+  tbody.innerHTML = feeds.map(f => `
     <tr data-id="${f.id}" data-was-llm="${f.summarize === 0 ? 0 : 1}"
         data-search="${esc([f.custom_title, f.title, f.url, f.categories]
                             .filter(Boolean).join(' ').toLowerCase())}"
         class="${f.enabled ? '' : 'off'}">
-      <td class="hint" style="white-space:nowrap">
-        <button class="btn ghost sm" data-act="up" title="move up (reader sees this order)"
-          ${idx === 0 ? 'disabled' : ''}>&#9650;</button>
-        <button class="btn ghost sm" data-act="down" title="move down"
-          ${idx === feeds.length - 1 ? 'disabled' : ''}>&#9660;</button>
-      </td>
+      <td class="grip" data-act="grip" title="drag to reorder (the reader sees this order)">&#9776;</td>
       <td><span class="fname-cell" data-role="fname">
           <a href="${esc(f.url)}" target="_blank">${esc(f.custom_title || f.title || f.url)}</a>
           ${f.custom_title ? ' <b class="hint" title="renamed">(you)</b>' : ''}
@@ -162,23 +157,6 @@ async function renderFeeds() {
     tr.querySelectorAll('button').forEach(btn => btn.addEventListener('click', async () => {
       if (btn.dataset.act === 'cfg') { openFeedCfg(id); return; }
       if (btn.dataset.act === 'rename') { startFeedRename(tr, id); return; }
-      if (btn.dataset.act === 'up' || btn.dataset.act === 'down') {
-        // swap with the DOM neighbour (DOM order == server order, hidden
-        // filtered rows included, so a search never reorders wrongly)
-        const ids = [...tbody.querySelectorAll('tr[data-id]')]
-          .map(r => +r.dataset.id);
-        const i = ids.indexOf(+id);
-        const j = btn.dataset.act === 'up' ? i - 1 : i + 1;
-        if (i < 0 || j < 0 || j >= ids.length) return;
-        [ids[i], ids[j]] = [ids[j], ids[i]];
-        btn.textContent = '\u2026';
-        try {
-          await api('/api/feeds/reorder', { method: 'POST',
-            body: JSON.stringify({ ids }) });
-        } catch (e) { alert('Reorder failed: ' + e.message); }
-        renderFeeds();
-        return;
-      }
       if (btn.dataset.act === 'del' && confirm('Delete this feed and its articles?'))
         await api(`/api/feeds/${id}`, { method: 'DELETE' });
       if (btn.dataset.act === 'refresh') {
@@ -188,6 +166,54 @@ async function renderFeeds() {
       renderFeeds(); renderCategories();
     }));
   });
+}
+
+// ---- drag reorder: pointer events on the grip (mouse AND touch; HTML5
+// draggable is mouse-only and untestable per-step). Rows re-order live in
+// the DOM; the FULL id list posts once on drop (same full-list endpoint
+// the ▲▼ buttons used). A 5px threshold keeps grip clicks inert and never
+// fights the row's buttons.
+let dragRow = null;
+$('feed-table').querySelector('tbody').addEventListener('pointerdown', e => {
+  const grip = e.target.closest('[data-act=grip]');
+  if (!grip) return;
+  const tr = grip.closest('tr[data-id]');
+  if (!tr) return;
+  e.preventDefault();                       // no text selection while dragging
+  dragRow = { tr, y0: e.clientY, moved: false };
+  tr.classList.add('drag-src');
+  window.addEventListener('pointermove', dragMove);
+  window.addEventListener('pointerup', dragEnd);
+});
+function dragMove(e) {
+  if (!dragRow) return;
+  if (!dragRow.moved && Math.abs(e.clientY - dragRow.y0) < 5) return;
+  dragRow.moved = true;
+  const tbody = $('feed-table').querySelector('tbody');
+  const others = [...tbody.querySelectorAll('tr[data-id]')]
+    .filter(r => r !== dragRow.tr);
+  const ref = others.find(r => {
+    const b = r.getBoundingClientRect();
+    return e.clientY < b.top + b.height / 2;
+  }) || null;
+  if (tbody.children.length &&
+      (dragRow.tr.parentElement !== tbody || dragRow.tr.nextElementSibling !== ref))
+    tbody.insertBefore(dragRow.tr, ref);
+}
+async function dragEnd() {
+  window.removeEventListener('pointermove', dragMove);
+  window.removeEventListener('pointerup', dragEnd);
+  if (!dragRow) return;
+  const d = dragRow; dragRow = null;
+  d.tr.classList.remove('drag-src');
+  if (!d.moved) return;                     // a click on the grip is nothing
+  const ids = [...$('feed-table').querySelectorAll('tr[data-id]')]
+    .map(r => +r.dataset.id);
+  try {
+    await api('/api/feeds/reorder', { method: 'POST',
+      body: JSON.stringify({ ids }) });
+  } catch (e) { alert('Reorder failed: ' + e.message); }
+  renderFeeds();
 }
 
 // ---- add feed: probe the URL, find a real feed if we can, ask before page mode
