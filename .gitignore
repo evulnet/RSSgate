@@ -7,3 +7,6 @@ config.yaml
 *.sqlite
 *.db
 .env
+
+rssgate.log
+*.log

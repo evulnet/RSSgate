@@ -13,7 +13,10 @@ reader and admin page. Python >= 3.11. No frontend build step: two scripts
 (`viewer.js`, `admin.js`), one stylesheet, two Jinja templates.
 
 ```
-.venv/bin/python run.py --config config.yaml   # serves the app (config sets host/port)
+.venv/bin/python -m rssgate --config config.yaml   # serves the app (config sets host/port)
+# LIVE server runs supervised: scripts/serve-loop.sh (respawns ~3s) guarded
+# by scripts/ensure-serving.sh from cron (*/5). Kill the server and the loop
+# restarts it; if the loop itself died, run the ensure script.
 .venv/bin/python -m pytest                     # hermetic tier, seconds
 .venv/bin/python -m pytest -m ui               # browser tier, ~1 min; REQUIRED for UI work
 ```
@@ -23,8 +26,11 @@ templates and the scheduler holds imported code.
 
 ## Map
 ```
-run.py              config -> create_app -> Scheduler -> maint loop -> flask
+run.py              compat shim -> rssgate/serve.py:main (LIVE cmd is -m rssgate)
 rssgate/
+  serve.py          config -> create_app -> Scheduler -> maint loop -> flask
+                    (launch as `python -m rssgate`: argv holds no "run.py",
+                    immune to other projects' pkill -f run.py)
   config.py         DEFAULTS + deep-merge load/save, env: secrets, masked_config.
                     ui.*: order, snapshot_width, stream_width, read_delay,
                     hide_untranscribed, share_title (snapshot_width = WIDE
@@ -64,6 +70,11 @@ rssgate/
   static/admin.js   panels, autosave, feed table + cog modal, nav spy
   static/style.css  CSS variables, light/dark via prefers-color-scheme
 tests/              hermetic tests + test_ui_contract.py + test_ui_real.py
+scripts/
+  serve-loop.sh     supervisor: respawns `python -m rssgate` (~3s), adopts
+                    an existing listener (manual start / test tier)
+  ensure-serving.sh cron (*/5) watchdog for the loop; pgrep pattern is the
+                    ABSOLUTE path (filmNotes' loop matches the generic one)
 ```
 
 ## Invariants (never break; most are test-enforced)
@@ -338,10 +349,11 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
   silently muted the pill for the session on one malformed answer
   (`test_pulse_survives_a_garbage_answer_with_no_manual_tick`). Browser
   `/api/pulse` route stubs must match `**/api/pulse**` - the client now
-  appends `?hw=`. Watch item: the first full UI run of v0.80.0 had ONE
-  unnamed test failure that never repeated across four later runs; suspects
-  are the timing-sensitive pulse browser tests (the two timer-free ones pass
-  in isolation).
+  appends `?hw=`. Watch item: the timing-sensitive pulse browser tests are
+  now NAMED flakers - `test_pill_and_sidebar_pips_agree_when_it_speaks`
+  failed two consecutive full-tier runs (v0.88.0) while passing in
+  isolation and in every other tier run; earlier unnamed one-offs were
+  almost certainly this family.
   Scheduling has ONE owner: `pulseArm()` ticks, then re-arms with
   `setTimeout(pulseArm, …)` (a NAMED callback, so the suite can shorten just
   that timer); `pulseTick` must never arm anything - when it called
@@ -416,20 +428,23 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
 4. Bump `__version__`, add the CHANGELOG entry (say what actually changed),
    commit, `git tag -a vX.Y.Z`, `git push --follow-tags`.
 5. Restart the live server; confirm `/api/status` shows the version and,
-   for UI changes, curl the served asset for a marker of the new code. Kill
-   it by EXACT argv, never by a pattern-matched pkill/grep joined into the
-   restart chain: the shell running that chain has the pattern text in its
-   own args, so the lookup returns that shell too and the kill takes the
-   whole chain down before the restart line ever runs (the live server was
-   left down twice this way - it is recoverable, but only by noticing the
-   143 and starting the process by hand). Split the steps and match fields,
-   not text:
+   for UI changes, curl the served asset for a marker of the new code. The
+   LIVE server is supervised (v0.88.0): **killing it is the whole restart** -
+   `scripts/serve-loop.sh` respawns `python -m rssgate` within ~13 s. Kill
+   by EXACT argv fields, never by pattern-matched pkill/grep joined into
+   the chain (self-match scar), and never kill the loop during a release:
    ```
-   kill $(ps -eo pid=,args= | awk '$2==".venv/bin/python" && $3=="run.py"{print $1}')
+   kill $(ps -eo pid=,args= | awk '$2==".venv/bin/python" && $3=="-m" && $4=="rssgate"{print $1}')
    ```
-   then start it fresh as its OWN command (`setsid nohup .venv/bin/python
-   run.py >> rssgate.log 2>&1 &`), not `&&`-joined behind the kill; verify
-   with `ps -eo pid,args | grep "[r]un\.py"` and a curl of `/api/status`.
+   then wait ~15 s and verify with a curl of `/api/status` (and
+   `ps -eo pid,args | grep "[r]ssgate"` showing ONE `-m rssgate` under ONE
+   `serve-loop.sh`). If no respawn comes, the loop is dead:
+   `sh scripts/ensure-serving.sh`. The server runs as `-m rssgate` on
+   purpose: another project's `pkill -f run.py` killed us on 2026-10-21
+   (filmNotes agent session, forensics in the session logs) - keep the
+   module argv and never advertise `run.py` as the live command. `run.py`
+   remains a compat shim for manual/dev starts; two servers can never
+   collide (the loop adopts an existing listener).
 
 Versioning: MAJOR = breaks a client/config; MINOR = new capability (endpoint,
 param, admin feature, config key with default, additive column); PATCH = fix,

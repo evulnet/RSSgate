@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.88.0] — 2026-10-22 - supervised server; invisible to other projects' pkills
+
+Forensics on the silent 22:38 death of 2026-10-21: a filmNotes agent
+session ran `pkill -f "python run.py"` seconds before committing - and
+our server's command line matched. No crash, no traceback: SIGTERM with
+the stdout buffer lost, the loop-less server simply gone. Two structural
+fixes. (1) The live server now runs as `python -m rssgate`
+(rssgate/serve.py; run.py stays a compat shim): the argv contains no
+"run.py", so no generic pattern-kill from any neighbouring project can
+ever reach us. (2) scripts/serve-loop.sh supervises it (respawn ~3 s,
+adopts an existing listener so manual starts and the test tier never
+collide), and cron runs scripts/ensure-serving.sh every 5 min to
+resurrect the loop itself (its pgrep pattern is the ABSOLUTE path -
+filmNotes' loop matches the generic one). Three layers cover every
+death mode: loop->server 3s, cron->loop 5min, and the release restart
+is now just the field-matched kill. Drills run live: respawn,
+resurrection (kill both, ensure brings both back), idempotency (double
+ensure, one loop). Also untracked rssgate.log (LAN IPs in every release
+commit via git add -A; history rewrite pending owner decision).
+
 ## [0.87.3] — 2026-10-21 - don't ask the LLM about a page with no article
 
 A Techmeme item shipped with the model's refusal as its digest ("I
