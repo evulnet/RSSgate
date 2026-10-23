@@ -42,6 +42,15 @@ body { margin:0; background:var(--bg); color:var(--text);
   background:var(--card); color:var(--text); font-size:1.05rem; cursor:pointer;
   text-decoration:none; }
 .icon-btn:hover { border-color:var(--accent); }
+/* 320px phones: brand + queue pip + three icon buttons must not push the
+   page into horizontal scroll (a ✓ added to the bar overflowed by 12px -
+   caught only when the pip was visible). The pip's WORD is the fluff; the
+   dot and number stay. */
+@media (max-width:400px) {
+  #pip-queue-label { display:none; }
+  .pip { padding:3px 7px; margin-left:5px; }
+  .icon-btn { width:32px; height:32px; }
+}
 
 /* ---------- viewer stream ---------- */
 .layout { display:flex; max-width:calc(var(--stream-w, 1280px) + 320px);

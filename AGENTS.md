@@ -152,6 +152,14 @@ scripts/
   NEXT card, defeating the credit). Never gate the CLICK-to-read path (a
   click implies attention; gating it would break
   test_read_marking_is_honest). Seam: `window.__dwellState()`.
+  **Mark all as read (v0.89.0):** top-bar ✓ (`#mark-read-btn`, left of ⟳)
+  marks the SIDEBAR SCOPE (one feed or all) after a `confirm()` that
+  quotes the pill count; `POST /api/mark_read {feed_id|0}` stamps
+  `read_at` + advances cursors (cardless rows excluded - pill parity).
+  n=0 never nags. Cards flip via `restart(true)`, pills via
+  `renderFeedFilter()`. The header at 320px must fit brand+pip+3 buttons
+  (the ✓ overflowed by 12px once, visible only with the pip showing -
+  media query hides the pip's word and trims padding under 400px).
   Unread-first (`prio=1`) applies to EVERY newest-first New view, INCLUDING a
   single feed (`store.feed`) and category filters - deliberately: a feed's pip
   links to that feed, and chronologically a late arrival (published 16:08,

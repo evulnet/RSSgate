@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.89.0] — 2026-10-22 - mark all as read (with a seatbelt)
+
+The top bar grew a ✓ left of the refresh: one tap marks the CURRENT
+scope - the sidebar's selected feed, or everything - as read, but only
+after a confirm() that quotes the number ("Mark 47 unread posts in
+Ars Technica as read?"). The count comes from the pills, which are
+server-parity by invariant, and cardless rows (hidden, queued) are
+excluded - you confirm a number of cards, not of DB rows. Zero unread
+never nags. POST /api/mark_read stamps read_at and advances each feed's
+cursor to its newest post (forward-only, invariant 4); cards flip via a
+stream restart and pills re-render from the server. The icon: a plain ✓
+- "everything checked" is the one glyph everyone reads correctly.
+A 320px scar along the way: the new button overflowed the header by
+12px, visible only when the queue pip was also showing - green in
+isolation, red in the shared-DB tier; under 400px the pip now shows
+dot+number without its word and the buttons trim to 32px.
+
 ## [0.88.0] — 2026-10-22 - supervised server; invisible to other projects' pkills
 
 Forensics on the silent 22:38 death of 2026-10-21: a filmNotes agent

@@ -1163,6 +1163,36 @@ def mark_feed_read(conn, feed_id: int, ts: str) -> None:
     conn.commit()
 
 
+def mark_scope_read(conn, feed_id: int = 0) -> int:
+    """'Mark all as read' (0 = every feed): stamp read_at on every unread
+    CARD in scope and advance each affected feed's cursor to its newest
+    post. Cardless rows (hidden/dropped/pending/processing) are excluded -
+    they render nothing, so they never inflate the confirmed number (the
+    pill-parity rule). Cursors only move forward (invariant 4)."""
+    where = ("read_at IS NULL AND status NOT IN"
+             " ('hidden','dropped','pending','processing')")
+    params: list = []
+    if feed_id:
+        where += " AND feed_id=?"
+        params.append(feed_id)
+    n = conn.execute(f"UPDATE articles SET read_at=? WHERE {where}",
+                     (now_iso(), *params)).rowcount
+    feeds = [feed_id] if feed_id else [
+        r["id"] for r in conn.execute("SELECT id FROM feeds")]
+    for fid in feeds:
+        row = conn.execute(
+            f"SELECT MAX({_TS_EXPR}) t FROM articles WHERE feed_id=?"
+            " AND status NOT IN ('hidden','dropped')", (fid,)).fetchone()
+        if row and row["t"]:
+            ts = norm_ts(row["t"])
+            if ts:
+                conn.execute("UPDATE feeds SET last_read_ts=? WHERE id=?"
+                             " AND (last_read_ts IS NULL OR last_read_ts < ?)",
+                             (ts, fid, ts))
+    conn.commit()
+    return n
+
+
 def feed_unread(conn, feed_id: int, last_read_ts: str | None,
                 hide_statuses: tuple = ()) -> int:
     """Articles newer than the feed's read cursor (never-read feeds: all).

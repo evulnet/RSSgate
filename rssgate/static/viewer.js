@@ -1135,6 +1135,36 @@
     setBusy(false);
   });
 
+  // top-bar ✓: mark the CURRENT scope (sidebar selection) read, after a
+  // confirm that states the number - counted from the pills, which are
+  // server-parity by invariant. Cards flip via restart(); pills re-render.
+  $('mark-read-btn').addEventListener('click', async () => {
+    let n = 0;
+    document.querySelectorAll('#feed-filter li').forEach(li => {
+      if (!li.dataset.feed) return;      // the "All feeds" row is not a feed
+      if (store.feed && li.dataset.feed !== String(store.feed)) return;
+      const p = li.querySelector('.unread-pill');
+      if (p) n += parseInt(p.textContent, 10) || 0;
+    });
+    if (!n) return;                      // nothing to do: never nag
+    const scope = store.feed
+      ? (document.querySelector(`#feed-filter li[data-feed='${store.feed}'] .fname`)?.textContent || 'this feed')
+      : 'all feeds';
+    if (!confirm(`Mark ${n} unread post${n === 1 ? '' : 's'} in ${scope} as read?`))
+      return;
+    const btn = $('mark-read-btn');
+    btn.classList.add('spinning');
+    try {
+      await fetch('/api/mark_read', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feed_id: store.feed ? +store.feed : 0 }) });
+      restart(true);
+      renderFeedFilter().catch(() => {});
+    } finally {
+      btn.classList.remove('spinning');
+    }
+  });
+
   // ---- back to top: pure navigation (refresh stays the sticky ⟳'s job).
   // Appears past ~1.5 screens; one tap lands at the top, where unread-first
   // has already parked the unread queue. The jump fires a scroll event, so

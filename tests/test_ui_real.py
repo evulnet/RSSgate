@@ -1537,6 +1537,38 @@ def test_admin_can_reorder_feeds_and_the_reader_sees_it(ui_server, browser):
     pg.close()
 
 
+def test_mark_all_as_read_button_asks_first(ui_server, browser):
+    """Top-bar ✓ marks the CURRENT feed's unread as read - but only after a
+    confirmed dialog: dismiss changes nothing; accept flips the cards and
+    empties the pill (both follow the server)."""
+    fid = _mkfeed("markall")
+    _seed_article(fid, "m1", title="mark probe one",
+                  ts="2027-08-21T00:00:00Z", summary="short one")
+    _seed_article(fid, "m2", title="mark probe two",
+                  ts="2027-08-20T00:00:00Z", summary="short two")
+    pg = _new_page(browser)
+    pg.goto(ui_server, wait_until="networkidle")
+    _scope(pg, fid, "mark probe one")
+    pg.wait_for_selector(f"#feed-filter li[data-feed='{fid}'] .unread-pill")
+
+    # dismiss: the confirm is a real gate
+    pg.once("dialog", lambda d: d.dismiss())
+    pg.click("#mark-read-btn")
+    pg.wait_for_timeout(400)
+    assert pg.locator(".card.unread").count() == 2, "dismiss must change nothing"
+
+    # accept: cards flip read, the pill follows the server truth
+    pg.once("dialog", lambda d: d.accept())
+    pg.click("#mark-read-btn")
+    pg.wait_for_function(
+        "() => !document.querySelector('.card.unread')", timeout=5000)
+    pg.wait_for_function(
+        f"() => !document.querySelector("
+        f"\"#feed-filter li[data-feed='{fid}'] .unread-pill\")", timeout=5000)
+    assert pg.errors == []
+    pg.close()
+
+
 def test_back_to_top_button_appears_and_jumps(ui_server, browser):
     """Mid-way down a long session, a floating button appears (past ~1.5
     screens) and ONE tap returns to the top - pure navigation: it must not

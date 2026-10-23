@@ -169,6 +169,14 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
         return jsonify({"items": items, "has_more": has_more,
                         "next": items[-1] if items else None})
 
+    @app.route("/api/mark_read", methods=["POST"])
+    def api_mark_read():
+        # the top-bar ✓ (viewer): mark the current scope read after the
+        # page's confirm(). {feed_id: 0} = every feed.
+        data = _body()
+        n = db.mark_scope_read(conn, _int(data.get("feed_id"), 0, lo=0))
+        return jsonify({"marked": n})
+
     @app.route("/api/position", methods=["POST"])
     def api_position():
         data = _body()
