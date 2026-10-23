@@ -130,6 +130,23 @@ def _new_page(browser, **ctx_kw):
     ctx = browser.new_page(**ctx_kw)
     ctx.on("pageerror", lambda e: ctx.errors.append(str(e)))
     ctx.errors = []
+    # The viewer registers a service worker, and API GETs are network-first
+    # INSIDE the SW - a page-level route never sees the SW's inner fetch, so
+    # stubs registered here are mirrored onto the CONTEXT (which does).
+    _pr, _pu = ctx.route, ctx.unroute
+
+    def route(pattern, handler, **kw):
+        ctx.context.route(pattern, handler, **kw)
+        return _pr(pattern, handler, **kw)
+
+    def unroute(pattern, handler=None, **kw):
+        try:
+            ctx.context.unroute(pattern, handler, **kw)
+        except Exception:
+            pass
+        return _pu(pattern, handler, **kw)
+
+    ctx.route, ctx.unroute = route, unroute
     return ctx
 
 
@@ -1565,6 +1582,59 @@ def test_mark_all_as_read_button_asks_first(ui_server, browser):
     pg.wait_for_function(
         f"() => !document.querySelector("
         f"\"#feed-filter li[data-feed='{fid}'] .unread-pill\")", timeout=5000)
+    assert pg.errors == []
+    pg.close()
+
+
+def _api_json(url):
+    import json
+    import urllib.request
+    with urllib.request.urlopen(url, timeout=5) as r:
+        return json.loads(r.read())
+
+
+def test_offline_shell_and_replayed_read_marks(ui_server, browser):
+    """The backcountry story: SW ready -> primed reload -> plane mode ->
+    reload still shows the last-seen stream with a loud Offline badge;
+    a read mark taken offline queues in IndexedDB and REPLAYS to the
+    server (asserted via the API, not just the UI) when the network
+    returns; the badge then goes quiet."""
+    fid = _mkfeed("offline")
+    aid = _seed_article(fid, "off1", title="offline probe one",
+                        ts="2027-09-21T00:00:00Z", summary="offline digest one")
+    pg = _new_page(browser)
+    pg.goto(ui_server, wait_until="networkidle")
+    _scope(pg, fid, "offline probe one")
+    assert pg.wait_for_function(
+        "() => navigator.serviceWorker.getRegistration().then("
+        "r => !!r && !!r.active)", timeout=10000), "SW must activate"
+    pg.reload(wait_until="networkidle")        # priming reload through the SW
+    _scope(pg, fid, "offline probe one")
+
+    pg.context.set_offline(True)
+    pg.reload(wait_until="domcontentloaded")
+    _scope(pg, fid, "offline probe one")       # cached API answers the scope
+    pg.wait_for_selector("#offline-badge:not([hidden])", timeout=8000)
+    assert "offline" in pg.inner_text("#offline-badge").lower()
+
+    # a read mark taken offline goes to the queue, not the void
+    pg.click(f".card[data-id='{aid}'] .digest")
+    pg.wait_for_function(
+        "() => /pending/.test((document.querySelector('#offline-badge')"
+        "||{}).textContent || '')", timeout=8000)
+
+    pg.context.set_offline(False)
+    deadline = time.time() + 15
+    while time.time() < deadline:
+        mine = [f for f in _api_json(ui_server + "/api/feeds")
+                if f["id"] == fid]
+        if mine and mine[0]["unread"] == 0:
+            break
+        time.sleep(0.5)
+    else:
+        assert False, "offline read mark never reached the server"
+    pg.wait_for_function(
+        "() => document.querySelector('#offline-badge').hidden", timeout=8000)
     assert pg.errors == []
     pg.close()
 

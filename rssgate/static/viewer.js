@@ -188,8 +188,97 @@
     scheduleFeedSync();
     sendPosition({ read_ids: [+card.dataset.id] });
   }
+  // ---- offline: service worker + IndexedDB write queue -------------------
+  // Only IDEMPOTENT writes are queued (read marks, mark-all): replaying one
+  // twice is a no-op, so no server-side dedupe is needed (unlike apps that
+  // CREATE rows). navigator.onLine lies on iOS - it decorates the badge;
+  // fetch failure is the real offline signal (netOk).
+  let replaying = false, netOk = true;
+  function qdb() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('rssgate-offline', 1);
+      r.onupgradeneeded = () => {
+        if (!r.result.objectStoreNames.contains('ops'))
+          r.result.createObjectStore('ops', { keyPath: 'id' });
+      };
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  function qTx(mode, fn) {
+    return qdb().then(db => new Promise((res, rej) => {
+      const t = db.transaction('ops', mode);
+      const out = fn(t.objectStore('ops'));
+      t.oncomplete = () => res(out);
+      t.onerror = () => rej(t.error);
+      t.onabort = () => rej(t.error);
+    }));
+  }
+  function qAdd(op) {
+    op.id = (self.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : Date.now() + '-' + Math.random().toString(36).slice(2);
+    op.ts = Date.now();
+    return qTx('readwrite', s => s.put(op)).then(() => offlineBadge());
+  }
+  function qAll() {
+    return qdb().then(db => new Promise((res, rej) => {
+      const req = db.transaction('ops').objectStore('ops').getAll();
+      req.onsuccess = () => res((req.result || []).sort((a, b) => a.ts - b.ts));
+      req.onerror = () => rej(req.error);
+    }));
+  }
+  const qDel = (id) => qTx('readwrite', s => s.delete(id));
+  async function qReplay() {
+    if (replaying) return;
+    replaying = true;
+    offlineBadge();
+    let did = false;
+    try {
+      for (const op of await qAll()) {
+        let res;
+        try {
+          res = await fetch(op.path, { method: op.method, body: op.body,
+            headers: { 'content-type': 'application/json' } });
+        } catch (e) { break; }                  // still no network: keep all
+        if (res.ok) { netOk = true; await qDel(op.id); did = true; }
+        else if (res.status >= 400 && res.status < 500) { await qDel(op.id); did = true; }
+        else break;                             // 5xx: keep the queue, retry later
+      }
+    } catch (e) { /* unreadable queue: the badge stays honest via failures */ }
+    finally {
+      replaying = false;
+      offlineBadge();
+      // sidebar re-render ONLY when marks actually landed: an empty-queue
+      // boot pass must not rebuild the sidebar under a click in flight
+      if (did) renderFeedFilter().catch(() => {});
+    }
+  }
+  function offlineBadge() {
+    const b = $('offline-badge');
+    if (!b) return Promise.resolve();
+    return qAll().then(ops => {
+      const off = !navigator.onLine || !netOk;
+      if (!off && !ops.length && !replaying) { b.hidden = true; return; }
+      b.hidden = false;
+      // tones are pipeline, never the reading green: offline is amber,
+      // queued work and syncing are neutral
+      b.className = 'pip ' + (off ? 'pip-warn' : 'pip-neutral');
+      b.textContent = replaying ? 'syncing\u2026'
+        : (off ? 'offline' : 'online')
+          + (ops.length ? ' \u00b7 ' + ops.length + ' pending' : '');
+    }).catch(() => {});
+  }
+
   function sendPosition(payload) {
     const body = JSON.stringify(payload);
+    // Offline: queue instead of beaming into the void. (A sendBeacon on a
+    // lying-onLine network can still be lost - harmless: the server never
+    // learned it, so the card comes back unread next load and re-marks.)
+    if (!navigator.onLine || !netOk) {
+      qAdd({ path: '/api/position', method: 'POST', body }).catch(() => {});
+      return;
+    }
     navigator.sendBeacon && navigator.sendBeacon('/api/position',
       new Blob([body], { type: 'application/json' }))
       || fetch('/api/position', { method: 'POST', body,
@@ -837,10 +926,17 @@
       const r = await fetch('/api/pulse?hw=' + pulseSeenHw);
       if (!r.ok) throw new Error('pulse ' + r.status);   // an error page is
       p = await r.json();                                // not a baseline
-    } catch (e) { pulseFails++; return; }                // off: retry, backed off
+    } catch (e) {
+      pulseFails++;
+      // a network-level rejection (TypeError) is the real offline signal;
+      // an HTTP error page means the server is up and disagreeing
+      if (e instanceof TypeError) { netOk = false; offlineBadge(); }
+      return;                                            // off: retry, backed off
+    }
     finally { pulseInFlight = false; }
     if (!p || typeof p !== 'object') { pulseFails++; return; }
     pulseFails = 0;
+    if (!netOk) { netOk = true; offlineBadge(); }
     // ONE owner of the cadence: this function reads it, pulseStart() arms it.
     // (It used to call schedulePulse(), which called this back: each pass
     // clearTimeout-ed the timer it had just set, so the interval never applied
@@ -1155,9 +1251,14 @@
     const btn = $('mark-read-btn');
     btn.classList.add('spinning');
     try {
-      await fetch('/api/mark_read', { method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feed_id: store.feed ? +store.feed : 0 }) });
+      const body = JSON.stringify({ feed_id: store.feed ? +store.feed : 0 });
+      try {
+        await fetch('/api/mark_read', { method: 'POST',
+          headers: { 'Content-Type': 'application/json' }, body });
+      } catch (e) {
+        netOk = false;
+        await qAdd({ path: '/api/mark_read', method: 'POST', body });
+      }
       restart(true);
       renderFeedFilter().catch(() => {});
     } finally {
@@ -1313,4 +1414,17 @@
     window.scrollTo(0, 0);
     loadNext();
   });
+
+  // offline wiring: replay on every wake-up (the online event lies asleep),
+  // drain what the last session left, and register the service worker.
+  addEventListener('online', () => { netOk = true; offlineBadge(); qReplay(); });
+  addEventListener('offline', () => offlineBadge());
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) { offlineBadge(); qReplay(); }
+  });
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+  offlineBadge();
+  qReplay();
 })();

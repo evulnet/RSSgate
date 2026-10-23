@@ -65,7 +65,10 @@ rssgate/
                     SQL. Input hygiene: _body() (JSON object or 400), _int(),
                     _strs(); /api/* errors are JSON, never an HTML 500
                     (tests/test_input_hygiene.py fuzzes every endpoint).
-  templates/        viewer.html, admin.html (assets stamped ?v={{app_version}})
+  templates/        viewer.html, admin.html (assets stamped ?v={{app_version}}
+                    = CONTENT HASH of style.css+viewer.js+admin.js, not the
+                    release version - a static edit busts the cache by
+                    itself) + sw.js (rendered by /sw.js, no-store)
   static/viewer.js  stream, read tracking, PTR, pips, share renderer
   static/admin.js   panels, autosave, feed table + cog modal, nav spy
   static/style.css  CSS variables, light/dark via prefers-color-scheme
@@ -282,6 +285,39 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
   settings) re-adds `title: a.title`. Recorders in tests must note `title`
   vanishes through `JSON.stringify` when undefined - assert `'title' in d`,
   not the parsed key.
+
+## Offline (service worker + write queue) - read before touching
+- **Layers** (v0.90.0, ported from filmNotes via meta/skills/pwa-home-screen):
+  `/sw.js` is a TEMPLATE route (no-store) baking `_asset_version()` into the
+  cache name + precache URLs - a byte change is what re-registers on iOS.
+  Lanes: `/api/*` GET network-first (cache = offline fallback ONLY; SWR there
+  breaks read-your-writes), `/img/*` cache-first (sha256 filenames = never
+  stale, offline reading keeps photos), shell/statics SWR. Non-GET and
+  cross-origin are NEVER intercepted.
+- **Writes queue in the page** (viewer.js `qAdd/qAll/qReplay`, IndexedDB
+  `rssgate-offline/ops`): only IDEMPOTENT writes (position beacons,
+  mark_read) - replay-twice is a no-op, so there is deliberately NO
+  server-side sync_log/X-Client-Id dedupe (that layer exists in filmNotes
+  because it CREATES rows). Replay on online/boot/visibilitychange; 4xx
+  drops the op, 5xx/network keeps the whole queue. `sendBeacon` is kept for
+  the online path only - a beacon on a lying-onLine network can be lost,
+  which is self-healing (server never learned it -> card returns unread).
+- **The badge (`#offline-badge`) is loud by design** (offline=amber,
+  syncing/pending=neutral - never the reading green). The queue lives in
+  ONE browser profile; Remove-App deletes unsynced marks.
+- **`navigator.onLine` lies on iOS**: `netOk` (set by fetch TypeErrors and
+  the pulse tick) is the real signal; onLine only decorates.
+- **SW needs a secure context**: works on localhost (tier) and on the
+  phone via the Caddy HTTPS hostname; raw `http://LAN-IP:8088` silently
+  never registers (registration is `.catch`ed by design).
+- **Browser tests + SW = context-level stubs**: `page.route` does NOT see
+  the SW's inner network-first fetch, so `_new_page` mirrors every
+  route/unroute onto the owning CONTEXT too. A stub registered directly on
+  the page while the SW is live silently stops applying - 14 pulse tests
+  failed at once when the SW landed, all from this.
+- **Unverified on real hardware**: Add-to-Home-Screen re-install behind
+  Caddy TLS, real airplane-mode reading, iOS badge behaviour. The tier
+  proves the mechanism on Chromium/localhost only.
 
 ## Admin page (admin.html / admin.js)
 - Sections are `section.panel#sec-*`, listed in `.sec-nav` under group labels
@@ -517,6 +553,16 @@ perf, docs, tests, polish. When unsure, cut smaller.
     that read live global state fire; freeze the state (one snapshot +
     route stub) instead of extending timeouts. Full story:
     `docs/POSTMORTEM-v0.84.0.md`.
+18. **A diagnostic is production code.** Run it red on purpose before
+    trusting a green (the v0.84.4 pillagree seam had a `NameError` and a
+    wrong column that only ever reported "all good"). Same rule as test
+    canaries, applied to the tools you write mid-hunt.
+19. **A live service worker silently disables `page.route` stubs.** The SW
+    makes API GETs happen INSIDE the worker, where page-level routes never
+    fire - the whole pulse family failed at once when v0.90.0 landed.
+    Stub via the owning CONTEXT (`_new_page` mirrors route/unroute); never
+    "fix" such a failure by disabling the SW in tests - that tests an app
+    the phone never runs.
 
 ## Known follow-ups (not started)
 - systemd user unit for the live server.

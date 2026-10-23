@@ -1,6 +1,7 @@
 """Flask web app: viewer API + admin API."""
 from __future__ import annotations
 
+import hashlib
 import os
 import threading
 
@@ -16,15 +17,30 @@ from .refresh import refresh_all, refresh_feed  # noqa: F401 (refresh_all: conft
 
 START_TIME = _time_mod.time()
 
+_STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+
+
+def _asset_version() -> str:
+    """Content hash of the static bundle, rendered into ?v= and sw.js.
+    A hand-bumped version string silently strands installed PWAs on stale
+    CSS/JS (iOS standalone caches per URL almost forever); a byte change
+    here is also what makes the service worker re-register."""
+    h = hashlib.sha256()
+    for name in ("style.css", "viewer.js", "admin.js"):
+        try:
+            with open(os.path.join(_STATIC_DIR, name), "rb") as fh:
+                h.update(fh.read())
+        except OSError:
+            h.update(name.encode())
+    return h.hexdigest()[:12]
+
 
 def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
     app = Flask(__name__)
 
-    from . import __version__ as _ver
-
     @app.context_processor
     def _inject_version():
-        return {"app_version": _ver}
+        return {"app_version": _asset_version()}
 
     # ---- input hygiene: malformed requests get a JSON 400, never a 500 ----
     def _body() -> dict:
@@ -96,6 +112,17 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
     def admin():
         cfg = load_config(config_path)
         return render_template("admin.html", cfg=masked_config(cfg))
+
+    @app.route("/sw.js")
+    def sw_js():
+        # Template route: the asset hash baked into the cache name makes a
+        # deploy change sw.js byte-for-byte, which is what triggers iOS to
+        # re-register. no-store so that byte change is seen immediately.
+        resp = make_response(
+            render_template("sw.js", app_version=_asset_version()))
+        resp.headers["Content-Type"] = "application/javascript"
+        resp.headers["Cache-Control"] = "no-store"
+        return resp
 
     # ------------------------------------------------------------- articles
 

@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.90.0] — 2026-10-23 - offline reading (the backcountry release)
+
+The phone app now works with no connection. A service worker (rendered by
+`/sw.js`, no-store, the asset content-hash baked into its cache name so a
+deploy re-registers it on iOS) precaches the shell, serves `/api/*` GETs
+network-first with the cache as OFFLINE fallback only, and `/img/*`
+cache-first - image filenames are sha256 content hashes, so offline
+reading keeps its photos with zero staleness risk. Airplane mode now
+means: the last-loaded stream renders, and a read mark you take offline
+goes into an IndexedDB queue and replays to the server when the network
+returns - asserted against the API, not just the UI. A loud amber
+`offline · N pending` badge sits in the top bar (neutral while syncing;
+never the reading green). Because every queued write is idempotent
+(read marks), the dangerous dedupe layer (filmNotes' sync_log/X-Client-Id)
+is deliberately absent. `?v=` on statics became a content hash of the
+bundle - the filmNotes scar where a hand-bumped version stranded installed
+PWAs on stale CSS. Along the way: a live SW silently disables
+page-level route stubs (the SW fetches inside the worker), so the browser
+tier now mirrors every stub onto the owning CONTEXT - lesson #19. The
+mechanism is Chromium/localhost-proven; the real iPhone behind the Caddy
+hostname needs a Remove-App + re-Add (manual check, AGENTS).
+
 ## [0.89.0] — 2026-10-22 - mark all as read (with a seatbelt)
 
 The top bar grew a ✓ left of the refresh: one tap marks the CURRENT

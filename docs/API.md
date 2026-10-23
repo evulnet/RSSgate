@@ -2,6 +2,11 @@
 
 Base: the app origin (default `http://127.0.0.1:8088`). Bodies are JSON.
 Pages: `GET /` viewer, `GET /admin` admin, `GET /static/<file>?v=<version>`
+(`?v=` is a 12-hex CONTENT hash of the static bundle, not the release
+version). `GET /sw.js` renders the service worker with that same hash
+baked in; served `Cache-Control: no-store` so deploys re-register it
+immediately. Offline reads: the SW answers `/api/*` GETs from cache only
+when the network fails, and `/img/*` cache-first (content-hashed names).
 assets (the `?v=` cache-buster is stamped by the templates on every release).
 Errors: `{"error": "message"}` with a 4xx/5xx status. Endpoints the admin page
 calls on load must degrade to JSON errors, never raise (a down LLM must not
