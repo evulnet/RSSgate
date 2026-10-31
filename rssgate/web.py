@@ -113,6 +113,29 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
         cfg = load_config(config_path)
         return render_template("admin.html", cfg=masked_config(cfg))
 
+    @app.after_request
+    def _cache_headers(resp):
+        # The iOS standalone scar: WebKit caches per URL almost forever.
+        # Right-size by content-addressability:
+        #   HTML          no-cache - every launch revalidates, so a deploy's
+        #                 fresh ?v= references (and the SW registration)
+        #                 actually reach installed PWAs
+        #   /static/?v=   immutable - the URL IS a content hash, revalidate
+        #                 forever is pure waste
+        #   /img/         short - filenames hash the SOURCE url, but the
+        #                 upstream bytes can change (SW cache-first owns
+        #                 the long life)
+        path = request.path
+        if path in ("/", "/admin"):
+            resp.headers["Cache-Control"] = "no-cache"
+        elif path.startswith("/static/"):
+            resp.headers["Cache-Control"] = (
+                "public, max-age=31536000, immutable" if "v" in request.args
+                else "public, max-age=300")
+        elif path.startswith("/img/"):
+            resp.headers["Cache-Control"] = "public, max-age=86400"
+        return resp
+
     @app.route("/sw.js")
     def sw_js():
         # Template route: the asset hash baked into the cache name makes a

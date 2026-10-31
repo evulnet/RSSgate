@@ -52,3 +52,16 @@ def test_viewer_registers_the_sw_and_shows_the_badge(client):
     html = _html(client)
     assert 'id="offline-badge"' in html
     assert "offline-badge" in src, "the UI contract wants every id used"
+
+
+def test_cache_headers_right_sized_for_installed_pwas(client):
+    """The stale-PWA scar, fixed at the source: HTML revalidates EVERY
+    launch (so a deploy's fresh ?v= refs reach the home-screen app),
+    content-hashed statics are immutable, /img gets a day."""
+    assert "no-cache" in client.get("/").headers["Cache-Control"]
+    assert "no-cache" in client.get("/admin").headers["Cache-Control"]
+    st = client.get("/static/viewer.js?v=deadbeefcafe")
+    assert "immutable" in st.headers["Cache-Control"]
+    plain = client.get("/static/favicon.svg")
+    assert "max-age=300" in plain.headers["Cache-Control"]
+    assert "no-store" in client.get("/sw.js").headers["Cache-Control"]

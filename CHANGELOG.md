@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.90.1] — 2026-10-23 - stop the home-screen app from freezing on old code
+
+Reported as "did we lose back-to-top?" - the feature was alive on desktop
+and dead in the iOS PWA because the page HTML was served with NO
+Cache-Control, so WebKit guessed: the installed app kept serving HTML
+from before the feature, pointing at old JS, forever. The house fix for
+the iOS per-URL cache scar, at the source: `/` and `/admin` are now
+`no-cache` (every launch revalidates, so a deploy's fresh ?v= references
+and the SW registration actually reach the phone), content-hashed
+`/static/*?v=` are `immutable` (the URL IS the content - revalidating is
+waste), `/img/*` gets a day (names hash the source url, bytes can still
+change upstream; the SW's cache-first owns the long life). One-time
+ritual for anyone already stuck: Remove-App + re-Add (the old cache
+predates these headers). Watch item: two DIFFERENT pulse browser tests
+each flaked once under full-tier load across three runs (green in
+isolation, as the 14-test family, and on the third full run) - the
+documented timing-sensitive pulse family again.
+
 ## [0.90.0] — 2026-10-23 - offline reading (the backcountry release)
 
 The phone app now works with no connection. A service worker (rendered by
