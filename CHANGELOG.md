@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.93.0] — 2026-11-07 - browser.py: the escalation ladder past the bot check
+
+v0.92.0 shipped the fallback but never met a live challenge, and a plain
+`p.chromium.launch` would have been the weakest rung possible: Cloudflare
+judges the browser, not the intent. This release builds the ladder properly
+(we read public pages for one local reader; the challenge is a machine
+problem, so rungs 1-2 are deterministic and the model only ever *chooses*
+from actions the code permits):
+
+- **Rung 1 (deterministic)**: `launch_persistent_context` with a per-host
+  profile under `fetch.browser_profile_dir` (Cloudflare trusts returning
+  visitors), the system Chrome channel when installed, and
+  `navigator.webdriver` scrubbed. Verified live against the Gizmodo article
+  that started this: 200, clean 277 KB page, cookies harvested.
+- **Rung 2 (rules, no model)**: consent/modal dismissal - Accept cookies /
+  I agree / Continue as guest / Close / Dismiss, max 3 clicks per fetch.
+- **Rung 3 (LLM rescue, `fetch.llm_rescue`)**: only if the page is still
+  stuck, the model sees a compact snapshot (title, control texts, excerpt)
+  and picks ONE action per step: `click` a text that verifiably exists in
+  the snapshot (hallucinated texts are refused), `wait` (capped), or
+  `give_up`. Hard caps: `rescue_max_steps` (4) and a 45 s budget; there is
+  no type/submit/navigate action to ask for. Fetched pages are untrusted
+  input - the gate is the allowlist, not the reasoning trace.
+- Wiring: `net.set_llm_factory()` (serve.py) supplies the client lazily;
+  no playwright or LLM import on the hot HTTP path. `net._browser_fetch`
+  now delegates to `browser.fetch`.
+
+Tests: `tests/test_browser_rescue.py` - rules click/cap/no-op, rescue
+allowlist refusal on hallucinated text, unknown-action and non-JSON
+rejection, step cap, wait cap, LLM-down fallback, `is_stuck`, net
+delegation. Full hermetic tier green (129); UI tier untouched.
+
 ## [0.92.0] — 2026-11-07 - net.py now passes bot checks instead of surrendering to them
 
 Gizmodo's article pages started answering our fetches with Cloudflare's JS

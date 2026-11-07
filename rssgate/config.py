@@ -61,6 +61,12 @@ DEFAULTS: dict = {
         # fetch that also harvests the site's bot-management cookies.
         "challenge_retry_seconds": 20,
         "browser_fallback": True,
+        # browser rescue rungs: rules dismiss consent/modals; the LLM may then
+        # pick one allowlisted action per step (click existing text / wait /
+        # give up) - it can never type, submit, or follow an arbitrary URL.
+        "llm_rescue": True,
+        "rescue_max_steps": 4,
+        "browser_profile_dir": "data/browser-profiles",
     },
     "summarizer": {
         "length": "medium",           # short | medium | long

@@ -28,6 +28,7 @@ def main():
     cfg = load_config(args.config)
     from rssgate import net
     net.configure(cfg)                    # UA + per-host pacing for all fetches
+    net.set_llm_factory(lambda: LLMClient(load_config(args.config)))
     os.makedirs(cfg["server"]["data_dir"], exist_ok=True)
     db_path = os.path.join(cfg["server"]["data_dir"], "rssgate.sqlite")
     conn = db.connect(db_path)

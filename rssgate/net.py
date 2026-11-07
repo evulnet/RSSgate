@@ -46,7 +46,8 @@ BROWSER_COOLDOWN = 600.0         # one Chromium launch per host per 10 min
 _lock = threading.Lock()
 _next_ok: dict[str, float] = {}  # host -> monotonic time of next allowed hit
 _cfg = {"ua": "", "interval": 0.0, "challenge_retry": 0.0,
-        "browser_fallback": False}
+        "browser_fallback": False, "fetch": {}}
+_llm_factory = None          # set by serve: () -> LLMClient, for browser rescue
 
 _jar_lock = threading.Lock()
 _jar: dict[str, dict[str, str]] = {}      # host -> {cookie name: value}
@@ -126,6 +127,13 @@ def configure(cfg: dict) -> None:
     except (TypeError, ValueError):
         _cfg["challenge_retry"] = 0.0
     _cfg["browser_fallback"] = bool(f.get("browser_fallback", False))
+    _cfg["fetch"] = dict(f)
+
+
+def set_llm_factory(fn) -> None:
+    """Wire the LLM client factory used by the browser rescue rung (serve.py)."""
+    global _llm_factory
+    _llm_factory = fn
 
 
 def user_agent() -> str:
@@ -220,32 +228,5 @@ def browser_get(url: str, timeout_s: int = 30):
 
 
 def _browser_fetch(url: str, host: str, timeout_s: int = 30):
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        return None
-    try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
-            try:
-                ctx = browser.new_context(
-                    user_agent=user_agent().replace(" rssgate", "").strip(),
-                    locale="en-CA", viewport={"width": 1366, "height": 900})
-                seeded = _cookies_for(host)
-                if seeded:
-                    ctx.add_cookies([{"name": k, "value": v,
-                                      "domain": host, "path": "/"}
-                                     for k, v in seeded.items()])
-                page = ctx.new_page()
-                r = page.goto(url, wait_until="domcontentloaded",
-                              timeout=timeout_s * 1000)
-                page.wait_for_timeout(3000)   # let a CF redirect chain settle
-                status = getattr(r, "status", 200) if r is not None else 200
-                html = page.content()
-                for ck in ctx.cookies():
-                    _store_cookie(host, ck.get("name", ""), ck.get("value", ""))
-            finally:
-                browser.close()
-    except Exception:  # noqa: BLE001 - any browser failure: caller falls back
-        return None
-    return _Browsed(status, html, url)
+    from . import browser          # lazy: keeps playwright/llm off the hot path
+    return browser.fetch(url, host, _cfg["fetch"], _llm_factory, timeout_s)

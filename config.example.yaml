@@ -46,6 +46,9 @@ fetch:
   block_backoff_minutes: 60 # pause a feed after 403/429; doubles per repeat, max 24h
   challenge_retry_seconds: 20  # wait, then ONE retry with browser headers (0 = off)
   browser_fallback: true    # still challenged: headless Chromium fetch + cookie harvest
+  llm_rescue: true          # stuck page: LLM picks allowlisted actions (click/wait/give up)
+  rescue_max_steps: 4       # model turns per page before giving up
+  browser_profile_dir: data/browser-profiles  # persistent per-host browser trust
 
 summarizer:
   # Target summary length: short | medium | long

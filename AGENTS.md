@@ -71,6 +71,13 @@ rssgate/
                     supplies them - hermetic tests keep 1-request semantics.
                     BLOCK_STATUSES = 403/429.
   fetcher.py        conditional GET, feed parsing, page fingerprint, probe.
+  browser.py        headless-Chromium last resort (from net._browser_fetch):
+                    persistent per-host profile + Chrome channel + webdriver
+                    scrub (rung 1), rules-based consent/modal dismissal (rung
+                    2, no model), LLM rescue (rung 3) limited to a hard
+                    allowlist - click-a-text-that-exists / wait / give_up,
+                    max steps + wall-clock budget, NO typing/submitting ever.
+                    The gate is the allowlist, not the model's judgment.
   llm.py            provider-agnostic client; no DB; raises LLMError.
   web.py            create_app(config_path, conn=None). Thin routes only, no
                     SQL. Input hygiene: _body() (JSON object or 400), _int(),
