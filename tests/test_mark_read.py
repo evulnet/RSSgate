@@ -30,8 +30,8 @@ def test_mark_read_scoped_to_one_feed(client):
 
 
 def test_mark_read_all_feeds(client):
-    a = _mk(client, "https://a.test/feed", 5, "a")
-    b = _mk(client, "https://b.test/feed", 3, "b")
+    _mk(client, "https://a.test/feed", 5, "a")
+    _mk(client, "https://b.test/feed", 3, "b")
     r = client.post("/api/mark_read", json={"feed_id": 0})
     assert r.get_json()["marked"] == 8
     assert all(f["unread"] == 0 for f in client.get("/api/feeds").get_json())

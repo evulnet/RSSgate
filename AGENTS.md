@@ -48,7 +48,9 @@ rssgate/
                     with its OWN connection. Re-reads config.yaml every tick
                     (config_path), so admin edits apply without a restart.
   maint.py          run_all every 6h + at boot: retention, orphan prune,
-                    dedupe_galleries (idempotent repair), cache cap.
+                    dedupe_galleries (idempotent repair), cache cap,
+                    rearm_blocked_excerpts (ladder-expired teasers get
+                    one more page try).
   imgstore.py       cache dir, store(url) (magic-byte sniff, sha256 name,
                     PIXEL FLOOR: both sides <100px = icon = refuse; only
                     when PIL can measure - unmeasurable bytes still store),
@@ -199,7 +201,11 @@ scripts/
   resets it (`feed_pages_ok`). Excerpt fallbacks get `upgrade_at` slots
   (`UPGRADE_HOURS` 6/24/72); the scheduler runs ONE `upgrade_excerpts` per
   tick, which replaces the excerpt with a real digest in place (status stays
-  `ready`, read state ignored). TechPowerUp's check is a browser-fingerprint
+  `ready`, read state ignored). A multi-day block can expire a post's ladder
+  while the site still bot-checks - maintenance `rearm_blocked_excerpts`
+  (v0.91.0) re-arms teaser-length excerpt posts (summary <200 chars, fetched
+  <=30d, 50/run, idempotent) so a lifted block actually heals them.
+  TechPowerUp's check is a browser-fingerprint
   firewall (WebGL renderer, GPU limits, webdriver): headless Chromium fails
   it by design. Do not add fingerprint spoofing or a disguised browser.
 - **LLM outage = hold, not fail.** `refresh.llm_unavailable` (connection

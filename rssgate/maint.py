@@ -55,6 +55,25 @@ def requeue_refusals(conn) -> int:
     return db.requeue_articles(conn, bad)
 
 
+def rearm_blocked_excerpts(conn) -> int:
+    """Posts that fell off the upgrade ladder WHILE a site was bot-checking
+    its pages get one more page attempt. A teaser-length summary on an
+    excerpt post means the feed had nothing and the block never lifted in
+    time (gizmodo 2026-11: feed is title+teaser only, pages intermittently
+    bot-checked, 23 posts stuck as teasers). Bounded (30-day window, 50
+    per run) and idempotent: a touched row leaves the selection
+    (upgrade_at set), so the next run is a no-op."""
+    rows = conn.execute(
+        "SELECT id FROM articles WHERE digest_source='excerpt'"
+        " AND status='ready' AND upgrade_at IS NULL"
+        " AND COALESCE(summary,'') <> '' AND length(summary) < 200"
+        " AND fetched_at >= datetime('now', '-30 days')"
+        " ORDER BY id DESC LIMIT 50").fetchall()
+    for r in rows:
+        db.schedule_upgrade(conn, r["id"], 0)   # a FULL fresh ladder
+    return len(rows)
+
+
 def dedupe_galleries(conn) -> int:
     """Repair pass: apply imgstore.dedupe to stored articles (rows written
     before the current rules). Idempotent - a clean row is never rewritten.
@@ -127,6 +146,7 @@ def run_all(conn, cfg) -> dict:
         # size cap may delete referenced files -> clean dangling refs too
         report["galleries_deduped"] = dedupe_galleries(conn)
         report["refusals_requeued"] = requeue_refusals(conn)
+        report["excerpts_rearmed"] = rearm_blocked_excerpts(conn)
         max_mb = float(cfg.get("maintenance", {}).get("images_max_mb", 0) or 0)
         d = imgstore.directory()
         if d and max_mb > 0:

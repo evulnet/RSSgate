@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.91.0] — 2026-11-07 - a lifted bot block now heals old posts
+
+Gizmodo started bot-checking its article pages (the feed still works; the
+feed is title+teaser only, so pages are the only real text). The auto
+machinery did its job - challenge streak, feed-excerpt publishing, daily
+page probes - but one gap stayed: a post whose 3-slot upgrade ladder
+(6h/24h/72h) expired DURING a multi-day block kept its teaser-length
+"digest" forever, even after the block lifted (and probes show the pages
+answer fine now - the check is intermittent, and the browser-like UA is
+not the problem). Maintenance grew `rearm_blocked_excerpts`: excerpt posts
+with a summary under 200 chars, fetched within 30 days and no ladder
+remaining get one more full ladder (50 per run, idempotent - a touched row
+leaves the selection, second run is a no-op, like every repair pass here).
+Booting the new server re-arms the 23 stuck Gizmodo teasers; the ladder
+then replaces them with real digests as the pages allow, and the first
+real page resets the feed's challenge streak on its own. No stealth, no
+fingerprint spoofing, no identity rotation - the doctrine held.
+
 ## [0.90.1] — 2026-10-23 - stop the home-screen app from freezing on old code
 
 Reported as "did we lose back-to-top?" - the feature was alive on desktop

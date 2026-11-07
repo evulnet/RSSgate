@@ -1,2 +1,2 @@
 """RSSgate - local RSS feed manager with LLM-transcribed reader view."""
-__version__ = "0.90.1"
+__version__ = "0.91.0"
