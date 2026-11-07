@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.93.1] — 2026-11-07 - bot-check failures now actually get their promised daily retry
+
+Six gizmodo articles sat in `status='error'` with the message "site serves
+a bot check and the feed has no text (retrying pages daily)" - except
+nothing retried them. The excerpt ladder only covers `status='ready'` +
+`digest_source='excerpt'`; a challenge with no feed text lands in `error`,
+whose only exit was the manual admin button. Pre-ladder failures therefore
+sat forever, and they only LOOKED like fresh ladder failures in the errors
+panel. Now that net.py passes bot checks, a retry wins - so `maint` requeues
+recent bot-check failures (message LIKE 'bot check'/'bot challenge', 30-day
+window, newest 50) once a day via a `botcheck_requeued` state key.
+
+Verified live: the 6 stuck articles requeued through the real endpoint and
+recovered to full page digests (1.8-2 KB summaries) with ZERO new challenge
+hits (streak 0, hits still 7). Unverified: the daily requeue firing under
+the scheduler's maint loop (unit-tested only; maint runs every 6 h).
+
 ## [0.93.0] — 2026-11-07 - browser.py: the escalation ladder past the bot check
 
 v0.92.0 shipped the fallback but never met a live challenge, and a plain

@@ -53,3 +53,37 @@ def test_run_all_reports_the_pass(client):
     assert report["excerpts_rearmed"] == 1
     # second run: nothing left to do (the idempotency assertion)
     assert maint.run_all(client.conn, {})["excerpts_rearmed"] == 0
+
+
+def _mk_error(client, url, guid, msg):
+    r = client.post("/api/feeds", json={"url": url, "type": "feed",
+                                        "categories": ["tech"]})
+    fid = r.get_json()["id"]
+    conn = client.conn
+    aid = db.upsert_article(conn, fid, guid, f"{url}/{guid}", "T",
+                            "2026-11-06T00:00:00Z")
+    db.set_article(conn, aid, status="error", error_msg=msg)
+    return aid
+
+
+def test_botcheck_errors_get_their_promised_daily_retry(client):
+    c = client.conn
+    a = _mk_error(client, "https://b1.test/feed", "b1",
+                  "site serves a bot check and the feed has no text"
+                  " (retrying pages daily) [attempt 1]")
+    b = _mk_error(client, "https://b2.test/feed", "b2",
+                  "site requires a browser (bot challenge) [attempt 1]")
+    other = _mk_error(client, "https://x.test/feed", "x1",
+                      "LLMError: provider exploded")
+    assert maint.requeue_botcheck_errors(c) == 2
+    for aid in (a, b):
+        row = c.execute("SELECT status, attempts FROM articles WHERE id=?",
+                        (aid,)).fetchone()
+        assert row["status"] == "pending" and row["attempts"] == 0
+    assert c.execute("SELECT status FROM articles WHERE id=?",
+                     (other,)).fetchone()["status"] == "error"
+    # once a day: same-day rerun is a no-op even for NEW failures...
+    assert maint.requeue_botcheck_errors(c) == 0
+    # ...and rows that left the selection stay gone
+    db.set_state(c, "botcheck_requeued", "")
+    assert maint.requeue_botcheck_errors(c) == 0

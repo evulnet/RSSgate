@@ -121,6 +121,27 @@ def enforce_cache_size(max_mb: float) -> tuple[int, int]:
     return n, freed
 
 
+def requeue_botcheck_errors(conn) -> int:
+    """Honor the promise in the error text. Articles that failed with
+    "site serves a bot check ... (retrying pages daily)" were NEVER retried:
+    only excerpt posts have ladder retries; error posts waited for the manual
+    admin button (gizmodo 2026-11-07: six pre-ladder failures sat in error
+    forever, and now that net.py passes bot checks a retry actually wins).
+    Once a day, re-queue recent bot-check failures, newest 50, 30-day window;
+    idempotent - a requeued row leaves the selection."""
+    today = db.now_iso()[:10]
+    if db.get_state(conn, "botcheck_requeued", "") == today:
+        return 0
+    ids = [r[0] for r in conn.execute(
+        "SELECT id FROM articles WHERE status='error'"
+        " AND (error_msg LIKE '%bot check%' OR error_msg LIKE '%bot challenge%')"
+        " AND fetched_at >= datetime('now', '-30 days')"
+        " ORDER BY id DESC LIMIT 50").fetchall()]
+    n = db.requeue_articles(conn, ids)
+    db.set_state(conn, "botcheck_requeued", today)
+    return n
+
+
 def run_all(conn, cfg) -> dict:
     report = {"ts": db.now_iso(), "deleted_articles": 0,
               "articles_freed_images": 0, "orphans_removed": 0,
@@ -147,6 +168,7 @@ def run_all(conn, cfg) -> dict:
         report["galleries_deduped"] = dedupe_galleries(conn)
         report["refusals_requeued"] = requeue_refusals(conn)
         report["excerpts_rearmed"] = rearm_blocked_excerpts(conn)
+        report["botcheck_errors_requeued"] = requeue_botcheck_errors(conn)
         max_mb = float(cfg.get("maintenance", {}).get("images_max_mb", 0) or 0)
         d = imgstore.directory()
         if d and max_mb > 0:
