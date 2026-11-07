@@ -38,9 +38,27 @@ def client(tmp_path, monkeypatch):
     from rssgate.web import create_app
     app = create_app(cfg_path, conn=conn)
     app.config["TESTING"] = True
+    from rssgate import imgstore
+    # create_app re-inits imgstore at the config data_dir (./data = LIVE
+    # dir); re-isolate AFTER it, whatever the fixture order was
+    imgstore.init(str(tmp_path / "img"))
     with app.test_client() as c:
         c.conn = conn
         yield c
+
+
+@pytest.fixture(autouse=True)
+def _isolate_imgstore(tmp_path):
+    """Tests must NEVER see the live cache dir. create_app() points imgstore
+    at the config's data_dir (default ./data = the repo's LIVE images when
+    pytest runs from the root), and maint.run_all/prune_orphans with a test
+    DB then deletes every real file - it did (v0.91.0 dev, 2026-11-07:
+    960 MB gone via a run_all test that forgot the per-test redirect).
+    Per-test monkeypatching was the fragile pattern; this is the box.
+    Tests wanting a specific dir still monkeypatch _dir afterwards."""
+    from rssgate import imgstore
+    imgstore.init(str(tmp_path / "img"))
+    yield
 
 
 @pytest.fixture(autouse=True)

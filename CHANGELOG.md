@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.91.1] — 2026-11-07 - tests can no longer touch the live image cache
+
+Self-reported incident: while developing v0.91.0, the new
+`test_run_all_reports_the_pass` ran `maint.run_all` with a TEST database
+while `imgstore._dir` still pointed at the repo's LIVE `data/images`
+(create_app inits it from the config's default `./data`, and pytest runs
+from the root) - `prune_orphans` concluded every real file was unreferenced
+and deleted the whole ~960 MB cache. Every test stayed green while it
+happened. The existing maint tests had each hand-redirected `imgstore._dir`
+- a per-test courtesy that one new test forgot. Fixed as a box, not a
+patch: an autouse conftest fixture redirects imgstore to the test tmp dir
+for EVERY test, and the `client` fixture re-asserts it after `create_app`
+(which re-inits from config). Proven both ways with a sentinel file in the
+live dir: suite deletes it before the fix (red), leaves it after (green).
+The live cache self-heals via the paced image backfill (0.16 MB -> 24 MB
+within twenty minutes of the restart; it re-fetches pages in budgeted
+batches through `net`, so sites see polite traffic). Lesson generalized
+from #6: shared session DB = shared fate, and so shared FILESYSTEM state -
+isolation belongs in the fixture box, never in per-test memory.
+
 ## [0.91.0] — 2026-11-07 - a lifted bot block now heals old posts
 
 Gizmodo started bot-checking its article pages (the feed still works; the
