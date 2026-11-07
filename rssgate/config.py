@@ -56,6 +56,11 @@ DEFAULTS: dict = {
         "user_agent": "",
         "per_host_interval": 3,        # seconds between hits to one site
         "block_backoff_minutes": 60,   # pause after 403/429; doubles, <=24h
+        # JS-challenge recovery: seconds to wait before one retry with
+        # browser headers (0 disables), then an optional headless-Chromium
+        # fetch that also harvests the site's bot-management cookies.
+        "challenge_retry_seconds": 20,
+        "browser_fallback": True,
     },
     "summarizer": {
         "length": "medium",           # short | medium | long

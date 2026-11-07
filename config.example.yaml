@@ -44,6 +44,8 @@ fetch:
   user_agent: ""            # empty = built-in browser-like UA; admin can copy yours
   per_host_interval: 3      # seconds between requests to the same site
   block_backoff_minutes: 60 # pause a feed after 403/429; doubles per repeat, max 24h
+  challenge_retry_seconds: 20  # wait, then ONE retry with browser headers (0 = off)
+  browser_fallback: true    # still challenged: headless Chromium fetch + cookie harvest
 
 summarizer:
   # Target summary length: short | medium | long

@@ -59,8 +59,17 @@ rssgate/
   extract.py        article text + image candidates (og first, article-root
                     scoped content images, avatar/junk filters).
   net.py            THE outbound HTTP path: get() adds the User-Agent
-                    (fetch.user_agent or DEFAULT_UA) and paces requests per
-                    host (fetch.per_host_interval). BLOCK_STATUSES = 403/429.
+                    (fetch.user_agent or DEFAULT_UA), paces requests per host
+                    (fetch.per_host_interval), and keeps a per-host COOKIE JAR
+                    (echoing __cf_bm back is what stops us looking like a bot).
+                    On a JS challenge it retries ONCE after
+                    fetch.challenge_retry_seconds with browser headers, then
+                    optionally runs headless Chromium (fetch.browser_fallback,
+                    10-min launch cooldown per host) and harvests its cookies;
+                    a still-challenged response returns as-is = ONE attempt for
+                    the streak logic. Retry/fallback are OFF until configure()
+                    supplies them - hermetic tests keep 1-request semantics.
+                    BLOCK_STATUSES = 403/429.
   fetcher.py        conditional GET, feed parsing, page fingerprint, probe.
   llm.py            provider-agnostic client; no DB; raises LLMError.
   web.py            create_app(config_path, conn=None). Thin routes only, no

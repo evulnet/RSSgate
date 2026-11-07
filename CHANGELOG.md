@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.92.0] — 2026-11-07 - net.py now passes bot checks instead of surrendering to them
+
+Gizmodo's article pages started answering our fetches with Cloudflare's JS
+challenge (3-in-a-row → Auto fell back to feed text, 23 posts stuck as
+excerpts). The feed itself was always fine; the pages kept failing because
+every request was a fresh `requests.get` that **never echoed the `__cf_bm`
+bot-management cookie Cloudflare had already handed us** - a client that
+drops that cookie is precisely what a bot looks like. (Not the User-Agent:
+the rssgate UA fetches gizmodo articles 200 today.) Cloudflare's challenge
+is a machine problem - JS + TLS + cookies - so the fix is machine-side:
+
+- `net.py` keeps a per-host cookie jar and replays it on every request
+  (feeds, pages, images); the first clean response now makes later ones
+  likelier, not less.
+- On a challenge, `get()` waits `fetch.challenge_retry_seconds` (default 20)
+  and retries ONCE with a fuller browser header set; if that still fails and
+  `fetch.browser_fallback` is on (default), a headless-Chromium fetch runs
+  the challenge script and harvests its cookies (10-min launch cooldown per
+  host; graceful None when playwright/chromium is absent). A still-challenged
+  response comes back as-is, so the streak/excerpt logic counts ONE attempt,
+  not three.
+- Both knobs are OFF until `configure()` supplies them - the hermetic suite
+  (which monkeypatches `requests.get` and asserts single-call challenge
+  semantics) is untouched; production gets them via config DEFAULTS.
+- Deliberately NOT an LLM path: a JS/TLS challenge can't be solved by a
+  language model; a real browser solves it deterministically. The LLM stays
+  where it belongs - understanding pages we legitimately fetched for one
+  local reader.
+
+Tests: `tests/test_net_resilience.py` (cookie echo + per-host isolation,
+no-retry-until-configured, retry recovers with browser headers, fallback
+returns browsed page, all-fail = one challenge, cooldown blocks relaunch,
+`_Browsed` shape). Full hermetic tier green; no UI surface touched.
+
 ## [0.91.1] — 2026-11-07 - tests can no longer touch the live image cache
 
 Self-reported incident: while developing v0.91.0, the new
