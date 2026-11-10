@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.93.2] — 2026-11-09 - the offline queue now drains itself
+
+Reported as "pips arent getting marked as read": the ✓ button's writes
+were vanishing into the IndexedDB queue. Server logs told the story -
+beacons and heartbeats flowing, `/api/feeds` re-fetches landing seconds
+after each read, DB current - but ZERO `POST /api/mark_read` since Oct 24
+despite taps. The v0.90.0 flaw: one failed fetch (a server restart
+guarantees one) sets `netOk=false`, every write then queues, and replay
+lived ONLY on the online/boot/visibilitychange events - an open, focused
+tab may fire none of them, for hours. Now a queued op schedules its own
+15s retry and a successful pulse tick flushes the queue in 2s; a replayed
+mark-all also restarts the stream so the CARDS flip, not just the pips
+(the ✓ re-rendered from the server while its own op was still queued, so
+the cards came back unread - the visible half of the bug). New browser
+test proves queue -> replay -> server -> card-flip end to end; a
+hermetic structural guard keeps the schedules from being deleted (the
+behavior test cannot suppress Playwright's honest `online` event). Bonus
+landmine defused: `PUT /api/config` arms the 20s challenge retry
+process-globally and conftest only reset pacing - a config-PUTting test
+made test_politeness sleep 20s each (suite 13s -> 137s -> 14s). Same
+class as the pacing leak it was written for. (Version note: this ships
+over the parallel v0.92.0/v0.93.x bot-check work; a botched release
+script briefly tagged this content v0.91.2 - that tag is deleted.)
+
 ## [0.93.1] — 2026-11-07 - bot-check failures now actually get their promised daily retry
 
 Six gizmodo articles sat in `status='error'` with the message "site serves
