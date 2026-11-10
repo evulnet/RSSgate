@@ -26,7 +26,7 @@ def test_sw_never_intercepts_writes_or_foreign_origins(client):
     body = client.get("/sw.js").get_data(as_text=True)
     assert 'req.method !== "GET"' in body, "non-GET must pass through to the page"
     assert "self.location.origin" in body, "cross-origin must pass through"
-    assert "/api/" in body and "/img/" in body, "API + image lanes exist"
+    assert "/api/" in body and "/image/" in body, "API + image lanes exist"
     assert "skipWaiting" in body and "clients.claim" in body
 
 

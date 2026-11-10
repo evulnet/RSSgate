@@ -112,6 +112,45 @@ LENGTH_TARGETS = {
 }
 
 
+def check_types(patch, defaults: dict | None = None, path: str = "") -> str | None:
+    """Reject a config patch whose leaves don't match the DEFAULTS types.
+    Returns an error message, or None when it is acceptable. Keys DEFAULTS
+    does not know pass through (per-purpose extras); a dict default with no
+    keys (extra_body, troubleshooting) accepts any dict. Numbers must be
+    finite and >= 0: one "x" in polling.feed_interval_minutes used to save
+    fine and then kill the scheduler tick silently, forever."""
+    import math
+    defaults = DEFAULTS if defaults is None else defaults
+    if not isinstance(patch, dict):
+        return f"{path or 'config'} must be an object"
+    for key, val in patch.items():
+        where = f"{path}.{key}" if path else str(key)
+        if key not in defaults:
+            continue
+        want = defaults[key]
+        if isinstance(want, dict):
+            if not isinstance(val, dict):
+                return f"{where} must be an object"
+            if want:
+                err = check_types(val, want, where)
+                if err:
+                    return err
+        elif isinstance(want, bool):
+            if not isinstance(val, bool):
+                return f"{where} must be true or false"
+        elif isinstance(want, (int, float)):
+            if isinstance(val, bool) or not isinstance(val, (int, float)) \
+                    or not math.isfinite(val) or val < 0:
+                return f"{where} must be a number >= 0"
+        elif isinstance(want, str):
+            if not isinstance(val, str):
+                return f"{where} must be a string"
+        elif isinstance(want, list):
+            if not isinstance(val, list):
+                return f"{where} must be a list"
+    return None
+
+
 def _merge(base: dict, override: dict) -> dict:
     out = copy.deepcopy(base)
     for key, val in (override or {}).items():

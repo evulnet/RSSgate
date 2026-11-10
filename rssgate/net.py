@@ -200,6 +200,15 @@ class _Browsed:
         self.headers: dict[str, str] = {}
         self.cookies: dict[str, str] = {}
 
+    def __enter__(self):                # imgstore uses `with net.get(...)`
+        return self
+
+    def __exit__(self, *exc) -> None:
+        return None
+
+    def close(self) -> None:
+        return None
+
     @property
     def ok(self) -> bool:
         return self.status_code < 400

@@ -1,6 +1,7 @@
 """Background scheduler: polls feeds/pages on their own timers, digests in batches."""
 from __future__ import annotations
 
+import calendar
 import logging
 import threading
 import time
@@ -32,8 +33,17 @@ class Scheduler(threading.Thread):
                    if feed["type"] == "page"
                    else self.cfg["polling"]["feed_interval_minutes"])
         if feed["last_fetched_at"]:
-            last = time.mktime(time.strptime(feed["last_fetched_at"], "%Y-%m-%dT%H:%M:%SZ"))
-            last -= last % 3600 * 0  # utc string; compare in utc epoch
+            try:
+                # timegm, not mktime: the stamp is UTC (mktime read it as
+                # LOCAL time - on UTC-5 every feed would stall 5 h)
+                last = calendar.timegm(time.strptime(
+                    feed["last_fetched_at"], "%Y-%m-%dT%H:%M:%SZ"))
+            except (TypeError, ValueError):
+                return True
+            try:
+                minutes = float(minutes)
+            except (TypeError, ValueError):
+                minutes = 30.0                 # a bad config must not stop polling
             return now - last >= minutes * 60
         return True
 
@@ -41,8 +51,8 @@ class Scheduler(threading.Thread):
         while not self._stop.is_set():
             try:
                 self.poll_due()
-            except Exception:  # noqa: BLE001 keep the loop alive
-                pass
+            except Exception:  # noqa: BLE001 keep the loop alive - but SAY so:
+                log.exception("scheduler tick failed")  # a bare pass hid a dead scheduler
             self._stop.wait(self.tick)
 
     def poll_due(self):

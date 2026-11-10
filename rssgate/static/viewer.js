@@ -47,6 +47,8 @@
   };
   const esc = s => (s || '').replace(/[&<>"]/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // hrefs from feeds: http(s) only - a feed can carry javascript: links
+  const escUrl = s => /^https?:\/\//i.test(s || '') ? esc(s) : '#';
 
   function cardHtml(a) {
     const own = (a.post_categories || []).length > 0;
@@ -68,15 +70,15 @@
     const body = a.status === 'ready' && a.summary
       ? `<div class="digest">${esc(a.summary)}</div>`
       : a.status === 'error'
-        ? `<div class="unsummarized">\u26a0 could not transcribe \u2014 <a href="${esc(a.link)}">read original</a></div>`
+        ? `<div class="unsummarized">\u26a0 could not transcribe \u2014 <a href="${escUrl(a.link)}">read original</a></div>`
         : `<div class="unsummarized">\u23f3 ${a.feed_summarize === false
             ? 'preparing\u2026' : 'waiting for AI transcription\u2026'}</div>`;
     const extra = (a.gallery || []).filter(g => g !== a.image).slice(0, 3);
     const gallery = extra.length
       ? `<div class="gallery">${extra.map(g =>
-          `<a href="${esc(a.link)}" target="_blank" rel="noopener"><img src="/image/${esc(g)}" loading="lazy" alt=""></a>`).join('')}</div>`
+          `<a href="${escUrl(a.link)}" target="_blank" rel="noopener"><img src="/image/${esc(g)}" loading="lazy" alt=""></a>`).join('')}</div>`
       : '';
-    const readmore = `<p class="readmore"><button class="copy-btn" type="button" title="Copy article link" aria-label="Copy link to this article">${ICON_COPY}</button><a href="${esc(a.link)}" target="_blank" rel="noopener">Read the full article at ${esc(a.feed_title || 'the original')} &#8599;</a></p>`;
+    const readmore = `<p class="readmore"><button class="copy-btn" type="button" title="Copy article link" aria-label="Copy link to this article">${ICON_COPY}</button><a href="${escUrl(a.link)}" target="_blank" rel="noopener">Read the full article at ${esc(a.feed_title || 'the original')} &#8599;</a></p>`;
     const thumb = a.image
       ? `<img class="card-thumb" src="/image/${esc(a.image)}" alt="" loading="lazy">`
       : '';
@@ -86,7 +88,7 @@
         ${cats}<span class="meta-actions"><time datetime="${esc(a.ts)}">${fmt(a.ts)}</time><button class="snap-btn" data-fmt="tall" title="Share as a tall card (phone-friendly)" aria-label="Share as a tall card">${ICON_TALL}</button><button class="snap-btn" data-fmt="wide" title="Share as a wide card (magazine layout)" aria-label="Share as a wide card">${ICON_WIDE}</button></span></div>
       ${thumb}
       ${sub}
-      <h2><a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.title)}</a></h2>
+      <h2><a href="${escUrl(a.link)}" target="_blank" rel="noopener">${esc(a.title)}</a></h2>
       ${body}${gallery}${readmore}</article>`;
   }
 
@@ -194,6 +196,9 @@
   // CREATE rows). navigator.onLine lies on iOS - it decorates the badge;
   // fetch failure is the real offline signal (netOk).
   let replaying = false, netOk = true;
+  // The service worker answers a dead network with a cached 200 or a 503
+  // stub instead of rejecting; it marks those so the page still knows.
+  const swOffline = r => !!(r && r.headers && r.headers.get('x-rssgate-offline'));
   function qdb() {
     return new Promise((res, rej) => {
       const r = indexedDB.open('rssgate-offline', 1);
@@ -245,22 +250,25 @@
     if (replaying) return;
     replaying = true;
     offlineBadge();
-    let did = false, didMark = false;
+    let did = false, didMark = false, stuck = false;
     try {
       for (const op of await qAll()) {
         let res;
         try {
           res = await fetch(op.path, { method: op.method, body: op.body,
             headers: { 'content-type': 'application/json' } });
-        } catch (e) { break; }                  // still no network: keep all
+        } catch (e) { stuck = true; break; }    // still no network: keep all
         if (res.ok) { netOk = true; await qDel(op.id); did = true;
           if (op.path.indexOf('/api/mark_read') >= 0) didMark = true; }
         else if (res.status >= 400 && res.status < 500) { await qDel(op.id); did = true; }
-        else break;                             // 5xx: keep the queue, retry later
+        else { stuck = true; break; }           // 5xx: keep the queue, retry later
       }
     } catch (e) { /* unreadable queue: the badge stays honest via failures */ }
     finally {
       replaying = false;
+      // a failed pass re-arms its own retry (it used to wait for an event
+      // or a pulse tick - none come with ui.pulse_minutes=0)
+      if (stuck) qSchedule();
       offlineBadge();
       // sidebar re-render ONLY when marks actually landed: an empty-queue
       // boot pass must not rebuild the sidebar under a click in flight
@@ -942,6 +950,7 @@
     let p = null;
     try {
       const r = await fetch('/api/pulse?hw=' + pulseSeenHw);
+      if (swOffline(r)) throw new TypeError('offline (service worker fallback)');
       if (!r.ok) throw new Error('pulse ' + r.status);   // an error page is
       p = await r.json();                                // not a baseline
     } catch (e) {
@@ -1087,8 +1096,10 @@
   function retryPulse() {           // defined once, re-armed on failure
     // .catch on the CHAIN (not inside .then) so an unparseable answer counts
     // as offline instead of surfacing as an uncaught rejection
-    fetch('/api/resume').then(r => r.json())
-      .then(() => location.reload())
+    fetch('/api/resume').then(r => {
+      if (swOffline(r) || !r.ok) throw new Error('still offline');
+      return r.json();
+    }).then(() => location.reload())
       .catch(() => setTimeout(retryPulse, 20000));
   }
   $('boot-retry').addEventListener('click', () => location.reload());
@@ -1098,7 +1109,10 @@
                   ? window.__SETTLE_MS : 2500;
   async function doRefreshWork() {       // shared by button + pull-to-refresh
     if (bootFailed) {                    // offline: no point POSTing /api/poll
-      try { await fetch('/api/resume'); } catch (e) { return; }
+      try {
+        const r = await fetch('/api/resume');
+        if (swOffline(r) || !r.ok) return;   // SW stub: a reload would loop
+      } catch (e) { return; }
       location.reload();
       return;
     }

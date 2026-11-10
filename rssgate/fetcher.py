@@ -54,6 +54,18 @@ def looks_like_feed(content: bytes) -> bool:
     return bool(XML_SNIFF.match(content[:512].decode("utf-8", "ignore")))
 
 
+def safe_link(base: str, link: str) -> str:
+    """An entry link the reader may put in an href: resolved against the feed
+    URL and http(s) only. feedparser passes javascript:/data: links through
+    untouched, and the viewer renders them as clickable links on its own
+    origin (stored XSS -> PUT /api/config). Anything else becomes the feed URL."""
+    try:
+        u = urljoin(base, (link or "").strip())
+    except ValueError:
+        return base
+    return u if urlparse(u).scheme in ("http", "https") else base
+
+
 def probe(url: str) -> str:
     """Classify a URL as 'feed' or 'page'."""
     res = _get(url)
@@ -175,10 +187,10 @@ def fetch_feed(url: str, etag: str | None = None, last_modified: str | None = No
                 "meta": {}, "entries": [], "etag": res["etag"], "last_modified": res["last_modified"]}
     entries = []
     for e in parsed.entries:
-        link = e.get("link") or e.get("id") or url
+        raw = e.get("link") or e.get("id") or url
         entries.append({
-            "guid": e.get("id") or link,
-            "link": link,
+            "guid": e.get("id") or raw,      # raw: guids must stay stable
+            "link": safe_link(url, raw),
             "title": (e.get("title") or "").strip() or "(untitled)",
             "published_at": _entry_pubdate(e),
             "categories": _entry_categories(e),

@@ -6,7 +6,9 @@ Pages: `GET /` viewer, `GET /admin` admin, `GET /static/<file>?v=<version>`
 version). `GET /sw.js` renders the service worker with that same hash
 baked in; served `Cache-Control: no-store` so deploys re-register it
 immediately. Offline reads: the SW answers `/api/*` GETs from cache only
-when the network fails, and `/img/*` cache-first (content-hashed names).
+when the network fails (every such fallback carries `X-RSSgate-Offline: 1`,
+which the viewer treats as offline), and `/image/*` cache-first in a separate
+`rssgate-img` cache that survives deploys.
 assets (the `?v=` cache-buster is stamped by the templates on every release).
 Errors: `{"error": "message"}` with a 4xx/5xx status. Endpoints the admin page
 calls on load must degrade to JSON errors, never raise (a down LLM must not
@@ -24,7 +26,7 @@ break the panel).
 | `GET /api/qr.png?u=<url>` | Local QR PNG for http(s) URLs (<=500 chars; 400 otherwise). Used by share cards. |
 | `GET /image/<name>` | Cached image. Only hash names `[0-9a-f]{24}.(jpg\|png\|webp\|gif)` resolve. A missing hero is re-fetched from the article's `image_url` and hash-verified (name = sha256(url)[:24]) before serving. Immutable cache headers. |
 | `GET /api/status` | `{version, uptime_min, feeds, feeds_enabled, pending, processing, errors, db_mb, cache_mb, llm_down_since, llm_down_reason, llm_next_try, polling}`. `llm_down_since` is non-null while the AI backend is unreachable and the queue is held. Powers the admin Status panel and the viewer's queue/failure pips. |
-| `GET /api/pulse` | `{newest_ts, ready_total, unread_total, unread_since_total, since_ts, every_minutes, feeds:[{feed_id,title,unread,unread_since,ts}]}`. READ-ONLY "anything waiting?" for the reader's pill: it never fetches feeds (pacing rule). `unread_total` mirrors the sidebar pills exactly (ready+error past the feed cursor, never pending/processing). `unread_since_total` is the pill's own number: those same posts restricted to ones newer than the reader's last-read marker (`state.resume_ts`, or the feed cursor when later); `since_ts` echoes the marker used, so the pill can say "since your last read" only when that is true. `feeds` is sorted by `unread_since` desc so `feeds[0]` is the feed with most to see. |
+| `GET /api/pulse?hw=<id>` | `{newest_ts, ready_total, unread_total, unread_since_total, since_ts, every_minutes, high_water_id, new_since_id, feeds:[{feed_id,title,unread,unread_since,ts}]}`. `hw` is the client's identity watermark; `new_since_id` counts readable-unread posts with `id > hw`, `high_water_id` is the max such id (ids only grow, so this trigger can't cancel out like a count). READ-ONLY "anything waiting?" for the reader's pill: it never fetches feeds (pacing rule). `unread_total` mirrors the sidebar pills exactly (ready+error past the feed cursor; pending/processing too only when `ui.hide_untranscribed` is off, because then they render cards). `unread_since_total` is the pill's own number: those same posts restricted to ones newer than the reader's last-read marker (`state.resume_ts`, or the feed cursor when later); `since_ts` echoes the marker used, so the pill can say "since your last read" only when that is true. `feeds` is sorted by `unread_since` desc so `feeds[0]` is the feed with most to see. |
 
 ## Feeds
 
@@ -60,7 +62,7 @@ break the panel).
 | `POST /api/articles/<id>/drop` | Hide a failed article permanently. |
 | `POST /api/articles/clear-failed` | Delete every `error` article and release images only they used: `{deleted, images_released}`. |
 | `GET /api/maintenance` | `{report, config}` of the last maintenance run. |
-| `POST /api/maintenance/run` | Run now (retention, orphan prune, gallery dedupe repair, cache cap); returns the report. |
+| `POST /api/maintenance/run` | Run now (retention, orphan prune, gallery dedupe repair, cache cap, refusal requeue, rearm of ladder-expired teaser excerpts, daily requeue of recent bot-check failures); returns the report. |
 | `POST /api/images/backfill` | Background image backfill. `{force?: true, limit?, page_fetches?}`. |
 
 ## Config and LLM
@@ -68,7 +70,7 @@ break the panel).
 | Method / path | Description |
 |---|---|
 | `GET /api/config` | Full config; `llm.api_key` masked to `***` plus `api_key_set`. |
-| `PUT /api/config` | Deep-merge patch persisted to `config.yaml`. `server` is file-only. `ui` accepts only validated keys: `order`, `snapshot_width` (360-1440), `stream_width` (480-1600), `hide_untranscribed`, `read_delay` (0-60). `fetch` accepts `user_agent` (printable, <=400 chars; "" = default), `per_host_interval` (0-60 s), `block_backoff_minutes` (1-1440); applied live. `api_key: "***"` keeps the key. `{length}` is appended to a system prompt that lacks it. |
+| `PUT /api/config` | Deep-merge patch persisted to `config.yaml`. Every other section is type-checked against the defaults (wrong type, non-finite or negative number, non-object section => 400 `{error}`; polling intervals and `summarizer.concurrency` must be >= 1). `server` is file-only. The `fetch` bot-check keys (`challenge_retry_seconds`, `browser_fallback`, `llm_rescue`, `rescue_max_steps`, `browser_profile_dir`) are file-only too. `ui` accepts only validated keys: `order`, `snapshot_width` (360-1440), `stream_width` (480-1600), `hide_untranscribed`, `read_delay` (0-60). `fetch` accepts `user_agent` (printable, <=400 chars; "" = default), `per_host_interval` (0-60 s), `block_backoff_minutes` (1-1440); applied live. `api_key: "***"` keeps the key. `{length}` is appended to a system prompt that lacks it. |
 | `GET /api/models` | Provider model list (`[]` + error when unavailable). |
 | `POST /api/llm/test` | "Reply with exactly: OK" round trip; usage logged. |
 | `GET /api/usage` | `{today, month, all_time}` tokens. |

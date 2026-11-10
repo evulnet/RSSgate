@@ -10,7 +10,7 @@ from flask import (
     request, send_file)
 
 from . import db
-from .config import load_config, save_config, masked_config, _merge
+from .config import load_config, save_config, masked_config, _merge, check_types
 from .llm import LLMClient, LLMError, TEST_PROMPT
 import time as _time_mod
 from .refresh import refresh_all, refresh_feed  # noqa: F401 (refresh_all: conftest stub seam)
@@ -122,9 +122,9 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
         #                 actually reach installed PWAs
         #   /static/?v=   immutable - the URL IS a content hash, revalidate
         #                 forever is pure waste
-        #   /img/         short - filenames hash the SOURCE url, but the
-        #                 upstream bytes can change (SW cache-first owns
-        #                 the long life)
+        #   /image/       set by image_route itself (immutable: the name
+        #                 is sha256 of the source URL; the SW's IMG cache
+        #                 owns offline life)
         path = request.path
         if path in ("/", "/admin"):
             resp.headers["Cache-Control"] = "no-cache"
@@ -132,8 +132,6 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
             resp.headers["Cache-Control"] = (
                 "public, max-age=31536000, immutable" if "v" in request.args
                 else "public, max-age=300")
-        elif path.startswith("/img/"):
-            resp.headers["Cache-Control"] = "public, max-age=86400"
         return resp
 
     @app.route("/sw.js")
@@ -584,7 +582,17 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
                 fp["block_backoff_minutes"] = bo
             if fp:
                 patch["fetch"] = fp
-        patch.get("llm", {}).pop("api_key_set", None)
+        if isinstance(patch.get("llm"), dict):
+            patch["llm"].pop("api_key_set", None)   # display-only echo
+        err = check_types(patch)
+        if err:
+            return jsonify({"error": err}), 400
+        for sect, key, lo in (("polling", "feed_interval_minutes", 1),
+                              ("polling", "page_interval_minutes", 1),
+                              ("summarizer", "concurrency", 1)):
+            v = patch.get(sect, {}).get(key)
+            if v is not None and v < lo:
+                return jsonify({"error": f"{sect}.{key} must be >= {lo}"}), 400
         if patch.get("llm", {}).get("api_key") == "***":
             del patch["llm"]["api_key"]
         if "system_prompt" in patch.get("summarizer", {}) and \

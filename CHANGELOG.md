@@ -1,5 +1,64 @@
 # Changelog
 
+## [0.93.3] — 2026-11-10 - review fixes: stored XSS, silent scheduler death, solved challenges paused feeds, SW offline blind spot
+
+From a full code review. Every fix has a test that was run red first
+(canary) unless noted.
+
+- **Stored XSS via feed links.** feedparser passes `<link>javascript:...`
+  through; the viewer escaped it but put it in `href` (the error card's
+  "read original" link ran on our origin, from where `PUT /api/config` can
+  repoint `llm.base_url` and send the stored key away). Links are now
+  resolved and http(s)-only at ingest (`fetcher.safe_link`), and viewer/
+  admin hrefs go through `escUrl`. Live DB checked: zero non-http links.
+- **One bad config value killed the scheduler, silently.** `PUT /api/config`
+  saved `{"polling":{"feed_interval_minutes":"x"}}` and every tick then
+  raised into a bare `except: pass`. Now `config.check_types` rejects
+  wrong-typed/non-finite/negative leaves with a 400 (intervals and
+  concurrency >= 1), malformed sections (`{"llm":null}`) are a 400 instead
+  of a 500, the tick logs its exception, and `_due` tolerates a bad value
+  and uses `calendar.timegm` (mktime read the UTC stamp as local time).
+- **A solved bot check paused the feed.** `browser.fetch` reported
+  `goto()`'s status - the challenge's 403 - for the page Chromium got
+  through to, so refresh treated success as a site block. Status now comes
+  from the final main-frame navigation (`tests/test_browser_real.py`, ui
+  tier, real Chromium vs a local 403-then-redirect server: 403 before, 200
+  after). Also: harvested cookies are this host's only (`ctx.cookies(url)`;
+  ad cookies were evicting `cf_clearance` from the 25-slot jar), the
+  rescue loop's "unstuck yet?" check reads the page instead of a snapshot
+  that was always under the size floor, `_Browsed` supports `with`
+  (imgstore crashed into a swallowed TypeError), and a missing playwright
+  is logged once instead of silently skipping a default-on rung.
+- **Cog modal wrote to other feeds.** A `change` listener was added to the
+  persistent modal body on every open, so feed B's edit was PUT to every
+  feed opened before it. Now `body.onchange`. Browser test opens A then B.
+- **Feed rename:** `rv` was never declared, so the pencil threw before
+  Enter/Esc were wired, and revert was dead. Browser test covers all three.
+- **Service worker:** the image lane matched `/img/`, which is not a route
+  (images live at `/image/`), so photos rode SWR and every deploy wiped
+  them; they now live cache-first in an unversioned `rssgate-img` cache
+  (cap 1500). API fallbacks are stamped `X-RSSgate-Offline: 1` and the
+  viewer treats them as offline: under the SW the page never saw a
+  TypeError, and a cached `/api/pulse` 200 kept `netOk=true` while the
+  server was down, so reads went out by beacon and were lost. The
+  boot-failure retry no longer reloads on the SW's 503 stub (reload loop),
+  and a failed replay re-arms its own retry. New browser test drives
+  "server down, onLine true" through the live SW.
+- **Docs:** looking like a browser to get past bot checks is now the stated
+  policy (AGENTS rule 10 rewritten; the old "no stealth" text contradicted
+  browser.py). AGENTS gains a bot-check ladder section with its known gaps;
+  README gains a Fetching section, the playwright install, offline
+  reading, feed reordering/mark-all/photo posts, `python -m rssgate`;
+  API.md gains pulse `hw`/`high_water_id`/`new_since_id`, the SW stamp,
+  the config 400s, the full maintenance step list. The admin bot-check
+  hint no longer says pages "can't be fetched".
+
+Browser tier: one pre-existing flake fails per full run (a different
+pulse test each time - `does_not_widen_the_stream`,
+`informs_without_disturbing`, `overlays_without_pushing_text` - its probe
+card is not on page 1 of the shared tier; they pass in isolation, and the
+untouched v0.93.2 tree fails the same way). These tests predate `_scope()`.
+
 ## [0.93.2] — 2026-11-09 - the offline queue now drains itself
 
 Reported as "pips arent getting marked as read": the ✓ button's writes

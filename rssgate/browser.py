@@ -16,6 +16,10 @@ import json
 import os
 import re
 import time
+import logging
+
+log = logging.getLogger("rssgate.browser")
+_warned = False
 
 STUCK_RE = re.compile(
     r"just a moment|verify you are human|attention required|"
@@ -115,9 +119,9 @@ def rescue(page, llm, max_steps: int = RESCUE_STEPS,
     for _ in range(max(0, max_steps)):
         if time.monotonic() - t0 > budget_s:
             break
+        if not is_stuck(page.content()):
+            return True             # the snapshot is capped < the size floor
         snap = snapshot(page)
-        if not is_stuck(f"{snap['title']} {snap['body']}"):
-            return True
         asked = json.dumps({"title": snap["title"], "controls": snap["texts"],
                             "excerpt": snap["body"]})
         try:
@@ -161,6 +165,12 @@ def fetch(url: str, host: str, fcfg: dict, llm_factory=None,
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
+        global _warned
+        if not _warned:          # default-on feature, optional dependency:
+            _warned = True       # say once why the rung never runs
+            log.warning("fetch.browser_fallback is on but playwright is not "
+                        "installed: pip install playwright && python -m "
+                        "playwright install chromium")
         return None
     from . import net
     profile = os.path.join(str(fcfg.get("browser_profile_dir")
@@ -195,6 +205,14 @@ def fetch(url: str, host: str, fcfg: dict, llm_factory=None,
                                       "domain": host, "path": "/"}
                                      for k, v in seeded.items()])
                 page = ctx.new_page()
+                # The FINAL main-frame navigation decides the status: a
+                # Cloudflare challenge answers 403 and only then redirects to
+                # the real page, so goto()'s response (the 403) reported a
+                # solved page as a site block and paused the feed.
+                navs = []
+                page.on("response", lambda resp: navs.append(resp.status)
+                        if resp.request.is_navigation_request()
+                        and resp.frame == page.main_frame else None)
                 r = page.goto(url, wait_until="domcontentloaded",
                               timeout=timeout_s * 1000)
                 page.wait_for_timeout(3000)      # let CF redirect chains settle
@@ -210,9 +228,14 @@ def fetch(url: str, host: str, fcfg: dict, llm_factory=None,
                     if llm is not None:
                         steps = fcfg.get("rescue_max_steps", RESCUE_STEPS)
                         rescue(page, llm, max_steps=int(steps))
-                status = getattr(r, "status", 200) if r is not None else 200
                 html = page.content()
-                for ck in ctx.cookies():
+                status = navs[-1] if navs else (
+                    getattr(r, "status", 200) if r is not None else 200)
+                if status in (403, 503) and not is_stuck(html):
+                    status = 200      # challenge solved in place (no new nav)
+                # this host's cookies only: ctx.cookies() is every domain the
+                # page touched, and ad cookies evicted cf_clearance (25 cap)
+                for ck in ctx.cookies(url):
                     net._store_cookie(host, ck.get("name", ""), ck.get("value", ""))
             finally:
                 ctx.close()

@@ -23,8 +23,11 @@ Two sides:
 
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
-cp config.example.yaml config.yaml     # optional; run.py generates defaults
-.venv/bin/python run.py                # serves on http://127.0.0.1:8088
+cp config.example.yaml config.yaml     # optional; defaults are generated
+.venv/bin/python -m rssgate            # serves on http://127.0.0.1:8088
+
+# optional, for sites behind bot checks (see "Fetching" below):
+.venv/bin/pip install playwright && .venv/bin/python -m playwright install chromium
 ```
 
 ## Example feeds
@@ -135,6 +138,12 @@ unlocks:
   and **wide** (magazine layout, photo and QR float in the text).
 - **Clipboard writes** — the snapshot lands on the clipboard instead of
   the Files-app download fallback.
+- **Offline reading** — a service worker keeps the app shell, the last
+  API answers and the photos you've seen, so the stream still opens with no
+  signal. Read marks taken offline queue in the browser and sync when the
+  server answers again. An **offline** / **N pending** badge shows while
+  marks are waiting. (Service workers need HTTPS; on plain `http://` this
+  layer silently stays off.)
 
 Over your tailnet this is zero-configuration: `tailscale serve --bg 8088`
 and browse `https://<machine>.<tailnet>.ts.net`. Same machine, same
@@ -171,6 +180,13 @@ The sidebar is an independently scrollable column with three filter boxes:
 (per-feed view with live unread counts that tick down as you read), and
 **Post Categories** (tags the articles themselves carry). Boxes combine:
 multiple chips within a box OR, different boxes AND.
+
+The sidebar's feed order is yours: drag the **☰** grip on a row in
+**Admin → Feeds** and both the admin table and the reader follow it. The
+top bar's **✓** marks everything in the current scope (one feed, or all)
+as read after a confirm that quotes the count. Posts that are mostly
+photos (a photo blog entry with a caption) are published as-is with their
+images and cost no tokens.
 
 Every card ends with a **"Read the full article at <feed> ↗"** link to the
 original page.
@@ -234,6 +250,43 @@ Clicking **Add feed** first probes it (`POST /api/feeds/probe`, no LLM):
    offered — so when RSSgate says "found a feed", it is one.
 3. Nothing found → you're asked to confirm adding the URL as a **bare page**
    (LLM article discovery), or cancel. A bare page is never added silently.
+
+## Fetching: pacing, blocks and bot checks
+
+Every request to a feed, article or image host goes through one place
+(`rssgate/net.py`):
+
+- **Pacing.** Requests to one site are spaced `fetch.per_host_interval`
+  seconds apart (default 3), across all threads.
+- **Blocks.** A 403/429 pauses that *feed* for `fetch.block_backoff_minutes`
+  (60), doubling on repeat up to 24 h. Its posts wait in the queue instead of
+  failing. A successful fetch, or **Resume now** in the feed's settings, clears it.
+- **Bot checks.** RSSgate deliberately presents itself as a browser so that
+  public pages behind Cloudflare-style checks still load. The ladder, each
+  step only if the previous one is still challenged:
+  1. a browser-like User-Agent plus a per-site cookie jar (Cloudflare's
+     `__cf_bm` cookie is echoed back, as a browser would);
+  2. after `fetch.challenge_retry_seconds` (20; 0 disables) one retry with a
+     full set of browser headers;
+  3. `fetch.browser_fallback` (on by default): the page is opened in headless
+     Chromium with a persistent per-site profile (`fetch.browser_profile_dir`),
+     automation markers hidden, cookie/consent walls dismissed by rules, and,
+     when `fetch.llm_rescue` is on, up to `fetch.rescue_max_steps` steps where
+     the model may only click a button text that exists on the page, wait, or
+     give up. It can never type or submit anything. At most one browser launch
+     per site every 10 minutes.
+
+  Step 3 needs Playwright and a Chromium build (the optional install line in
+  Quick start); without them it is skipped and a warning is logged once.
+  When every step fails, the post is shown from the feed's own text, labelled
+  **feed excerpt**, and the page is retried later (after 6 h, 24 h, 72 h).
+  After three checks in a row an Auto feed stops requesting pages and probes
+  once a day. Feeds that keep hitting checks get a **browser-check site**
+  badge in the admin panel. Some checks (TechPowerUp's fingerprint firewall)
+  still don't pass.
+
+The bot-check keys are set in `config.yaml` only; the admin panel edits the
+User-Agent, pacing and backoff.
 
 ## Raw mode (per feed, zero LLM tokens)
 
@@ -313,8 +366,10 @@ picker on the end banner simply switches into Since mode.
 ## Development & tests
 
 ```bash
-.venv/bin/pip install pytest
-.venv/bin/python -m pytest        # 84 tests, no network required
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m playwright install chromium   # browser tier + bot-check rung
+.venv/bin/python -m pytest        # hermetic tier: no network, seconds
+.venv/bin/python -m pytest -m ui  # real-browser tier, ~1 min
 ```
 
 See [docs/API.md](docs/API.md) for the HTTP surface,

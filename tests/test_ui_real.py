@@ -1210,6 +1210,66 @@ def test_content_source_select_and_fallback_badges(ui_server, browser):
     pg.close()
 
 
+def test_cog_edit_saves_only_the_open_feed(ui_server, browser):
+    """#cfg-modal-body persists across opens; the change handler used to be
+    ADDED per open, so after opening A then B, B's edit was PUT to A too."""
+    from rssgate import db
+    fa, fb = _mkfeed("coga"), _mkfeed("cogb")
+    pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    pg.goto(ui_server + "/admin", wait_until="networkidle")
+    pg.locator(f"tr[data-id='{fa}'] button[data-act=cfg]").click()
+    pg.wait_for_selector(".cfg-panel [data-role=csrc]")
+    pg.click(".cfg-panel button[data-act=cfg-done]")
+    pg.locator(f"tr[data-id='{fb}'] button[data-act=cfg]").click()
+    pg.wait_for_selector(".cfg-panel [data-role=csrc]")
+    pg.select_option(".cfg-panel [data-role=csrc]", "feed")
+    pg.wait_for_selector(".cfg-panel label:has([data-role=csrc]).cfg-ok",
+                         timeout=5000)
+    pg.wait_for_load_state("networkidle")
+    conn = db.connect(UI_DB)
+    assert db.get_feed(conn, fb)["content_source"] == "feed"
+    assert db.get_feed(conn, fa)["content_source"] == "auto", \
+        "feed B's edit leaked into feed A"
+    conn.close()
+    assert pg.errors == []
+    pg.close()
+
+
+def test_feed_rename_keys_and_revert(ui_server, browser):
+    """Rename: Enter saves, Esc cancels, revert restores the feed's own
+    title (an undeclared `rv` threw before the key handlers were wired)."""
+    from rssgate import db
+    fid = _mkfeed("ren")
+    pg = _new_page(browser, viewport={"width": 1280, "height": 900})
+    pg.goto(ui_server + "/admin", wait_until="networkidle")
+    row = f"tr[data-id='{fid}']"
+    pg.locator(f"{row} button[data-act=rename]").click()
+    pg.fill(f"{row} input.feed-rename", "Renamed <b>&amp; feed")
+    pg.press(f"{row} input.feed-rename", "Enter")
+    pg.wait_for_function(
+        f"() => !document.querySelector(\"{row} input.feed-rename\")",
+        timeout=5000)
+    conn = db.connect(UI_DB)
+    assert db.get_feed(conn, fid)["custom_title"] == "Renamed <b>&amp; feed"
+    conn.close()
+    pg.locator(f"{row} button[data-act=rename]").click()
+    assert pg.input_value(f"{row} input.feed-rename") == "Renamed <b>&amp; feed"
+    pg.press(f"{row} input.feed-rename", "Escape")
+    pg.wait_for_function(
+        f"() => !document.querySelector(\"{row} input.feed-rename\")",
+        timeout=5000)
+    pg.locator(f"{row} button[data-act=rename]").click()
+    pg.click(f"{row} button[data-revert]")
+    pg.wait_for_function(
+        f"() => !document.querySelector(\"{row} input.feed-rename\")",
+        timeout=5000)
+    conn = db.connect(UI_DB)
+    assert not db.get_feed(conn, fid)["custom_title"]
+    conn.close()
+    assert pg.errors == []
+    pg.close()
+
+
 def test_challenge_flag_warns_in_admin(ui_server, browser):
     """A site that serves a browser check gets a row badge and a warning
     right at the Content source control."""
@@ -1725,6 +1785,55 @@ def test_offline_shell_and_replayed_read_marks(ui_server, browser):
         assert False, "offline read mark never reached the server"
     pg.wait_for_function(
         "() => document.querySelector('#offline-badge').hidden", timeout=8000)
+    assert pg.errors == []
+    pg.close()
+
+
+def test_sw_fallback_still_reads_as_offline(ui_server, browser):
+    """Server down while navigator.onLine stays TRUE (a restart; iOS lying):
+    the SW answers /api/pulse from cache or a 503 stub, so the page never
+    sees a TypeError. Before v0.93.3 a cached 200 even set netOk=true and
+    reads went out by sendBeacon into the void. The SW now stamps fallbacks
+    X-RSSgate-Offline; the tick must flip netOk off, a read must QUEUE, and
+    the queue must drain once pulse answers for real again."""
+    fid = _mkfeed("swoff")
+    aid = _seed_article(fid, "so1", title="sw offline probe",
+                        ts="2027-09-22T00:00:00Z", summary="sw offline digest")
+    pg = _new_page(browser)
+    pg.goto(ui_server, wait_until="networkidle")
+    _scope(pg, fid, "sw offline probe")
+    assert pg.wait_for_function(
+        "() => navigator.serviceWorker.getRegistration().then("
+        "r => !!r && !!r.active)", timeout=10000), "SW must activate"
+    pg.reload(wait_until="networkidle")         # page now controlled by the SW
+    _scope(pg, fid, "sw offline probe")
+    assert pg.evaluate("() => !!navigator.serviceWorker.controller")
+    pg.evaluate("() => window.__pulseTick()")   # prime the cached pulse 200
+
+    pg.route("**/api/pulse**", lambda route: route.abort())
+    pg.evaluate("() => window.__pulseTick()")
+    pg.wait_for_function(
+        "() => window.__queueState().then(s => s.netOk === false)",
+        timeout=8000)
+    assert pg.evaluate("() => navigator.onLine") is True
+    pg.wait_for_selector("#offline-badge:not([hidden])", timeout=8000)
+
+    pg.click(f".card[data-id='{aid}'] .digest")       # read while "down"
+    pg.wait_for_function(
+        "() => window.__queueState().then(s => s.paths.some("
+        "p => p.indexOf('/api/position') >= 0))", timeout=8000)
+
+    pg.unroute("**/api/pulse**")
+    pg.evaluate("() => window.__pulseTick()")   # real answer -> flush in 2s
+    deadline = time.time() + 20
+    while time.time() < deadline:
+        mine = [f for f in _api_json(ui_server + "/api/feeds")
+                if f["id"] == fid]
+        if mine and mine[0]["unread"] == 0:
+            break
+        time.sleep(0.5)
+    else:
+        assert False, "the queued read never reached the server"
     assert pg.errors == []
     pg.close()
 

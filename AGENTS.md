@@ -71,6 +71,9 @@ rssgate/
                     supplies them - hermetic tests keep 1-request semantics.
                     BLOCK_STATUSES = 403/429.
   fetcher.py        conditional GET, feed parsing, page fingerprint, probe.
+                    safe_link(): entry links are resolved + http(s)-only at
+                    ingest (feedparser passes javascript: through; viewer/
+                    admin also href via escUrl). Stored-XSS guard, v0.93.3.
   browser.py        headless-Chromium last resort (from net._browser_fetch):
                     persistent per-host profile + Chrome channel + webdriver
                     scrub (rung 1), rules-based consent/modal dismissal (rung
@@ -103,7 +106,9 @@ scripts/
    has no cached digest. Unchanged pages, raw-mode feeds, sponsored and
    category-blocked items cost zero calls. Call-count tests guard this.
 2. **Config is the source of truth.** Admin writes go `PUT /api/config` ->
-   `_merge` -> `save_config`. No config in the DB. API keys leave the server
+   `config.check_types` (400 on a wrong-typed leaf; a string interval once
+   saved fine and silently killed the scheduler) -> `_merge` ->
+   `save_config`. No config in the DB. API keys leave the server
    only masked.
 3. **All SQL lives in `db.py`.** Routes stay thin.
 4. **Keyset cursors `(ts, id)`, never OFFSET.** Read cursors only move forward.
@@ -133,14 +138,22 @@ scripts/
    the FEED (`db.feed_block`, doubling to 24h, cleared by a successful
    fetch or the cog modal's Resume now); paused feeds are skipped by the
    scheduler, refresh_all and claim_pending, and their posts stay `pending`
-   instead of failing. Never retry around a block or rotate identities.
-   A bot CHALLENGE (Cloudflare "Just a moment", `net.is_challenge`) is not
-   a block - waiting never helps - so it does not pause the feed: the post
-   is published from the feed's own text (`articles.feed_text`,
-   `digest_source='excerpt'`, zero tokens, labelled "feed excerpt" on the
-   card), or fails with "site requires a browser" if the feed had none.
-   Headless Chromium was tried against guru3d and does not pass; don't
-   add stealth/evasion tooling.
+   instead of failing. Never hammer through a 403/429 BLOCK (that is the
+   site rate-limiting us; backing off is the answer) and never rotate
+   IPs/identities to dodge one.
+   A bot CHALLENGE (Cloudflare "Just a moment", `net.is_challenge`) is a
+   different thing - a machine check on a public page, not a "go away" -
+   and getting past it is allowed: **looking like a real browser is fine
+   and deliberate** (owner decision, 2026-11-10). That means a browser-like
+   default UA, the browser-header retry, and the headless-Chromium rung
+   with `navigator.webdriver` scrubbed, `AutomationControlled` off and the
+   ` rssgate` UA token stripped (see "Bot-check ladder" below). Docs and
+   the site must say so plainly - don't pretend otherwise. Politeness
+   still binds every rung: pacing, one launch per host per 10 min, no
+   bursts. When every rung fails the post is published from the feed's
+   own text (`articles.feed_text`, `digest_source='excerpt'`, zero tokens,
+   labelled "feed excerpt" on the card), or fails with "site requires a
+   browser" if the feed had none.
 
 ## Key flows
 - **Add feed:** probe -> POST /api/feeds -> background refresh -> upsert ->
@@ -220,10 +233,39 @@ scripts/
   `ready`, read state ignored). A multi-day block can expire a post's ladder
   while the site still bot-checks - maintenance `rearm_blocked_excerpts`
   (v0.91.0) re-arms teaser-length excerpt posts (summary <200 chars, fetched
-  <=30d, 50/run, idempotent) so a lifted block actually heals them.
-  TechPowerUp's check is a browser-fingerprint
-  firewall (WebGL renderer, GPU limits, webdriver): headless Chromium fails
-  it by design. Do not add fingerprint spoofing or a disguised browser.
+  <=30d, 50/run) so a lifted block actually heals them. NOT a one-shot:
+  `upgrade_at IS NULL` is re-set when the ladder expires again, so a
+  still-teaser post is re-armed every run for the 30-day window (~21 page
+  fetches); known follow-up - add a rearmed marker before widening it.
+  TechPowerUp's check is a browser-fingerprint firewall (WebGL renderer,
+  GPU limits, webdriver); the current Chromium rung does not pass it.
+  Fingerprint work there is allowed if it is worth the effort - keep it
+  in browser.py, behind the cooldown, and tested.
+- **Bot-check ladder** (net.get -> browser.fetch; v0.92-0.93.3). Rungs,
+  each only when the previous still sees a challenge:
+  1. plain `net.get` with the per-host cookie jar (echoing `__cf_bm`);
+  2. after `fetch.challenge_retry_seconds` (20; 0 = off) ONE retry with
+     `BROWSER_HEADERS`;
+  3. `fetch.browser_fallback` (default on): headless Chromium via
+     Playwright, persistent per-host profile under
+     `fetch.browser_profile_dir` (data/browser-profiles), system Chrome
+     channel when installed, webdriver scrub; rules click consent walls
+     (`WALL_RULES`, <=3 clicks); then, still stuck and `fetch.llm_rescue`,
+     the model picks ONE allowlisted action per step (click a text that
+     exists / wait / give up; `rescue_max_steps` 4, 45 s budget, no typing
+     or submitting). Cookies for that host are harvested into the jar.
+  Status comes from the FINAL main-frame navigation (a solved challenge is
+  403-then-redirect; reporting goto()'s 403 paused feeds as blocked until
+  v0.93.3 - `tests/test_browser_real.py`, ui tier, real Chromium).
+  Requirements: `playwright` is in requirements-dev.txt only, plus
+  `python -m playwright install chromium`; without it rung 3 silently
+  returns None (logged once). Costs and gaps (known, not fixed): rung 2
+  sleeps a worker (or the admin probe request) for 20 s; Chromium page
+  loads are not paced per subresource; rescue LLM tokens are NOT recorded
+  in token_usage; feed XML and images also go through the ladder (a
+  browser-rendered feed/image is useless - they should opt out); the
+  harvested `cf_clearance` is bound to Chromium's UA/TLS, so it rarely
+  helps later plain requests. Chromium runs with `--no-sandbox`.
 - **LLM outage = hold, not fail.** `refresh.llm_unavailable` (connection
   errors, timeouts, 502/503/504) puts the post back untouched, records the
   outage in state (`llm_down_since/reason/next_try`, probe 15s doubling to
@@ -313,15 +355,20 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
   `/sw.js` is a TEMPLATE route (no-store) baking `_asset_version()` into the
   cache name + precache URLs - a byte change is what re-registers on iOS.
   Lanes: `/api/*` GET network-first (cache = offline fallback ONLY; SWR there
-  breaks read-your-writes), `/img/*` cache-first (sha256 filenames = never
-  stale, offline reading keeps photos), shell/statics SWR. Non-GET and
+  breaks read-your-writes; every fallback answer is stamped
+  `X-RSSgate-Offline: 1`), `/image/*` cache-first in its own unversioned
+  `rssgate-img` cache (capped 1500, survives deploys; sha256 filenames =
+  never stale), shell/statics SWR. (Until v0.93.3 the lane said `/img/`,
+  which is not a route - images silently rode SWR and every deploy
+  wiped offline photos.) Non-GET and
   cross-origin are NEVER intercepted.
 - **Writes queue in the page** (viewer.js `qAdd/qAll/qReplay`, IndexedDB
-  `rssgate-offline/ops`): only IDEMPOTENT writes (position beacons,
+  `rssgate-offline/ops`): only replay-safe writes (position beacons,
   mark_read) - replay-twice is a no-op, so there is deliberately NO
   server-side sync_log/X-Client-Id dedupe (that layer exists in filmNotes
   because it CREATES rows). Replay on online/boot/visibilitychange AND on
-  its own schedule - a queued op arms a 15s retry and a successful pulse
+  its own schedule - a queued op arms a 15s retry (a FAILED replay pass
+  re-arms it too, v0.93.3) and a successful pulse
   tick flushes the queue in 2s (events lie asleep: the netOk-stuck incident
   had a focused tab queueing writes for hours with no event ever firing);
   4xx drops the op, 5xx/network keeps the whole queue. `sendBeacon` is kept for
@@ -330,8 +377,14 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
 - **The badge (`#offline-badge`) is loud by design** (offline=amber,
   syncing/pending=neutral - never the reading green). The queue lives in
   ONE browser profile; Remove-App deletes unsynced marks.
-- **`navigator.onLine` lies on iOS**: `netOk` (set by fetch TypeErrors and
-  the pulse tick) is the real signal; onLine only decorates.
+- **`navigator.onLine` lies on iOS**: `netOk` (set by fetch TypeErrors,
+  SW-stamped fallbacks via `swOffline(r)`, and the pulse tick) is the real
+  signal; onLine only decorates. The SW never lets a GET reject, so
+  without the stamp a cached /api/pulse 200 set netOk=true while the
+  server was down and beacons were lost
+  (`test_sw_fallback_still_reads_as_offline`). Caveat: a queued mark_read
+  replays as "mark everything unread in scope NOW", so a late replay also
+  covers posts that arrived after the tap (known follow-up: bound it).
 - **SW needs a secure context**: works on localhost (tier) and on the
   phone via the Caddy HTTPS hostname; raw `http://LAN-IP:8088` silently
   never registers (registration is `.catch`ed by design).
@@ -489,8 +542,9 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
 ## Workflow and release checklist
 1. Make the change. For patch scripts: assert every anchor exists
    (`assert old in s`) - a silent `str.replace` miss shipped fake fixes here.
-2. `node --check` edited JS; `pyflakes rssgate tests` (one known warning:
-   `web.refresh_all` is imported only as a conftest stub seam).
+2. `node --check` edited JS; `pyflakes rssgate tests` (known: in rssgate/
+   only `web.refresh_all`, imported as a conftest stub seam; tests/ carries
+   ~14 old unused-variable warnings - add none).
 3. Hermetic tier green. For any template/CSS/JS change: browser tier green
    **twice** (a one-off failure that never repeats is a watch item; write
    it down).

@@ -2,6 +2,8 @@
 const $ = id => document.getElementById(id);
 const esc = s => (s || '').replace(/[&<>"]/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// hrefs from feeds: http(s) only - a feed can carry javascript: links
+const escUrl = s => /^https?:\/\//i.test(s || '') ? esc(s) : '#';
 
 async function api(path, opts = {}) {
   const res = await fetch(path, { headers: { 'content-type': 'application/json' }, ...opts });
@@ -58,7 +60,7 @@ async function renderFeeds() {
         class="${f.enabled ? '' : 'off'}">
       <td class="grip" data-act="grip" title="drag to reorder (the reader sees this order)">&#9776;</td>
       <td><span class="fname-cell" data-role="fname">
-          <a href="${esc(f.url)}" target="_blank">${esc(f.custom_title || f.title || f.url)}</a>
+          <a href="${escUrl(f.url)}" target="_blank">${esc(f.custom_title || f.title || f.url)}</a>
           ${f.custom_title ? ' <b class="hint" title="renamed">(you)</b>' : ''}
           <button class="btn ghost sm" data-act="rename" title="rename feed">&#9998;</button>
         </span>
@@ -664,7 +666,7 @@ async function renderWorkqueue() {
        <span class="hint">\u2014 ${esc(why(w))}${w.oldest ? `, oldest from ${ago(w.oldest)}` : ''}</span></li>`
   ).join('') || '<li class="hint">nothing waiting</li>';
   $('wq-next').innerHTML = (wq.up_next || []).map(u =>
-    `<li><a href="${esc(u.link)}" target="_blank" rel="noopener">${esc(u.title)}</a>
+    `<li><a href="${escUrl(u.link)}" target="_blank" rel="noopener">${esc(u.title)}</a>
        <span class="hint">${esc(u.feed_title)}</span></li>`
   ).join('') || (wq.queue_ahead
     ? '<li class="hint">nothing can run right now (see the reasons on the left)</li>'
@@ -779,7 +781,7 @@ async function openFeedCfg(id) {
         </select>
         ${autoState(feed) ? `<b class="warn">${esc(autoState(feed).text)}</b><br>` : ''}
         <small>${feed.challenge_at && isAuto(feed)
-          ? '<b class="warn">\u26a0 This site answers with a browser check (often Cloudflare \u201cJust a moment\u201d): its article pages can\'t be fetched. \u201cFeed text only\u201d is usually the right choice here.</b>'
+          ? '<b class="warn">\u26a0 This site answers with a browser check (often Cloudflare \u201cJust a moment\u201d): article pages that the browser fallback can\'t get past are shown from the feed\u2019s text and retried later. If that keeps happening, \u201cFeed text only\u201d saves the attempts.</b>'
           : '(feed text only suits sites that block readers or feeds that already carry full articles; long feed text still gets an LLM digest)'}</small></label>
       <label class="snap-pick"><input type="checkbox" data-role="llm"
         ${feed.summarize === 0 ? '' : 'checked'} style="width:auto">
@@ -841,7 +843,10 @@ async function openFeedCfg(id) {
     cat:     () => ({ category_block: [...body.querySelectorAll(
                  '.cat-pick input:not(:checked)')].map(i => i.dataset.cat) }),
   };
-  body.addEventListener('change', async e => {
+  // onchange PROPERTY, not addEventListener: #cfg-modal-body persists across
+  // opens, so a listener per open re-PUT feed B's edits to every feed opened
+  // before it (each closure kept its own id).
+  body.onchange = async e => {
     const el = e.target;
     const role = el.dataset.role || (el.dataset.cat !== undefined ? 'cat' : '');
     if (!FIELD[role]) return;
@@ -869,7 +874,7 @@ async function openFeedCfg(id) {
       body.dataset.wasLlm = el.checked ? '1' : '0'; redo = true; }
     await renderFeeds();
     if (redo) await maybeRedigest(id);
-  });
+  };
   q('[data-act=cfg-done]').addEventListener('click', () => { veil.hidden = true; });
   const up = q('[data-act=cfg-unpause]');
   if (up) up.addEventListener('click', async () => {
@@ -948,7 +953,7 @@ function startFeedRename(tr, id) {
   const cell = tr.querySelector('[data-role=fname]');
   const f = ALLFEEDS.find(x => String(x.id) === String(id)) || {};
   const cur = f.custom_title || f.title || f.url;
-  const q = cur.replace(/"/g, '&quot;');
+  const q = esc(cur);
   cell.innerHTML = `<input class="feed-rename" value="${q}" size="28">
     <button class="btn sm" data-ok title="save">&#10003;</button>
     <button class="btn ghost sm" data-cancel title="cancel">&#10005;</button>
@@ -962,6 +967,7 @@ function startFeedRename(tr, id) {
   };
   cell.querySelector('[data-ok]').onclick = () => commit(inp.value.trim());
   cell.querySelector('[data-cancel]').onclick = () => renderFeeds();
+  const rv = cell.querySelector('[data-revert]');
   if (rv) rv.onclick = () => commit('');
   inp.onkeydown = ev => {
     if (ev.key === 'Enter') commit(inp.value.trim());
@@ -974,7 +980,7 @@ async function renderFailures() {
   const rows = await api('/api/feed-errors?limit=30');
   $('failure-list').innerHTML = rows.length
     ? rows.map(r => `<li><b class="hint">${esc(r.feed_title)}</b>
-        <a href="${esc(r.link)}" target="_blank">${esc(r.title || r.link)}</a>
+        <a href="${escUrl(r.link)}" target="_blank">${esc(r.title || r.link)}</a>
         <span class="att" title="transcription attempts">\u00d7${r.attempts}</span>
         ${r.error_msg ? `<code>${esc(r.error_msg)}</code>` : '<span class="hint">(reason not stored - enable troubleshooting)</span>'}
         <button class="btn ghost sm" data-retry="${r.id}" title="try again (resets attempts)">\u21bb retry</button>
