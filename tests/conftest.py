@@ -63,9 +63,11 @@ def _isolate_imgstore(tmp_path):
 
 @pytest.fixture(autouse=True)
 def _no_host_pacing():
-    """net pacing is process-global; a config PUT in one test must not make
-    later tests sleep 3s per request."""
+    """net pacing/retry are process-global; a config PUT in one test must
+    not make later tests sleep 3s per request - or wait 20s for a challenge
+    retry (challenge_retry leaks exactly like interval did: PUT /api/config
+    arms it via net.configure, and test_politeness runs after it)."""
     from rssgate import net
     yield
-    net._cfg.update({"ua": "", "interval": 0.0})
+    net._cfg.update({"ua": "", "interval": 0.0, "challenge_retry": 0.0})
     net._next_ok.clear()

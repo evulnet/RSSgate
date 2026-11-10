@@ -320,8 +320,11 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
   `rssgate-offline/ops`): only IDEMPOTENT writes (position beacons,
   mark_read) - replay-twice is a no-op, so there is deliberately NO
   server-side sync_log/X-Client-Id dedupe (that layer exists in filmNotes
-  because it CREATES rows). Replay on online/boot/visibilitychange; 4xx
-  drops the op, 5xx/network keeps the whole queue. `sendBeacon` is kept for
+  because it CREATES rows). Replay on online/boot/visibilitychange AND on
+  its own schedule - a queued op arms a 15s retry and a successful pulse
+  tick flushes the queue in 2s (events lie asleep: the netOk-stuck incident
+  had a focused tab queueing writes for hours with no event ever firing);
+  4xx drops the op, 5xx/network keeps the whole queue. `sendBeacon` is kept for
   the online path only - a beacon on a lying-onLine network can be lost,
   which is self-healing (server never learned it -> card returns unread).
 - **The badge (`#offline-badge`) is loud by design** (offline=amber,

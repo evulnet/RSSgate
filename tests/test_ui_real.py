@@ -1554,6 +1554,96 @@ def test_admin_can_reorder_feeds_and_the_reader_sees_it(ui_server, browser):
     pg.close()
 
 
+def test_pips_follow_reads_without_a_reload(ui_server, browser):
+    """The phone story in one test: read a card (click), never reload - the
+    sidebar pip must DROP via the heartbeat heal (the tick's per-feed
+    unread vector), not wait for a feed switch or a reload."""
+    fid = _mkfeed("pipheal")
+    aids = [_seed_article(fid, f"ph{i}", title=f"pip probe {i}",
+                          ts=f"2027-10-0{3 - i}T00:00:00Z",
+                          summary="short pip digest") for i in range(3)]
+    pg = _new_page(browser)
+    pg.goto(ui_server, wait_until="networkidle")
+    _scope(pg, fid, "pip probe 1")
+    pill = pg.locator(f"#feed-filter li[data-feed='{fid}'] .unread-pill")
+    pg.wait_for_function(
+        f"() => (document.querySelector("
+        f"\"#feed-filter li[data-feed='{fid}'] .unread-pill\")||{{}})"
+        f".textContent.trim() === '3'", timeout=5000)
+
+    pg.click(f".card[data-id='{aids[0]}'] .digest")     # click = read
+    deadline = time.time() + 15
+    while time.time() < deadline:                        # server first
+        mine = [f for f in _api_json(ui_server + "/api/feeds")
+                if f["id"] == fid]
+        if mine and mine[0]["unread"] == 2:
+            break
+        time.sleep(0.4)
+    else:
+        assert False, "the read never reached the server"
+
+    # the pip must follow WITHOUT a reload: drive the heartbeat (the real
+    # cadence has a 60s floor; the seam runs one check now)
+    for _ in range(3):
+        pg.evaluate("() => window.__pulseTick()")
+        pg.wait_for_timeout(400)
+    pg.wait_for_function(
+        f"() => (document.querySelector("
+        f"\"#feed-filter li[data-feed='{fid}'] .unread-pill\")||{{}})"
+        f".textContent.trim() === '2'", timeout=5000)
+    assert pg.errors == []
+    pg.close()
+
+
+def test_queued_mark_read_self_heals_without_events(ui_server, browser):
+    """The netOk-stuck incident (v0.90.0): a failed fetch queues writes, and
+    replay that depends ONLY on online/boot/visibility events can sit for
+    hours in a focused tab. Prove the self-heal: queue a mark-read while
+    offline, then drive the replay path directly (what the qAdd timer and
+    the successful pulse tick call) - the server must learn the mark and
+    the CARDS must flip, not just the pips."""
+    fid = _mkfeed("qmark")
+    for i in (1, 2):
+        _seed_article(fid, f"qm{i}", title=f"qmark probe {i}",
+                      ts=f"2027-11-0{i}T00:00:00Z", summary="qmark digest")
+    pg = _new_page(browser)
+    pg.goto(ui_server, wait_until="networkidle")
+    _scope(pg, fid, "qmark probe 1")
+
+    pg.context.set_offline(True)
+    pg.once("dialog", lambda d: d.accept())
+    pg.click("#mark-read-btn")
+    pg.wait_for_function(
+        "() => /pending/.test((document.querySelector('#offline-badge')"
+        "||{}).textContent || '')", timeout=8000)
+    paths = pg.evaluate("() => window.__queueState().then(s => s.paths)")
+    assert any("mark_read" in p for p in paths), \
+        "the ✓ write must be in the queue, not the void"
+
+    pg.context.set_offline(False)
+    # (Playwright's set_offline(False) fires the real `online` event, so
+    # this test covers queue -> replay -> server -> card-flip end to end;
+    # the EVENT-FREE schedules - qAdd's own timer and the successful-tick
+    # flush - are guarded structurally in tests/test_sw.py, and their
+    # callback is the same qReplay proven here.)
+    deadline = time.time() + 15
+    while time.time() < deadline:
+        mine = [f for f in _api_json(ui_server + "/api/feeds")
+                if f["id"] == fid]
+        if mine and mine[0]["unread"] == 0:
+            break
+        time.sleep(0.4)
+    else:
+        assert False, "replayed mark-read never reached the server"
+    # the stream must follow WITHOUT a manual reload (the didMark restart)
+    pg.wait_for_function("() => !document.querySelector('.card.unread')",
+                         timeout=8000)
+    pg.wait_for_function(
+        "() => document.querySelector('#offline-badge').hidden", timeout=8000)
+    assert pg.errors == []
+    pg.close()
+
+
 def test_mark_all_as_read_button_asks_first(ui_server, browser):
     """Top-bar ✓ marks the CURRENT feed's unread as read - but only after a
     confirmed dialog: dismiss changes nothing; accept flips the cards and

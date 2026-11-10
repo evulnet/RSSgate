@@ -219,6 +219,7 @@
       ? crypto.randomUUID()
       : Date.now() + '-' + Math.random().toString(36).slice(2);
     op.ts = Date.now();
+    qSchedule();
     return qTx('readwrite', s => s.put(op)).then(() => offlineBadge());
   }
   function qAll() {
@@ -229,11 +230,22 @@
     }));
   }
   const qDel = (id) => qTx('readwrite', s => s.delete(id));
+  // Self-heal: the online/boot/visibility events are the fast path but an
+  // open, focused tab may fire NONE of them (netOk-stuck incident: one
+  // TypeError from a server restart queued every write for hours). A queued
+  // op schedules its own retry, and a successful pulse tick does too -
+  // events lie asleep, the timer doesn't.
+  let qTimer = 0;
+  function qSchedule(delay) {
+    if (qTimer) return;
+    qTimer = setTimeout(() => { qTimer = 0; qReplay(); },
+                        delay === undefined ? 15000 : delay);
+  }
   async function qReplay() {
     if (replaying) return;
     replaying = true;
     offlineBadge();
-    let did = false;
+    let did = false, didMark = false;
     try {
       for (const op of await qAll()) {
         let res;
@@ -241,7 +253,8 @@
           res = await fetch(op.path, { method: op.method, body: op.body,
             headers: { 'content-type': 'application/json' } });
         } catch (e) { break; }                  // still no network: keep all
-        if (res.ok) { netOk = true; await qDel(op.id); did = true; }
+        if (res.ok) { netOk = true; await qDel(op.id); did = true;
+          if (op.path.indexOf('/api/mark_read') >= 0) didMark = true; }
         else if (res.status >= 400 && res.status < 500) { await qDel(op.id); did = true; }
         else break;                             // 5xx: keep the queue, retry later
       }
@@ -252,6 +265,11 @@
       // sidebar re-render ONLY when marks actually landed: an empty-queue
       // boot pass must not rebuild the sidebar under a click in flight
       if (did) renderFeedFilter().catch(() => {});
+      // a replayed mark-all must also flip the CARDS (the ✓ re-rendered
+      // from the server while the op was still queued, so they came back
+      // unread); scoped restart, and only for that op - position beacons
+      // must never yank the reader's scroll
+      if (didMark) restart(true);
     }
   }
   function offlineBadge() {
@@ -937,6 +955,7 @@
     if (!p || typeof p !== 'object') { pulseFails++; return; }
     pulseFails = 0;
     if (!netOk) { netOk = true; offlineBadge(); }
+    qSchedule(2000);       // the network just proved itself: flush any queue
     // ONE owner of the cadence: this function reads it, pulseStart() arms it.
     // (It used to call schedulePulse(), which called this back: each pass
     // clearTimeout-ed the timer it had just set, so the interval never applied
@@ -1053,6 +1072,9 @@
     renderFeedFilter().catch(() => {});   // sidebar pips must match what loaded
   });
   window.__pulseTick = pulseTick;      // test seam: run one check now
+  window.__queueState = () => qAll().then(ops =>
+    ({ n: ops.length, netOk: netOk, paths: ops.map(o => o.path) }));
+  window.__replayNow = qReplay;        // seam: the event-free replay path
   window.__dwellState = () => ({cur: curCard ? curCard.dataset.id : null,
                                 credit: dwellCredit, timer: !!curTimer,
                                 active: readerActive, delay: READ_DELAY_MS});

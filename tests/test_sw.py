@@ -54,6 +54,23 @@ def test_viewer_registers_the_sw_and_shows_the_badge(client):
     assert "offline-badge" in src, "the UI contract wants every id used"
 
 
+def test_queue_schedules_its_own_replay(client):
+    """The netOk-stuck incident: replay that lives only on online/boot/
+    visibility events can sit for hours in a focused tab. A queued op must
+    schedule its own retry, and a proven-good network (successful pulse
+    tick) must flush the queue - guarded structurally; the behavior is
+    browser-tested end to end (test_queued_mark_read_self_heals)."""
+    import re
+    src = open(client.application.static_folder + "/viewer.js",
+               encoding="utf-8").read()
+    m = re.search(r"function qAdd\(op\) \{.*?\n  \}", src, re.S)
+    assert m and "qSchedule()" in m.group(0), "qAdd must schedule a retry"
+    m = re.search(r"function qSchedule\(delay\) \{.*?\n  \}", src, re.S)
+    assert m and "setTimeout" in m.group(0) and "qReplay()" in m.group(0)
+    # the successful-tick flush (the tick body, after its failure ladder)
+    assert "qSchedule(2000)" in src, "a good tick must flush the queue"
+
+
 def test_cache_headers_right_sized_for_installed_pwas(client):
     """The stale-PWA scar, fixed at the source: HTML revalidates EVERY
     launch (so a deploy's fresh ?v= refs reach the home-screen app),
