@@ -65,3 +65,113 @@ def test_browsed_is_a_context_manager():
     b = net._Browsed(200, "<html></html>", "https://h.test/i.jpg")
     with b as r:
         assert r is b
+
+
+def test_scheduler_thread_opens_its_own_connection(tmp_path, monkeypatch):
+    """Invariant 6: serve.py passes the request connection; the scheduler
+    thread must not keep using it."""
+    import threading
+    from rssgate import db
+    path = str(tmp_path / "s.sqlite")
+    shared = db.connect(path)
+    db.init_db(shared)
+    s = Scheduler(shared, {}, lambda: None, tick_seconds=3600, db_path=path)
+    seen = threading.Event()
+    used = []
+    monkeypatch.setattr(s, "poll_due", lambda: used.append(s.conn) or seen.set())
+    s.start()
+    assert seen.wait(5)
+    s.stop()
+    assert used[0] is not shared
+
+
+def test_garbage_cursor_cannot_freeze_a_feed(client):
+    from rssgate import db
+    fid = db.add_feed(client.conn, "https://cur.test/f", type_="feed")["id"]
+    r = client.post("/api/position", json={"ts": "2026-01-01T00:00:00Z",
+                                           "id": 1, "reads": {str(fid): "zzz"}})
+    assert r.status_code < 500
+    assert db.get_feed(client.conn, fid)["last_read_ts"] is None
+    client.post("/api/position", json={"ts": "zzz", "id": 1, "global": True})
+    assert db.get_state(client.conn, "resume_ts", "") != "zzz"
+    db.mark_feed_read(client.conn, fid, "2026-01-01T00:00:00+00:00")
+    assert db.get_feed(client.conn, fid)["last_read_ts"] == "2026-01-01T00:00:00Z"
+
+
+def test_superscript_digit_read_id_is_not_a_500(client):
+    r = client.post("/api/position", json={"read_ids": ["²", "3"]})
+    assert r.status_code == 200
+
+
+def test_bounded_mark_all_leaves_later_arrivals_unread(client):
+    """A queued ✓ replays with max_id: posts that arrived after the tap
+    stay unread."""
+    from rssgate import db
+    c = client.conn
+    fid = db.add_feed(c, "https://mr.test/f", type_="feed")["id"]
+    a1 = db.upsert_article(c, fid, "m1", "https://mr.test/1", "t",
+                           "2026-11-01T00:00:00Z")
+    a2 = db.upsert_article(c, fid, "m2", "https://mr.test/2", "t",
+                           "2026-11-02T00:00:00Z")
+    for a in (a1, a2):
+        db.set_article(c, a, status="ready", summary="s")
+    r = client.post("/api/mark_read", json={"feed_id": fid, "max_id": a1})
+    assert r.get_json()["marked"] == 1
+    rows = {x["id"]: x["read_at"] for x in
+            c.execute("SELECT id, read_at FROM articles WHERE feed_id=?", (fid,))}
+    assert rows[a1] and not rows[a2]
+    assert db.get_feed(c, fid)["last_read_ts"] == "2026-11-01T00:00:00Z"
+    # unbounded (the online tap) still marks everything
+    assert client.post("/api/mark_read", json={"feed_id": fid}).get_json()["marked"] == 1
+
+
+def test_models_endpoint_degrades_when_backend_is_down(tmp_path, monkeypatch):
+    """A down LLM must not break the admin panel: JSON 502, never a 500."""
+    import requests
+    from rssgate import llm as L
+
+    def boom(*a, **k):
+        raise requests.ConnectionError("refused")
+    monkeypatch.setattr(requests, "get", boom)
+    c = L.LLMClient({"llm": {"provider": "local", "base_url": "http://127.0.0.1:9/v1"}})
+    try:
+        c.list_models()
+        assert False, "should raise"
+    except L.LLMError:
+        pass
+    from rssgate.refresh import llm_unavailable
+    try:
+        c.list_models()
+    except L.LLMError as e:
+        assert llm_unavailable(e), "a connection failure must HOLD the queue"
+
+
+def test_concurrent_requests_do_not_share_a_connection(client):
+    """Werkzeug serves each request on its own thread; one shared sqlite
+    handle interleaved cursors and COUNT(*) came back rowless (/api/feeds
+    500 - the tier's pillagree 'flake'). Hammer it from threads."""
+    import threading
+    from rssgate import db
+    for i in range(5):
+        fid = db.add_feed(client.conn, f"https://cc{i}.test/f", type_="feed")["id"]
+        for j in range(5):
+            aid = db.upsert_article(client.conn, fid, f"g{j}", f"https://cc{i}.test/{j}",
+                                    "t", f"2026-11-0{j + 1}T00:00:00Z")
+            db.set_article(client.conn, aid, status="ready", summary="s")
+    bad = []
+
+    def worker():
+        for _ in range(25):
+            for u in ("/api/feeds", "/api/status", "/api/pulse"):
+                try:
+                    r = client.application.test_client().get(u)
+                    if r.status_code != 200:
+                        bad.append((u, r.status_code))
+                except Exception as e:  # noqa: BLE001
+                    bad.append((u, repr(e)[:80]))
+    ts = [threading.Thread(target=worker) for _ in range(8)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join()
+    assert bad == [], bad[:5]

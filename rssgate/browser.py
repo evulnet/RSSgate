@@ -112,9 +112,11 @@ def _parse_action(text: str) -> dict:
 
 
 def rescue(page, llm, max_steps: int = RESCUE_STEPS,
-           budget_s: float = RESCUE_BUDGET_S) -> bool:
+           budget_s: float = RESCUE_BUDGET_S, on_usage=None) -> bool:
     """Rung 3: LLM picks actions from the allowlist until un-stuck or spent.
-    Returns True when the page stopped looking stuck."""
+    Returns True when the page stopped looking stuck. on_usage(llm, usage,
+    ms) is told about every call - rescue tokens are real spend and belong
+    in token_usage (purpose 'rescue'), not off the books."""
     t0 = time.monotonic()
     for _ in range(max(0, max_steps)):
         if time.monotonic() - t0 > budget_s:
@@ -124,12 +126,19 @@ def rescue(page, llm, max_steps: int = RESCUE_STEPS,
         snap = snapshot(page)
         asked = json.dumps({"title": snap["title"], "controls": snap["texts"],
                             "excerpt": snap["body"]})
+        t_call = time.monotonic()
         try:
-            reply, _usage = llm.chat(
+            reply, usage = llm.chat(
                 [{"role": "system", "content": RESCUE_SYSTEM},
                  {"role": "user", "content": asked}], max_tokens=150)
         except Exception:  # noqa: BLE001 - LLM down: deterministic outcome
             return not is_stuck(page.content())
+        if on_usage is not None:
+            try:
+                on_usage(llm, usage or {},
+                         int((time.monotonic() - t_call) * 1000))
+            except Exception:  # noqa: BLE001 - accounting must not break a fetch
+                log.exception("recording rescue usage failed")
         act = _parse_action(reply)
         kind = str(act.get("action", "")).lower()
         if kind == "click":
@@ -227,7 +236,8 @@ def fetch(url: str, host: str, fcfg: dict, llm_factory=None,
                             llm = None
                     if llm is not None:
                         steps = fcfg.get("rescue_max_steps", RESCUE_STEPS)
-                        rescue(page, llm, max_steps=int(steps))
+                        rescue(page, llm, max_steps=int(steps),
+                               on_usage=net._usage_sink)
                 html = page.content()
                 status = navs[-1] if navs else (
                     getattr(r, "status", 200) if r is not None else 200)

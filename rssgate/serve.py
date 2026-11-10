@@ -31,6 +31,15 @@ def main():
     net.set_llm_factory(lambda: LLMClient(load_config(args.config)))
     os.makedirs(cfg["server"]["data_dir"], exist_ok=True)
     db_path = os.path.join(cfg["server"]["data_dir"], "rssgate.sqlite")
+
+    def _rescue_usage(llm, usage, ms):
+        import contextlib             # the fetching thread's own connection
+        with contextlib.closing(db.connect(db_path)) as uconn:
+            db.log_usage(uconn, llm.provider, llm.model or "auto",
+                         int(usage.get("prompt_tokens", 0) or 0),
+                         int(usage.get("completion_tokens", 0) or 0),
+                         duration_ms=ms, purpose="rescue")
+    net.set_usage_sink(_rescue_usage)
     conn = db.connect(db_path)
     db.init_db(conn)
     app = create_app(args.config, conn=conn)

@@ -141,3 +141,22 @@ def test_browsed_response_shape():
     assert list(b.iter_content(4))
     b5 = net._Browsed(403, "Just a moment... cloudflare", "u")
     assert not b5.ok and net.is_challenge(b5)
+
+
+@pytest.mark.parametrize("mode,requests_made,browser", [
+    ("none", 1, False), ("headers", 2, False), ("full", 2, True)])
+def test_recover_caps_the_ladder_per_call(monkeypatch, mode, requests_made, browser):
+    """Images ("none") and feed XML ("headers") never reach Chromium: a
+    browser-rendered feed is the XML viewer and an image fetch paid a 20 s
+    sleep plus a launch for nothing."""
+    calls, launched = [], []
+    monkeypatch.setattr("requests.get", lambda url, **kw: calls.append(kw) or CF())
+    monkeypatch.setattr(net, "browser_get",
+                        lambda url, **kw: launched.append(url) or None)
+    net.configure({"fetch": {"per_host_interval": 0,
+                             "challenge_retry_seconds": 0.01,
+                             "browser_fallback": True}})
+    net.get("https://cf.test/1", recover=mode)
+    assert len(calls) == requests_made
+    assert bool(launched) is browser
+    assert all("recover" not in kw for kw in calls)   # never leaks to requests

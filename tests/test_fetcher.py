@@ -30,7 +30,7 @@ def test_sniff_feed_vs_html():
 
 
 def test_entry_categories_collected(monkeypatch):
-    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None: {
+    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None, **k: {
         "ok": True, "not_modified": False, "status": 200,
         "content": RSS_WITH_CATS, "content_type": "", "etag": None, "last_modified": None})
     res = fetch_feed("https://ex.com/feed")
@@ -47,14 +47,14 @@ def test_entry_categories_collected(monkeypatch):
 def test_channel_categories_preferred(monkeypatch):
     xml = RSS_WITH_CATS.replace(b"<channel>",
         b"<channel><category>Science</category>")
-    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None: {
+    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None, **k: {
         "ok": True, "not_modified": False, "status": 200,
         "content": xml, "content_type": "", "etag": None, "last_modified": None})
     assert fetch_feed("u")["meta"]["categories"] == ["Science"]
 
 
 def test_feed_304_not_modified(monkeypatch):
-    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None: {
+    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None, **k: {
         "ok": True, "not_modified": True, "status": 304, "content": b"",
         "content_type": "", "etag": None, "last_modified": None})
     res = fetch_feed("u", etag='"abc"')
@@ -62,7 +62,7 @@ def test_feed_304_not_modified(monkeypatch):
 
 
 def test_page_unchanged_detected_by_hash(monkeypatch):
-    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None: {
+    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None, **k: {
         "ok": True, "not_modified": False, "status": 200,
         "content": b"<html>hi</html>", "content_type": "text/html",
         "etag": '"e1"', "last_modified": None})

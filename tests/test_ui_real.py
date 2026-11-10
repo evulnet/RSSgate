@@ -80,10 +80,12 @@ def ui_server(tmp_path_factory):
         tag = "rssgate-ui" + "-test"     # split so pkill never matches us
         subprocess.run(["pkill", "-f", tag], capture_output=True)
     time.sleep(0.5)
+    # server output kept for post-mortems (a 500 in the tier is otherwise
+    # invisible): /tmp/rssgate-ui-test/server.log
+    log = open(data / "server.log", "wb")
     proc = subprocess.Popen(
         [sys.executable, str(ROOT / "run.py"), "--config", str(cfg)],
-        cwd=str(ROOT), stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL)
+        cwd=str(ROOT), stdout=log, stderr=subprocess.STDOUT)
     try:
         _wait_port(PORT)
         sys.path.insert(0, str(ROOT))
@@ -701,6 +703,39 @@ def test_stream_progress_rail(ui_server, browser):
     assert pg.errors == []
     pg.close()
 
+
+
+@pytest.mark.parametrize("width", [320, 360])
+def test_header_fits_with_every_pip_showing(ui_server, browser, width):
+    """Worst case on a small phone: queue pip ("waiting · AI offline"), fail
+    pip and offline badge all at once. The fail pip used to keep its word
+    and push refresh + admin 46px off a 320px screen - only when the tier
+    happened to have failures, so it looked like a flake."""
+    pg = _new_page(browser, viewport={"width": width, "height": 700})
+    pg.goto(ui_server, wait_until="networkidle")
+    pg.evaluate("""() => {
+      for (const id of ['pip-queue', 'pip-fail', 'offline-badge'])
+        document.getElementById(id).hidden = false;
+      document.getElementById('pip-queue-n').textContent = '128';
+      document.getElementById('pip-queue-label').textContent = 'waiting \u00b7 AI offline';
+      document.getElementById('pip-fail-n').textContent = '37';
+      document.getElementById('offline-badge').textContent = 'offline \u00b7 12 pending';
+    }""")
+    geo = pg.evaluate("""() => ({
+      over: document.documentElement.scrollWidth - innerWidth,
+      btns: ['menu-btn', 'mark-read-btn', 'refresh-btn'].map(id => {
+        const r = document.getElementById(id).getBoundingClientRect();
+        return [id, Math.round(r.left), Math.round(r.right), Math.round(r.width)]; }),
+      admin: Math.round(document.querySelector('.topbar a.icon-btn')
+                        .getBoundingClientRect().right),
+      kids: [...document.querySelector('.topbar').children].filter(e => !e.hidden)
+        .map(e => (e.id || e.className) + ':' + Math.round(e.getBoundingClientRect().width)
+             + '/' + getComputedStyle(e).flexShrink + '/' + getComputedStyle(e).minWidth) })""")
+    assert geo["over"] <= 0, f"header overflows at {width}px: {geo}"
+    assert geo["admin"] <= width, geo
+    assert all(b[3] >= 30 for b in geo["btns"]), f"tap targets shrank: {geo}"
+    assert pg.errors == []
+    pg.close()
 
 
 def test_refresh_button_drives_the_rail(ui_server, browser):
@@ -2223,7 +2258,14 @@ def test_share_buttons_stay_on_one_line_on_mobile(ui_server, browser, width):
       return {btns, time, crRight: Math.round(cr.right),
               innerWidth, scrollOverflow: document.documentElement.scrollWidth - innerWidth,
               metaLeft: Math.round(g(card.querySelector('.meta-actions')).left),
-              cardLeft: Math.round(cr.left), timeRight: Math.round(time.right)};
+              cardLeft: Math.round(cr.left), timeRight: Math.round(time.right),
+              // diagnostics: WHAT overflows (failed once per ~3 full runs)
+              wide: [...document.querySelectorAll('body *')]
+                .filter(e => e.getBoundingClientRect().right > innerWidth + 1)
+                .slice(0, 6).map(e => (e.id || e.className || e.tagName) + ':'
+                  + Math.round(e.getBoundingClientRect().right)),
+              badge: (document.getElementById('offline-badge') || {}).hidden,
+              badgeText: (document.getElementById('offline-badge') || {}).textContent};
     }""")
     btns, t = geo["btns"], geo["time"]
     assert len(btns) == 2, geo
@@ -2241,7 +2283,7 @@ def test_share_buttons_stay_on_one_line_on_mobile(ui_server, browser, width):
     assert t["width"] > 0, "timestamp hidden"
     assert (geo["metaLeft"] - geo["cardLeft"]) / (geo["crRight"] - geo["cardLeft"]) > .4, \
         "share group no longer right-aligned"
-    assert geo["scrollOverflow"] <= 0, "page overflows horizontally"
+    assert geo["scrollOverflow"] <= 0, f"page overflows horizontally: {geo}"
     assert pg.errors == []
     pg.close()
 
@@ -2528,9 +2570,11 @@ def test_pulse_pill_does_not_widen_the_stream(ui_server, browser):
     pg.route("**/api/pulse**", lambda r: r.fulfill(json=stub))
     pg.goto(ui_server, wait_until="networkidle")
     pg.wait_for_selector(".card")
+    _scope(pg, fid, "geometry probe")      # shared tier: page 1 may not hold it
     card = pg.locator(".card", has_text="geometry probe")
     assert card.count() == 1
-    pg.wait_for_function("document.getElementById('pulse').hidden === true")
+    pg.wait_for_function(  # detached by restart() until shown
+        "(document.getElementById('pulse') || {hidden: true}).hidden === true")
     b0 = card.bounding_box()
     s0 = pg.locator("#stream").bounding_box()
     stub["feeds"][0]["unread_since"] = 3       # now 3 posts are waiting
@@ -2572,7 +2616,9 @@ def test_pulse_pill_overlays_without_pushing_text(ui_server, browser):
     pg.route("**/api/pulse**", lambda r: r.fulfill(json=stub))
     pg.goto(ui_server, wait_until="networkidle")
     pg.wait_for_selector(".card")
-    pg.wait_for_function("document.getElementById('pulse').hidden === true")
+    _scope(pg, fid, "overlay probe")      # shared tier: page 1 may not hold it
+    pg.wait_for_function(  # detached by restart() until shown
+        "(document.getElementById('pulse') || {hidden: true}).hidden === true")
     card = pg.locator(".card", has_text="overlay probe")
     pg.evaluate("window.scrollTo(0, 300)")
     pg.wait_for_timeout(150)

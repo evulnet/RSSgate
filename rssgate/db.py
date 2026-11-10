@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime
+import re
 import sqlite3
 
 SCHEMA = """
@@ -156,6 +157,8 @@ def _migrate(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE articles ADD COLUMN image TEXT")
     if "images" not in cols:
         conn.execute("ALTER TABLE articles ADD COLUMN images TEXT NOT NULL DEFAULT ''")
+    if "rearmed" not in cols:            # maint.rearm_blocked_excerpts: once
+        conn.execute("ALTER TABLE articles ADD COLUMN rearmed INTEGER NOT NULL DEFAULT 0")
 
 
 def norm_ts(value):
@@ -182,10 +185,64 @@ def norm_ts(value):
     return dt.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def cursor_ts(value):
+    """norm_ts for values that become CURSORS (feed last_read_ts, resume_ts):
+    unparseable -> None instead of passing through. A client-sent "zzz"
+    sorted after every timestamp, so the forward-only cursor froze the feed
+    at 0 unread for good."""
+    out = norm_ts(value)
+    if not out or not re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ", out):
+        return None
+    return out
+
+
 def path_of(conn) -> str:
     """The database FILE behind a connection - background threads must open
     their OWN connection to it (never share a handle across threads)."""
     return conn.execute("PRAGMA database_list").fetchone()["file"]
+
+
+class ThreadConn:
+    """One SQLite connection PER THREAD behind one handle (invariant 6, for
+    the request path). Werkzeug serves each request on its own thread, and
+    every route used to share the single connection create_app was given:
+    interleaved cursors on one handle made `SELECT COUNT(*)` come back
+    with no row (`fetchone()` None -> /api/feeds 500), the root of the
+    pillagree "flake". The creating thread keeps the original connection
+    (tests seed through it and the test client runs on that thread); any
+    other thread lazily opens its own to the same file, closed by
+    release() at request teardown."""
+
+    def __init__(self, conn: sqlite3.Connection):
+        import threading
+        self._home = conn
+        self._home_tid = threading.get_ident()
+        self._path = path_of(conn)
+        self._local = threading.local()
+        self._ident = threading.get_ident
+
+    def _conn(self) -> sqlite3.Connection:
+        if self._ident() == self._home_tid:
+            return self._home
+        c = getattr(self._local, "c", None)
+        if c is None:
+            c = self._local.c = connect(self._path)
+        return c
+
+    def release(self) -> None:
+        c = getattr(self._local, "c", None)
+        if c is not None:
+            self._local.c = None
+            c.close()
+
+    def __getattr__(self, name):
+        return getattr(self._conn(), name)
+
+    def __enter__(self):
+        return self._conn().__enter__()
+
+    def __exit__(self, *exc):
+        return self._conn().__exit__(*exc)
 
 
 def init_db(conn: sqlite3.Connection) -> None:
@@ -760,6 +817,10 @@ def schedule_upgrade(conn, aid: int, tries: int) -> None:
     conn.commit()
 
 
+def mark_rearmed(conn, aid: int) -> None:
+    conn.execute("UPDATE articles SET rearmed=1 WHERE id=?", (aid,))
+
+
 def due_upgrades(conn, limit: int = 1) -> list[sqlite3.Row]:
     """Excerpt- and image-led posts whose page retry is due, newest first,
     skipping feeds that are paused or currently skipping pages (unless a
@@ -1137,7 +1198,8 @@ def log_usage(conn, provider: str, model: str, prompt: int, completion: int,
 
 def mark_articles_read(conn, ids) -> int:
     """Per-article read marks (dwell, click, scrolled fully past)."""
-    ids = [int(i) for i in ids if str(i).isdigit()][:500]
+    # isascii: str.isdigit() accepts "²", which int() then rejects (500)
+    ids = [int(i) for i in ids if str(i).isascii() and str(i).isdigit()][:500]
     if not ids:
         return 0
     q = ",".join("?" * len(ids))
@@ -1155,7 +1217,7 @@ def article_exists(conn, aid: int) -> bool:
 
 def mark_feed_read(conn, feed_id: int, ts: str) -> None:
     """Advance one feed's read cursor (canonical UTC strings); forward only."""
-    ts = norm_ts(ts)
+    ts = cursor_ts(ts)
     if not ts or not feed_id:
         return
     conn.execute("UPDATE feeds SET last_read_ts=? WHERE id=?"
@@ -1163,18 +1225,25 @@ def mark_feed_read(conn, feed_id: int, ts: str) -> None:
     conn.commit()
 
 
-def mark_scope_read(conn, feed_id: int = 0) -> int:
+def mark_scope_read(conn, feed_id: int = 0, max_id: int = 0) -> int:
     """'Mark all as read' (0 = every feed): stamp read_at on every unread
     CARD in scope and advance each affected feed's cursor to its newest
     post. Cardless rows (hidden/dropped/pending/processing) are excluded -
     they render nothing, so they never inflate the confirmed number (the
-    pill-parity rule). Cursors only move forward (invariant 4)."""
+    pill-parity rule). Cursors only move forward (invariant 4).
+    max_id > 0 bounds the sweep to posts the reader's page knew about: a
+    queued tap replayed hours later must not read what arrived since."""
     where = ("read_at IS NULL AND status NOT IN"
              " ('hidden','dropped','pending','processing')")
     params: list = []
     if feed_id:
         where += " AND feed_id=?"
         params.append(feed_id)
+    bound, bparams = "", []
+    if max_id > 0:
+        where += " AND id<=?"
+        params.append(max_id)
+        bound, bparams = " AND id<=?", [max_id]
     n = conn.execute(f"UPDATE articles SET read_at=? WHERE {where}",
                      (now_iso(), *params)).rowcount
     feeds = [feed_id] if feed_id else [
@@ -1182,7 +1251,8 @@ def mark_scope_read(conn, feed_id: int = 0) -> int:
     for fid in feeds:
         row = conn.execute(
             f"SELECT MAX({_TS_EXPR}) t FROM articles WHERE feed_id=?"
-            " AND status NOT IN ('hidden','dropped')", (fid,)).fetchone()
+            " AND status NOT IN ('hidden','dropped')" + bound,
+            (fid, *bparams)).fetchone()
         if row and row["t"]:
             ts = norm_ts(row["t"])
             if ts:

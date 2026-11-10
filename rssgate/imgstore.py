@@ -82,7 +82,7 @@ def store(url: str, timeout=20) -> str | None:
         if existing:
             return existing
         from . import net
-        with net.get(url, timeout=timeout, stream=True,
+        with net.get(url, timeout=timeout, stream=True, recover="none",
                      allow_redirects=True) as r:
             if not r.ok:
                 return None

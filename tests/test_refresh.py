@@ -24,7 +24,7 @@ class FakeLLM:
 
 def stub_network(monkeypatch, page_html=ARTICLE_HTML, page_bytes=None):
     content = page_bytes or page_html.encode()
-    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None: {
+    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None, **k: {
         "ok": True, "not_modified": False, "status": 200, "content": content,
         "content_type": "text/html", "etag": None, "last_modified": None})
     class R:
@@ -83,7 +83,7 @@ def test_bare_page_unchanged_skips_llm(conn, cfg, monkeypatch):
 
 
 def test_feed_304_skips_everything(conn, cfg, monkeypatch):
-    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None: {
+    monkeypatch.setattr(fetcher, "_get", lambda url, e=None, l=None, **k: {
         "ok": True, "not_modified": True, "status": 304, "content": b"",
         "content_type": "", "etag": None, "last_modified": None})
     from rssgate.config import load_config

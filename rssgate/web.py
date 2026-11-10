@@ -94,9 +94,14 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
     os.makedirs(data_dir, exist_ok=True)
     from . import imgstore
     imgstore.init(os.path.abspath(os.path.join(data_dir, "images")))
-    if conn is None:
-        conn = db.connect(db.path_of(conn))
+    if conn is None:          # (path_of(None) used to crash here)
+        conn = db.connect(os.path.join(data_dir, "rssgate.sqlite"))
         db.init_db(conn)
+    conn = db.ThreadConn(conn)     # per-request-thread handles, see db.py
+
+    @app.teardown_request
+    def _release_conn(_exc):
+        conn.release()
 
     def llm() -> LLMClient:
         return LLMClient(load_config(config_path))
@@ -222,15 +227,19 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
         # the top-bar ✓ (viewer): mark the current scope read after the
         # page's confirm(). {feed_id: 0} = every feed.
         data = _body()
-        n = db.mark_scope_read(conn, _int(data.get("feed_id"), 0, lo=0))
+        # max_id (optional): a QUEUED tap replayed later is bounded to the
+        # posts the page knew about when the reader confirmed
+        n = db.mark_scope_read(conn, _int(data.get("feed_id"), 0, lo=0),
+                               max_id=_int(data.get("max_id"), 0, lo=0))
         return jsonify({"marked": n})
 
     @app.route("/api/position", methods=["POST"])
     def api_position():
         data = _body()
         ts, aid = data.get("ts"), _int(data.get("id"), 0)
-        if not isinstance(ts, str):
-            ts = None
+        # canonical or nothing: an unparseable ts stored as a cursor sorts
+        # after every real one and freezes the reader for good
+        ts = db.cursor_ts(ts) if isinstance(ts, str) else None
         rid = data.get("read_ids")
         marked = db.mark_articles_read(conn, rid) if isinstance(rid, list) else 0
         if not (ts and aid):
@@ -464,7 +473,7 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
         throttled so frantic pulling can't hammer sources."""
         import contextlib, threading, time as _t
         last = db.get_state(conn, "last_manual_poll", "")
-        if last and (_t.time() - _t.mktime(_t.strptime(
+        if last and (_t.time() - __import__("calendar").timegm(_t.strptime(
                 last, "%Y-%m-%dT%H:%M:%SZ"))) < 60:
             return jsonify({"ok": True, "started": False, "throttled": True,
                             "why": "throttled"})
@@ -475,12 +484,10 @@ def create_app(config_path: str, conn=None, scheduler=None) -> Flask:
             import rssgate.refresh as R
             with contextlib.closing(db.connect(
                     db.path_of(conn))) as pconn:
-                for feed in db.list_feeds(pconn):
-                    if feed["enabled"]:
-                        try:
-                            R.refresh_feed(pconn, feed, cfg, llm())
-                        except Exception:  # noqa: BLE001
-                            pass
+                # refresh_all = the ONE "poll everything" path: it skips
+                # PAUSED feeds (a pull-to-refresh used to re-hit a site
+                # that had just said 403/429, deepening the ban)
+                R.refresh_all(pconn, cfg, llm())
         threading.Thread(target=_go, daemon=True).start()
         return jsonify({"ok": True, "started": True})
 

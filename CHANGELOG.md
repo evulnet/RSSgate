@@ -1,5 +1,66 @@
 # Changelog
 
+## [0.93.4] — 2026-11-10 - the shared-connection 500s (the pillagree "flake"), paused feeds stay paused, bounded mark-all replay
+
+Second batch from the code review, plus one found on the way.
+
+- **Request threads shared one SQLite handle.** Werkzeug serves every
+  request on its own thread, and every route used the single connection
+  create_app was given. Under concurrency `SELECT COUNT(*)` came back with
+  no row: `/api/feeds`, `/api/status`, `/api/maintenance` and
+  `/api/position` 500s, visible once the browser tier's server log was
+  kept (it went to /dev/null; now `/tmp/rssgate-ui-test/server.log`).
+  This is the real cause of the "named flaker"
+  `test_pill_and_sidebar_pips_agree_when_it_speaks` (its pip went stale
+  after four 500s from `/api/feeds`). `db.ThreadConn` gives each thread
+  its own handle (the creating thread keeps the original), closed at
+  request teardown. Hermetic test hammers three routes from 8 threads;
+  canary (force the shared handle) reproduces the 500s.
+- **The Scheduler thread** also polled feeds on the request connection;
+  it now opens its own in `run()`. `create_app(conn=None)` no longer
+  crashes (`path_of(None)`).
+- **Refresh / pull-to-refresh polled paused feeds**, deepening 403/429
+  bans. `/api/poll` now goes through `refresh_all`, which skips them and
+  (new) survives one broken feed with a logged exception. The manual
+  throttle used `mktime` on a UTC stamp (same bug as the scheduler's).
+- **A replayed mark-all read posts that arrived after the tap.** The
+  queued (offline) copy carries `max_id` - the highest id the page knew,
+  from loaded cards and the pulse watermark - and `mark_scope_read`
+  honours it. The online tap is unchanged.
+- **`rearm_blocked_excerpts` is once per post** (`articles.rearmed`,
+  additive). The old guard was re-set by every expired ladder, so the
+  same teasers were re-armed every run for a month.
+- **Garbage read cursors:** `/api/position` and `mark_feed_read` now take
+  canonical timestamps only (`db.cursor_ts`); `reads:{fid:"zzz"}` used to
+  freeze a feed at 0 unread forever. `read_ids:["²"]` is no longer a 500.
+- **Bot-check ladder per call:** `net.get(..., recover=)`. Images and the
+  admin's probe/discovery use `none` (the 20 s retry sleep hung the probe
+  request; images paid it plus a Chromium launch for nothing), feed XML
+  uses `headers` (a browser-rendered feed is Chrome's XML viewer), article
+  and bare pages keep `full`.
+- **Rescue tokens are counted** (`purpose='rescue'` in token_usage, via
+  `net.set_usage_sink`).
+- **`/api/models` 500'd whenever the LLM backend was down** (raw
+  `ConnectionError`, 55 of them in one tier log); now an `LLMError` ->
+  JSON 502. A status-less LLMError still reads as an outage, so the
+  queue still holds rather than fails.
+- **320px header overflowed when the fail pip showed.** Only the queue
+  pip dropped its word under 400px; "N failed" beside it pushed refresh +
+  admin 46px off the screen (diagnosed from the intermittent
+  `test_share_buttons_stay_on_one_line_on_mobile[320]` once it reported
+  WHAT overflowed - it only failed when the tier had failures). Every pip
+  now drops its word (`.pip-word`), pips shrink before buttons, and the
+  narrow bar's gaps/padding tighten (nine items x 10px gaps were 80px).
+  New test forces queue + fail + offline badge at 320 and 360px.
+- **Browser tier hygiene:** the test server's output is kept
+  (`/tmp/rssgate-ui-test/server.log`); the two pulse geometry tests that
+  assumed their probe card was on page 1 of the shared tier now use
+  `_scope()`. TESTING.md: never run two tiers at once - the fixture's
+  `fuser -k` evicts the other run's server (an orphaned run did exactly
+  that here and produced six "flaky" failures).
+- conftest also resets `browser_fallback`; the five Chromium profiles old
+  test runs wrote into the live `data/browser-profiles` are deleted.
+
 ## [0.93.3] — 2026-11-10 - review fixes: stored XSS, silent scheduler death, solved challenges paused feeds, SW offline blind spot
 
 From a full code review. Every fix has a test that was run red first

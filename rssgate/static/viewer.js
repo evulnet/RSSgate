@@ -196,6 +196,10 @@
   // CREATE rows). navigator.onLine lies on iOS - it decorates the badge;
   // fetch failure is the real offline signal (netOk).
   let replaying = false, netOk = true;
+  // Highest article id this page has learned of (cards + pulse watermark):
+  // a QUEUED mark-all carries it as max_id, so a replay hours later reads
+  // only what the reader could have meant, not what arrived since.
+  let knownMaxId = 0;
   // The service worker answers a dead network with a cached 200 or a 503
   // stub instead of rejecting; it marks those so the page still knows.
   const swOffline = r => !!(r && r.headers && r.headers.get('x-rssgate-offline'));
@@ -386,7 +390,8 @@
     if (data.items.length) {
       $('empty-hint').hidden = true;
       endBanner.hidden = true;
-      data.items.forEach(a => { snapData[a.id] = a; });
+      data.items.forEach(a => { snapData[a.id] = a;
+                                if (a.id > knownMaxId) knownMaxId = a.id; });
       stream.insertAdjacentHTML('beforeend', data.items.map(cardHtml).join(''));
       observeCards();
       const last = data.items.at(-1) || (PRIO ? rawLast : null);
@@ -963,6 +968,7 @@
     finally { pulseInFlight = false; }
     if (!p || typeof p !== 'object') { pulseFails++; return; }
     pulseFails = 0;
+    if ((p.high_water_id || 0) > knownMaxId) knownMaxId = p.high_water_id;
     if (!netOk) { netOk = true; offlineBadge(); }
     qSchedule(2000);       // the network just proved itself: flush any queue
     // ONE owner of the cadence: this function reads it, pulseStart() arms it.
@@ -1293,7 +1299,10 @@
           headers: { 'Content-Type': 'application/json' }, body });
       } catch (e) {
         netOk = false;
-        await qAdd({ path: '/api/mark_read', method: 'POST', body });
+        // replayed later: bound it to the posts this page knew about
+        const bounded = JSON.stringify({ feed_id: store.feed ? +store.feed : 0,
+                                         max_id: knownMaxId });
+        await qAdd({ path: '/api/mark_read', method: 'POST', body: bounded });
       }
       restart(true);
       renderFeedFilter().catch(() => {});

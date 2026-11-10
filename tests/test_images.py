@@ -50,7 +50,7 @@ def test_feed_entry_image(monkeypatch):
     <media:thumbnail xmlns:media="http://search.yahoo.com/mrss/"
       url="https://img.x/thumb.jpg"/>
     </item></channel></rss>"""
-    monkeypatch.setattr(f, "_get", lambda url, e=None, l=None: {
+    monkeypatch.setattr(f, "_get", lambda url, e=None, l=None, **k: {
         "ok": True, "not_modified": False, "content": rss.encode(),
         "etag": None, "last_modified": None, "status": 200,
         "content_type": "application/rss+xml"})

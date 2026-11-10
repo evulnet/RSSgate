@@ -69,5 +69,8 @@ def _no_host_pacing():
     arms it via net.configure, and test_politeness runs after it)."""
     from rssgate import net
     yield
-    net._cfg.update({"ua": "", "interval": 0.0, "challenge_retry": 0.0})
+    # browser_fallback/fetch too: before v0.93.2 the leak reached Chromium,
+    # which wrote real profiles for cf.test & co. into the LIVE data dir
+    net._cfg.update({"ua": "", "interval": 0.0, "challenge_retry": 0.0,
+                     "browser_fallback": False, "fetch": {}})
     net._next_ok.clear()

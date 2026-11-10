@@ -59,6 +59,17 @@ Excluded from the default run via `addopts = -m "not ui"` in pytest.ini; CI
 (or you) opts in explicitly. The fixture evicts zombie servers on its port
 before booting, so a killed test run never wedges the next.
 
+**One tier at a time.** That eviction (`fuser -k 8977/tcp`) also kills a
+CONCURRENT run's server, so two overlapping runs fail each other at random
+(six "flaky" failures and a 4.5-min run, 2026-11-10). A killed shell
+wrapper can leave pytest running as an orphan - check
+`ps -eo pid,args | grep "[p]ytest -m ui"` before starting another.
+
+**The server log is kept** at `/tmp/rssgate-ui-test/server.log` (it used to
+go to /dev/null). Before calling a browser failure a timing flake, grep it
+for ` 500 ` and `Traceback`: the long-running pillagree "flake" was the
+server answering `/api/feeds` with a 500 from a shared SQLite handle.
+
 ## House rules for UI work (learned the hard way)
 
 1. **Never claim a UI feature from patch exit codes.** Verification means:

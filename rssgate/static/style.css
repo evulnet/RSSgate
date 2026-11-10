@@ -47,7 +47,18 @@ body { margin:0; background:var(--bg); color:var(--text);
    caught only when the pip was visible). The pip's WORD is the fluff; the
    dot and number stay. */
 @media (max-width:400px) {
-  #pip-queue-label { display:none; }
+  /* every pip drops its word (the fail pip kept "failed" and, shown beside
+     the queue pip, pushed refresh + admin 46px off a 320px screen) */
+  #pip-queue-label, .pip-word { display:none; }
+  /* and pips yield before buttons do: the badge's "offline · N pending"
+     ellipsizes instead of overflowing the bar */
+  .topbar .pip { min-width:0; flex-shrink:1; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap; }
+  .topbar .icon-btn { flex-shrink:0; }
+  /* nine flex items: at 10px the GAPS alone were 80px of a 320px bar */
+  .topbar { gap:4px; padding-left:8px; padding-right:8px; }
+  .topbar .brand { font-size:1.05rem; }
+  .topbar .pip { padding:3px 5px; margin-left:0; }
   .pip { padding:3px 7px; margin-left:5px; }
   .icon-btn { width:32px; height:32px; }
 }

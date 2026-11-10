@@ -48,6 +48,11 @@ class Scheduler(threading.Thread):
         return True
 
     def run(self):
+        # Invariant 6: the scheduler THREAD gets its own connection. serve.py
+        # hands us the Flask request connection; polling feeds on it from
+        # this thread interleaved commits with every request handler.
+        if self.db_path:
+            self.conn = db.connect(self.db_path)
         while not self._stop.is_set():
             try:
                 self.poll_due()
@@ -74,7 +79,7 @@ class Scheduler(threading.Thread):
             try:
                 refresh_feed(self.conn, feed, self.cfg, llm)
             except Exception:  # noqa: BLE001
-                pass
+                log.exception("scheduled refresh of feed %s failed", feed["id"])
         try:
             llm = llm or self.llm_factory()
             workers = max(1, int(self.cfg["summarizer"].get("concurrency", 2)))

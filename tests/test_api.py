@@ -418,3 +418,21 @@ def test_pulse_counts_since_the_read_marker(client):
     assert p["feeds"][0]["unread_since"] == 2
     db.update_feed(conn, fid, last_read_ts="2026-10-03T00:00:00Z")
     assert client.get("/api/pulse").get_json()["unread_since_total"] == 1
+
+
+def test_poll_now_skips_paused_feeds(client, monkeypatch):
+    """Pull-to-refresh must not re-hit a site that just said 403/429."""
+    ok = db.add_feed(client.conn, "https://pollok.test/feed", type_="feed")["id"]
+    bad = db.add_feed(client.conn, "https://pollbad.test/feed", type_="feed")["id"]
+    db.feed_block(client.conn, bad, 60)
+    seen = []
+    monkeypatch.setattr("rssgate.refresh.refresh_feed",
+                        lambda conn, feed, *a, **k: seen.append(feed["id"]) or "ok")
+    assert client.post("/api/poll").get_json()["started"] is True
+    import time
+    for _ in range(50):
+        time.sleep(0.05)
+        if ok in seen:
+            break
+    time.sleep(0.1)
+    assert ok in seen and bad not in seen

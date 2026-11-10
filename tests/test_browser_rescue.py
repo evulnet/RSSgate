@@ -181,3 +181,18 @@ def test_net_delegates_to_browser_fetch(monkeypatch):
     r = net.get("https://cf.test/1")
     assert r.ok and seen["host"] == "cf.test"
     assert seen["fcfg"].get("llm_rescue") is True
+
+
+def test_rescue_reports_every_llm_call_for_accounting():
+    """Rescue tokens are real spend: each model turn reaches on_usage."""
+    el = El("button", "I agree", None)
+    p = Page(els=[el], html=STUCK_HTML,
+             snapshot={"title": "Just a moment...", "texts": ["I agree"],
+                       "body": "checking your browser"},
+             after_click=[GOOD])
+    el.page = p
+    got = []
+    browser.rescue(p, LLM(['{"action":"click","text":"I agree"}']),
+                   max_steps=2, budget_s=10,
+                   on_usage=lambda llm, usage, ms: got.append(usage))
+    assert len(got) == 1 and isinstance(got[0], dict)

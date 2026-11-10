@@ -199,7 +199,10 @@ def refresh_all(conn, cfg, llm=None) -> list[str]:
     results = []
     for feed in db.list_feeds(conn):
         if feed["enabled"] and not db.feed_paused(feed):
-            results.append(f"{feed['url']}: {refresh_feed(conn, feed, cfg, llm)}")
+            try:                 # one broken feed must not end the sweep
+                results.append(f"{feed['url']}: {refresh_feed(conn, feed, cfg, llm)}")
+            except Exception:  # noqa: BLE001
+                log.exception("refresh of feed %s failed", feed["id"])
     return results
 
 

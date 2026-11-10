@@ -33,10 +33,19 @@ class LLMClient:
         if not self.base_url:
             return []
         headers = self._headers()
-        resp = requests.get(f"{self.base_url}/models", headers=headers, timeout=20)
+        try:
+            resp = requests.get(f"{self.base_url}/models", headers=headers, timeout=20)
+        except requests.RequestException as exc:
+            # LLMError, not a raw ConnectionError: /api/models 500'd whenever
+            # the backend was down (refresh.llm_unavailable still reads a
+            # status-less LLMError as an outage = hold, not fail)
+            raise LLMError(f"models request failed: {exc}") from exc
         if resp.status_code != 200:
             raise LLMError(f"models request failed ({resp.status_code}): {resp.text[:200]}")
-        data = resp.json().get("data", [])
+        try:
+            data = resp.json().get("data", [])
+        except (ValueError, AttributeError) as exc:
+            raise LLMError("models request returned non-JSON") from exc
         return sorted({m.get("id") for m in data if m.get("id")})
 
     def resolve_model(self) -> str:

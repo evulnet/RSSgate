@@ -119,7 +119,17 @@ scripts/
    add-feed refresh, backfill, scheduler workers, maintenance) opens its own
    via `db.connect(db.path_of(conn))` - never a path rebuilt from config
    (under tests that pointed at a different database). Sharing the request
-   connection with a thread corrupts commit state.
+   connection with a thread corrupts commit state. The Scheduler thread
+   opens its own in `run()` (serve.py hands it the request connection;
+   until v0.93.4 it polled feeds on it).
+   REQUEST threads too: create_app wraps its connection in `db.ThreadConn`
+   (the creating thread keeps the original; every other thread gets its
+   own handle, closed at teardown). Until v0.93.4 every Werkzeug request
+   thread shared one handle and concurrent requests made `COUNT(*)` return
+   no row - `/api/feeds`, `/api/status`, `/api/maintenance`,
+   `/api/position` 500s in the tier log, and the real cause of the
+   "named flaker" pillagree failures below
+   (`test_concurrent_requests_do_not_share_a_connection`).
 7. **`hidden` is terminal but reversible** (sponsored/category toggles);
    hidden items never reach `/api/articles` or stats.
 8. **UI contract** (`test_ui_contract.py`): `[hidden]{display:none
@@ -137,7 +147,9 @@ scripts/
    through `net.get` (UA + per-host pacing). A 403/429 from a site pauses
    the FEED (`db.feed_block`, doubling to 24h, cleared by a successful
    fetch or the cog modal's Resume now); paused feeds are skipped by the
-   scheduler, refresh_all and claim_pending, and their posts stay `pending`
+   scheduler, refresh_all (which `/api/poll` = Refresh/pull-to-refresh
+   now goes through; it polled paused feeds until v0.93.4) and
+   claim_pending, and their posts stay `pending`
    instead of failing. Never hammer through a 403/429 BLOCK (that is the
    site rate-limiting us; backing off is the answer) and never rotate
    IPs/identities to dodge one.
@@ -191,7 +203,8 @@ scripts/
   quotes the pill count; `POST /api/mark_read {feed_id|0}` stamps
   `read_at` + advances cursors (cardless rows excluded - pill parity).
   n=0 never nags. Cards flip via `restart(true)`, pills via
-  `renderFeedFilter()`. The header at 320px must fit brand+pip+3 buttons
+  `renderFeedFilter()`. The header at 320px must fit brand + ALL pips (queue,
+  fail, offline badge - `test_header_fits_with_every_pip_showing`) + 3 buttons
   (the ✓ overflowed by 12px once, visible only with the pip showing -
   media query hides the pip's word and trims padding under 400px).
   Unread-first (`prio=1`) applies to EVERY newest-first New view, INCLUDING a
@@ -233,10 +246,10 @@ scripts/
   `ready`, read state ignored). A multi-day block can expire a post's ladder
   while the site still bot-checks - maintenance `rearm_blocked_excerpts`
   (v0.91.0) re-arms teaser-length excerpt posts (summary <200 chars, fetched
-  <=30d, 50/run) so a lifted block actually heals them. NOT a one-shot:
-  `upgrade_at IS NULL` is re-set when the ladder expires again, so a
-  still-teaser post is re-armed every run for the 30-day window (~21 page
-  fetches); known follow-up - add a rearmed marker before widening it.
+  <=30d, 50/run) so a lifted block actually heals them. ONCE per post:
+  `articles.rearmed` (v0.93.4). The old guard, `upgrade_at IS NULL`, is
+  re-set when a ladder expires, so the same teasers were re-armed every
+  run for a month.
   TechPowerUp's check is a browser-fingerprint firewall (WebGL renderer,
   GPU limits, webdriver); the current Chromium rung does not pass it.
   Fingerprint work there is allowed if it is worth the effort - keep it
@@ -259,13 +272,16 @@ scripts/
   v0.93.3 - `tests/test_browser_real.py`, ui tier, real Chromium).
   Requirements: `playwright` is in requirements-dev.txt only, plus
   `python -m playwright install chromium`; without it rung 3 silently
-  returns None (logged once). Costs and gaps (known, not fixed): rung 2
-  sleeps a worker (or the admin probe request) for 20 s; Chromium page
-  loads are not paced per subresource; rescue LLM tokens are NOT recorded
-  in token_usage; feed XML and images also go through the ladder (a
-  browser-rendered feed/image is useless - they should opt out); the
-  harvested `cf_clearance` is bound to Chromium's UA/TLS, so it rarely
-  helps later plain requests. Chromium runs with `--no-sandbox`.
+  returns None (logged once). Per-call cap: `net.get(..., recover=)` -
+  `full` (article pages, bare pages), `headers` (feed XML: a browser-
+  rendered feed is Chrome's XML viewer), `none` (images, and the admin's
+  probe/discovery, which run on a request thread - the 20 s retry sleep
+  hung them). Rescue tokens are logged as purpose `rescue` through
+  `net.set_usage_sink` (serve.py opens its own connection per call).
+  Known gaps: rung 2 still sleeps a scheduler worker 20 s; Chromium
+  subresource loads are not paced; the harvested `cf_clearance` is bound
+  to Chromium's UA/TLS, so it rarely helps later plain requests; Chromium
+  runs with `--no-sandbox`.
 - **LLM outage = hold, not fail.** `refresh.llm_unavailable` (connection
   errors, timeouts, 502/503/504) puts the post back untouched, records the
   outage in state (`llm_down_since/reason/next_try`, probe 15s doubling to
@@ -384,7 +400,10 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
   server was down and beacons were lost
   (`test_sw_fallback_still_reads_as_offline`). Caveat: a queued mark_read
   replays as "mark everything unread in scope NOW", so a late replay also
-  covers posts that arrived after the tap (known follow-up: bound it).
+  covers posts that arrived after the tap - so the QUEUED copy carries
+  `max_id` (`knownMaxId`: highest id from loaded cards and the pulse
+  watermark) and `db.mark_scope_read` honours it (v0.93.4). The online tap
+  stays unbounded (it is "now").
 - **SW needs a secure context**: works on localhost (tier) and on the
   phone via the Caddy HTTPS hostname; raw `http://LAN-IP:8088` silently
   never registers (registration is `.catch`ed by design).
@@ -472,7 +491,8 @@ renderCardPng(a, {style, width})   load hero + QR bitmaps, build env, DPR=2
   (`test_pulse_survives_a_garbage_answer_with_no_manual_tick`). Browser
   `/api/pulse` route stubs must match `**/api/pulse**` - the client now
   appends `?hw=`. Watch item: the timing-sensitive pulse browser tests are
-  now NAMED flakers - `test_pill_and_sidebar_pips_agree_when_it_speaks`
+  now NAMED flakers (root cause found v0.93.4: the shared request
+  connection, invariant 6 - re-check before blaming timing) - `test_pill_and_sidebar_pips_agree_when_it_speaks`
   failed two consecutive full-tier runs (v0.88.0) while passing in
   isolation and in every other tier run; earlier unnamed one-offs were
   almost certainly this family.

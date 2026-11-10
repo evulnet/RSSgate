@@ -61,15 +61,18 @@ def rearm_blocked_excerpts(conn) -> int:
     excerpt post means the feed had nothing and the block never lifted in
     time (gizmodo 2026-11: feed is title+teaser only, pages intermittently
     bot-checked, 23 posts stuck as teasers). Bounded (30-day window, 50
-    per run) and idempotent: a touched row leaves the selection
-    (upgrade_at set), so the next run is a no-op."""
+    per run) and ONCE per post: `rearmed` marks it. (Until v0.93.4 the only
+    guard was upgrade_at IS NULL, which the expired ladder re-sets, so the
+    same posts were re-armed every run for a month - ~21 page fetches each,
+    including boilerplate-fallback posts that were never blocked.)"""
     rows = conn.execute(
         "SELECT id FROM articles WHERE digest_source='excerpt'"
-        " AND status='ready' AND upgrade_at IS NULL"
+        " AND status='ready' AND upgrade_at IS NULL AND rearmed=0"
         " AND COALESCE(summary,'') <> '' AND length(summary) < 200"
         " AND fetched_at >= datetime('now', '-30 days')"
         " ORDER BY id DESC LIMIT 50").fetchall()
     for r in rows:
+        db.mark_rearmed(conn, r["id"])
         db.schedule_upgrade(conn, r["id"], 0)   # a FULL fresh ladder
     return len(rows)
 

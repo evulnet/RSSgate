@@ -87,3 +87,15 @@ def test_botcheck_errors_get_their_promised_daily_retry(client):
     # ...and rows that left the selection stay gone
     db.set_state(c, "botcheck_requeued", "")
     assert maint.requeue_botcheck_errors(c) == 0
+
+
+def test_rearm_is_once_per_post_even_after_the_ladder_expires_again(client):
+    """The old guard was upgrade_at IS NULL - which an expired ladder
+    re-sets - so the same teaser was re-armed every run for 30 days."""
+    aid = _mk(client, "https://g2.test/feed", "g2",
+              "2026-11-06T00:00:00Z", "A bare teaser line.", "excerpt")
+    assert maint.rearm_blocked_excerpts(client.conn) == 1
+    db.schedule_upgrade(client.conn, aid, 3)       # ladder runs out again
+    assert client.conn.execute("SELECT upgrade_at FROM articles WHERE id=?",
+                               (aid,)).fetchone()["upgrade_at"] is None
+    assert maint.rearm_blocked_excerpts(client.conn) == 0

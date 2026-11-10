@@ -21,7 +21,8 @@ UA = net.DEFAULT_UA      # back-compat alias; live value: net.user_agent()
 XML_SNIFF = re.compile(r"^\s*(<\?xml|<rss|<feed|<rdf:RDF)", re.I)
 
 
-def _get(url: str, etag: str | None = None, last_modified: str | None = None) -> dict:
+def _get(url: str, etag: str | None = None, last_modified: str | None = None,
+         recover: str = "none") -> dict:
     """Conditional GET. Returns dict(ok, not_modified, status, content, content_type,
     etag, last_modified)."""
     headers = {"accept": "application/rss+xml, application/atom+xml,"
@@ -31,7 +32,8 @@ def _get(url: str, etag: str | None = None, last_modified: str | None = None) ->
     if last_modified:
         headers["if-modified-since"] = last_modified
     try:
-        resp = net.get(url, headers=headers, timeout=30, allow_redirects=True)
+        resp = net.get(url, headers=headers, timeout=30, allow_redirects=True,
+                       recover=recover)
     except requests.RequestException as exc:
         return {"ok": False, "not_modified": False, "status": 0, "error": str(exc),
                 "content": b"", "content_type": "", "etag": None, "last_modified": None}
@@ -175,7 +177,7 @@ def fetch_feed(url: str, etag: str | None = None, last_modified: str | None = No
     """Fetch & parse an RSS/Atom feed.
     Returns {ok, changed, not_modified?, meta:{title,description,categories},
              entries:[{guid,link,title,published_at}], etag, last_modified, error?}"""
-    res = _get(url, etag, last_modified)
+    res = _get(url, etag, last_modified, recover="headers")
     if not res["ok"]:
         return {"ok": False, "changed": False, **res}
     if res["not_modified"]:
@@ -212,7 +214,7 @@ def fetch_feed(url: str, etag: str | None = None, last_modified: str | None = No
 def fetch_page(url: str, etag: str | None = None, last_modified: str | None = None) -> dict:
     """Fetch a bare web page. changed=False when conditional GET or content hash
     proves nothing moved -> callers must skip the (expensive) discovery LLM call."""
-    res = _get(url, etag, last_modified)
+    res = _get(url, etag, last_modified, recover="full")
     if not res["ok"]:
         return {"ok": False, "changed": False, **res}
     if res["not_modified"]:

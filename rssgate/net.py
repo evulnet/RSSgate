@@ -130,6 +130,15 @@ def configure(cfg: dict) -> None:
     _cfg["fetch"] = dict(f)
 
 
+_usage_sink = None           # set by serve: (llm, usage, ms) -> log to DB
+
+
+def set_usage_sink(fn) -> None:
+    """Wire token accounting for the browser rescue rung (serve.py)."""
+    global _usage_sink
+    _usage_sink = fn
+
+
 def set_llm_factory(fn) -> None:
     """Wire the LLM client factory used by the browser rescue rung (serve.py)."""
     global _llm_factory
@@ -163,17 +172,28 @@ def pace(url: str) -> float:
     return wait
 
 
-def get(url: str, headers: dict | None = None, **kw) -> requests.Response:
+RECOVER = ("none", "headers", "full")
+
+
+def get(url: str, headers: dict | None = None, recover: str = "full",
+        **kw) -> requests.Response:
     """GET with pacing, cookie echo, and (once configured) challenge recovery:
     one delayed retry with browser headers, then optional headless Chromium.
     A still-challenged response is returned as-is so callers keep their
-    existing streak/excerpt logic - and it counts as ONE attempt, not three."""
+    existing streak/excerpt logic - and it counts as ONE attempt, not three.
+
+    recover caps the ladder per call: "full" (article pages), "headers"
+    (feed XML: a browser-rendered feed is Chrome's XML viewer, useless),
+    "none" (images, and anything on a request thread - the 20 s retry
+    sleep used to hang the admin's feed probe)."""
+    if recover not in RECOVER:
+        recover = "full"
     pace(url)
     resp = _send(url, headers, dict(kw))
     _store_cookies(host_of(url), resp)
     if not is_challenge(resp):
         return resp
-    if _cfg["challenge_retry"] <= 0:
+    if _cfg["challenge_retry"] <= 0 or recover == "none":
         return resp                        # unconfigured (hermetic tests): 1 request
     time.sleep(min(_cfg["challenge_retry"], 120.0))
     pace(url)
@@ -183,7 +203,7 @@ def get(url: str, headers: dict | None = None, **kw) -> requests.Response:
     _store_cookies(host_of(url), resp2)
     if not is_challenge(resp2):
         return resp2
-    if _cfg["browser_fallback"]:
+    if _cfg["browser_fallback"] and recover == "full":
         browsed = browser_get(url)
         if browsed is not None and not is_challenge(browsed):
             return browsed
