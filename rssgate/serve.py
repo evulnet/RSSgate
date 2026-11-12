@@ -28,9 +28,20 @@ def main():
     cfg = load_config(args.config)
     from rssgate import net
     net.configure(cfg)                    # UA + per-host pacing for all fetches
-    net.set_llm_factory(lambda: LLMClient(load_config(args.config)))
     os.makedirs(cfg["server"]["data_dir"], exist_ok=True)
     db_path = os.path.join(cfg["server"]["data_dir"], "rssgate.sqlite")
+
+    def _rescue_llm():
+        # The backend goes down for hours (training). While an outage is on
+        # record, the rescue rung does not ask: its call has the client's
+        # 180 s timeout and would hold a fetch thread + a live Chromium.
+        # Probing stays the digest queue's job; None = rules-only rescue.
+        import contextlib
+        with contextlib.closing(db.connect(db_path)) as sconn:
+            if db.get_state(sconn, "llm_down_since", ""):
+                return None
+        return LLMClient(load_config(args.config))
+    net.set_llm_factory(_rescue_llm)
 
     def _rescue_usage(llm, usage, ms):
         import contextlib             # the fetching thread's own connection

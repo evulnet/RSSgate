@@ -325,7 +325,10 @@ def discover_page_articles(html: str, base_url: str, llm, model: str = "") -> di
                  if isinstance(p, dict) and p.get("link")
                  and urljoin(base_url, p["link"]) in {c["link"] for c in candidates}]
         if valid:
-            return {"items": valid[:15], "usage": usage}
-    except Exception:
-        pass
+            return {"items": valid[:15], "usage": usage, "answered": True}
+    except Exception as exc:  # noqa: BLE001
+        # hand the failure up: an OUTAGE must not publish raw nav links
+        # (the caller decides; a bad reply still falls back as before)
+        return {"items": slim[:15], "error": exc,
+                "usage": {"prompt_tokens": 0, "completion_tokens": 0}}
     return {"items": slim[:15], "usage": {"prompt_tokens": 0, "completion_tokens": 0}}

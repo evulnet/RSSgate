@@ -290,6 +290,14 @@ scripts/
   "waiting · AI offline"; admin Status explains. A real rejection (400 etc.)
   still fails the article. `fail()` alone decides pending-vs-error; never
   override its status afterwards (that bug silently disabled retries).
+  The backend goes down for HOURS on purpose (model training windows), so
+  every LLM path must hold, not degrade: bare-page DISCOVERY holds too
+  (v0.93.5: no raw-link fallback published, fingerprint not stored, outage
+  recorded, no call until the probe time - it used to add 15 nav links as
+  articles and never re-read the page), and the browser RESCUE rung skips
+  the model while `llm_down_since` is set (serve.py `_rescue_llm`; a call
+  there has the client's 180 s timeout inside a live Chromium). A new LLM
+  call site must answer "what happens during a 6-hour outage?" first.
 - **Not-an-article guards:** `looks_like_botcheck` catches interstitials
   served as HTTP 200 (TechPowerUp's "drag the handle"); `is_refusal`
   catches the model saying the input wasn't an article (matched only in the

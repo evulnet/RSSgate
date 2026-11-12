@@ -125,3 +125,45 @@ def test_duplicate_content_image_not_in_gallery(conn, tmp_path, monkeypatch):
     assert row["image"] == names[0]
     assert not (row["images"] or "").replace(",", "").replace("-", "") \
         or row["images"] == ",".join(names)
+
+
+def test_bare_page_discovery_holds_during_llm_outage(conn, cfg, monkeypatch):
+    """Training windows take the backend down for hours. Discovery must HOLD
+    like the digest queue: no raw nav links published as articles, no
+    fingerprint stored (so the page is re-read after), the outage recorded,
+    and no calls while the probe time hasn't come."""
+    import json
+    import requests
+    from rssgate.config import load_config
+    stub_network(monkeypatch, page_html=PAGE_HTML)
+    calls = []
+
+    class Down:
+        provider, model = "local", "m"
+
+        def chat(self, *a, **k):
+            calls.append(1)
+            raise requests.ConnectionError("training")
+    fid = db.add_feed(conn, "https://ex.com/news", type_="page")["id"]
+    st = refresh.refresh_feed(conn, db.get_feed(conn, fid), load_config(cfg), Down())
+    assert st.startswith("waiting: AI offline"), st
+    assert conn.execute("SELECT COUNT(*) c FROM articles").fetchone()["c"] == 0
+    assert not db.get_feed(conn, fid)["content_hash"], "page must be re-read later"
+    assert db.get_state(conn, "llm_down_since", "")
+    n = len(calls)
+    refresh.refresh_feed(conn, db.get_feed(conn, fid), load_config(cfg), Down())
+    assert len(calls) == n, "asked the model again before the probe time"
+
+    db.set_state(conn, "llm_next_try", "2000-01-01T00:00:00Z")   # probe due
+
+    class Up:
+        provider, model = "local", "m"
+
+        def chat(self, messages, **k):
+            return json.dumps([{"title": f"Article {i} with a sufficiently long title",
+                                "link": f"https://ex.com/posts/article-{i}-with-"
+                                        "sufficiently-long-title"} for i in range(3)]), \
+                {"prompt_tokens": 9, "completion_tokens": 9}
+    st = refresh.refresh_feed(conn, db.get_feed(conn, fid), load_config(cfg), Up())
+    assert st == "ok (3 new)", st
+    assert not db.get_state(conn, "llm_down_since", ""), "the answer ends the outage"

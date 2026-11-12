@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.93.5] — 2026-11-12 - training-window outages: discovery and rescue hold too
+
+The LLM backend goes down for hours at a time for model training (five
+outages Nov 10-12 in the live log, up to 15 h). The digest queue already
+held through every one of them - zero posts failed - but two other LLM
+paths did not:
+
+- **Bare-page discovery** caught the outage and fell back to the page's
+  first 15 raw links (menus, tags, nav), published them as articles,
+  stored the page fingerprint so the real articles were never discovered
+  after, and with `sync_deletes` pruned real posts missing from the junk
+  list. It now holds like the digest queue: nothing published, fingerprint
+  untouched (the next poll after the outage re-reads the page), outage
+  recorded, and no model call until the probe time; a successful answer
+  ends the outage. Test canaried (the old path published "ok (3 new)").
+  No bare-page feeds exist live, so nothing was hit.
+- **Browser rescue** asked the model even during a known outage; with the
+  client's 180 s timeout that could hold a fetch thread and a live
+  Chromium for minutes. While `llm_down_since` is set the rescue now runs
+  rules-only.
+
 ## [0.93.4] — 2026-11-10 - the shared-connection 500s (the pillagree "flake"), paused feeds stay paused, bounded mark-all replay
 
 Second batch from the code review, plus one found on the way.

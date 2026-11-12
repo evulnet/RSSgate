@@ -167,10 +167,28 @@ def refresh_feed(conn, feed, cfg, llm=None) -> str:
         return "not modified"
     if llm is None:
         return "error: LLM required for bare pages"
+    # LLM outage (training windows): HOLD, exactly like the digest queue.
+    # Never publish the unfiltered link fallback and never store the new
+    # fingerprint - then the next poll after the outage discovers for real.
+    # (Before v0.93.5 an outage added up to 15 raw nav links as articles,
+    # recorded the hash so the page was never re-read, and with
+    # sync_deletes pruned real posts missing from that junk list.)
+    held = "waiting: AI offline (page re-read when it is back)"
+    if not llm_may_try(conn):
+        db.update_feed(conn, feed_id, last_fetched_at=db.now_iso(),
+                       last_status=held)
+        return held
     disc_started = time.perf_counter()
     disc = discover_page_articles(res["html"], url, llm,
                                   model=_purpose_model(cfg, "model_discover"))
     disc_ms = int((time.perf_counter() - disc_started) * 1000)
+    if disc.get("error") is not None and llm_unavailable(disc["error"]):
+        mark_llm_down(conn, f"{type(disc['error']).__name__}: {disc['error']}")
+        db.update_feed(conn, feed_id, last_fetched_at=db.now_iso(),
+                       last_status=held)
+        return held
+    if disc.get("answered"):
+        mark_llm_up(conn)             # the model answered: outage over
     db.log_usage(conn, llm.provider, llm.model or "auto",
                  disc["usage"]["prompt_tokens"], disc["usage"]["completion_tokens"],
                  duration_ms=disc_ms, purpose="discovery")
