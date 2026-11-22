@@ -2954,6 +2954,49 @@ def test_backfilled_unread_surfaces_above_read_posts(ui_server, browser):
     pg.close()
 
 
+def test_feed_count_reads_as_metadata_not_unread(ui_server, browser):
+    """The zero-unread total must not read as an unread count (the HF
+    '300 for weeks' misread): it recedes - smaller than the feed name and
+    dimmed - while the REAL unread pill keeps its accent fill."""
+    fid = _mkfeed("countmute")
+    for i in (1, 2):
+        _seed_article(fid, f"cm{i}", title=f"count probe {i}",
+                      ts=f"2027-12-0{i}T00:00:00Z", summary="count digest")
+    from rssgate import db
+    conn = db.connect(UI_DB)
+    conn.execute("UPDATE articles SET read_at=? WHERE feed_id=?",
+                 (db.now_iso(), fid))
+    conn.commit()
+    pg = _new_page(browser)
+    pg.goto(ui_server, wait_until="networkidle")
+    cnt = pg.locator(f"#feed-filter li[data-feed='{fid}'] .feed-count")
+    assert cnt.count() == 1 and cnt.inner_text() == "2"
+    st = cnt.evaluate("""el => { const cs = getComputedStyle(el);
+        const name = getComputedStyle(el.closest('li').querySelector('.fname'));
+        return {op: cs.opacity, fs: parseFloat(cs.fontSize),
+                nfs: parseFloat(name.fontSize)}; }""")
+    assert float(st["op"]) < 1.0, "the count must recede"
+    assert st["fs"] < st["nfs"], "smaller than the feed name"
+
+    # the one loud number stays the unread pill
+    fid2 = _mkfeed("countaccent")
+    _seed_article(fid2, "ca1", title="accent probe",
+                  ts="2027-12-05T00:00:00Z", summary="accent digest")
+    pg.reload(wait_until="networkidle")
+    pill = pg.locator(f"#feed-filter li[data-feed='{fid2}'] .unread-pill")
+    assert pill.count() == 1
+    bg = pill.evaluate("el => getComputedStyle(el).backgroundColor")
+    accent = pg.evaluate("() => getComputedStyle(document.documentElement)"
+                         ".getPropertyValue('--accent').trim()")
+
+    def to_rgb(v):
+        v = v.lstrip("#")
+        return "rgb(%d, %d, %d)" % tuple(int(v[i:i + 2], 16) for i in (0, 2, 4))
+    assert bg == to_rgb(accent), "the unread pill keeps the accent"
+    assert pg.errors == []
+    pg.close()
+
+
 def test_queued_pip_does_not_wear_the_unread_green(ui_server, browser):
     """Regression: the queue pip carried .pip-ok (success green), so a backlog
     of posts waiting to be digested read as unread posts. It must render in

@@ -89,6 +89,10 @@ body { margin:0; background:var(--bg); color:var(--text);
 #feed-filter .fname { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #feed-filter .unread-pill { background:var(--accent); color:#fff; border-radius:999px;
   min-width:20px; text-align:center; padding:0 6px; font-size:.72rem; align-self:center; }
+/* the zero-unread total is METADATA, never a count to clear (a rolling
+   sync-deletes feed shows its constant window size - the HF "300 for
+   weeks" misread): smaller than the name and dimmed, all feeds alike */
+#feed-filter .feed-count { font-size:.68rem; opacity:.7; }
 .card.unread { border-left:3px solid var(--accent); }
 .newdot { width:8px; height:8px; border-radius:50%; background:var(--accent);
   display:inline-block; flex:none; }

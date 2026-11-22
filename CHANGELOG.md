@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.93.6] — 2026-11-22 - the sidebar total reads as metadata, not a to-do
+
+"The huggingface feed has shown 300 posts for weeks" was neither the
+feed nor a bug: that feed is a rolling 300-model trending window
+(sync_deletes keeps our rows equal to the current window), zero unread,
+all healthy - the sidebar was showing its TOTAL article count, the
+fallback it uses when a feed has no unread. But a bare number where the
+unread badge lives reads as a to-do forever, so the fallback is now
+distinctively metadata: smaller than the feed name and dimmed
+(.feed-count, opacity .7), for every feed - a constant window size is
+misleading on a rolling feed and merely library-size on a normal one,
+one visual language beats two greys. The unread pill keeps its accent
+fill (browser test asserts both: the count recedes, the pill stays loud;
+CSS canary red first). The count itself was always muted ink - the
+confusability was shape and position, which is why muting alone wasn't
+enough.
+
 ## [0.93.5] — 2026-11-12 - training-window outages: discovery and rescue hold too
 
 The LLM backend goes down for hours at a time for model training (five

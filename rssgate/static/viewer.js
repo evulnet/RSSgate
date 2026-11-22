@@ -1394,7 +1394,7 @@
       + feeds.map(f => `<li data-feed="${f.id}" class="${store.feed == f.id ? 'active' : ''}"
            title="${esc(f.url)}"><span class="fname">${esc(f.display_title || f.title || f.url)}</span>
            ${f.unread ? `<b class="unread-pill">${f.unread}</b>`
-                      : `<span>${f.article_count}</span>`}</li>`)
+                      : `<span class="feed-count">${f.article_count}</span>`}</li>`)
           .join('');
     ul.querySelectorAll('li').forEach(li =>
       li.addEventListener('click', () => setFeedFilter(li.dataset.feed)));
